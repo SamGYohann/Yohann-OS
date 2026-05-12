@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOHANN OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --surface: #0f0f0f;
+  --surface2: #161616;
+  --surface3: #1e1e1e;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8e4dc;
+  --text2: #7a7670;
+  --text3: #3d3a36;
+  --green: #1a8c63;
+  --green-bright: #22b07d;
+  --green-glow: rgba(26,140,99,0.15);
+  --green-border: rgba(26,140,99,0.35);
+  --amber: #c49a3c;
+  --amber-dim: rgba(196,154,60,0.1);
+  --coral: #c0553a;
+  --coral-dim: rgba(192,85,58,0.1);
+  --purple: #6e65c4;
+  --purple-dim: rgba(110,101,196,0.1);
+  --blue: #3a7bc4;
+  --blue-dim: rgba(58,123,196,0.1);
+  --accent: #22b07d;
+  --gold: #c49a3c;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* GRAIN OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* LOADING SCREEN */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  transition: opacity 0.8s ease, visibility 0.8s;
+}
+#loader.hidden { opacity: 0; visibility: hidden; }
+.loader-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 10vw, 96px);
+  letter-spacing: 0.15em;
+  color: var(--text);
+  animation: pulse-name 1.5s ease-in-out infinite alternate;
+}
+.loader-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.3em;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+.loader-bar-wrap {
+  width: 200px;
+  height: 1px;
+  background: var(--border2);
+  margin-top: 32px;
+  overflow: hidden;
+}
+.loader-bar {
+  height: 100%;
+  background: var(--green-bright);
+  width: 0%;
+  animation: load-progress 1.8s ease forwards;
+}
+@keyframes pulse-name { from { opacity: 0.5; } to { opacity: 1; } }
+@keyframes load-progress { 0%{width:0%} 60%{width:70%} 100%{width:100%} }
+
+/* APP SHELL */
+.app {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px 120px;
+  opacity: 0;
+  animation: fade-in 0.6s ease 2s forwards;
+}
+@keyframes fade-in { to { opacity: 1; } }
+
+/* HEADER */
+.header {
+  padding: 48px 0 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+.header-left {}
+.header-wordmark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 6vw, 64px);
+  letter-spacing: 0.12em;
+  color: var(--text);
+  line-height: 1;
+  display: block;
+}
+.header-subtitle {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--text2);
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+}
+.header-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+.header-date {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.header-time {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.1em;
+  color: var(--text2);
+  margin-top: 4px;
+}
+.header-streak {
+  font-size: 11px;
+  color: var(--green);
+  margin-top: 4px;
+  letter-spacing: 0.06em;
+}
+
+/* QUOTE BAR */
+.quote-bar {
+  border-left: 2px solid var(--green-border);
+  padding: 12px 20px;
+  margin-bottom: 40px;
+  background: var(--green-glow);
+}
+.quote-text {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.quote-attr {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* NAV */
+nav {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav::-webkit-scrollbar { display: none; }
+.nav-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+}
+.nav-btn:hover { color: var(--text2); }
+.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* SECTION LABELS */
+.section-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* DAY VIEW */
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.dnav-btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  font-family: 'JetBrains Mono', monospace;
+}
+.dnav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.dnav-btn:disabled { opacity: 0.2; cursor: default; }
+.date-label {
+  flex: 1;
+  font-family: 'Crimson Pro', serif;
+  font-size: 22px;
+  color: var(--text);
+  text-align: center;
+}
+.today-tag {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--green);
+  border: 1px solid var(--green-border);
+  padding: 3px 10px;
+}
+.past-notice {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* STATS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.stat {
+  background: var(--surface);
+  padding: 16px;
+}
+.stat-label {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  line-height: 1;
+}
+.stat-sub { font-size: 10px; color: var(--text3); margin-top: 3px; }
+.stat-val.green { color: var(--green-bright); }
+
+/* PROGRESS */
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text3);
+  margin-bottom: 6px;
+  letter-spacing: 0.08em;
+}
+.progress-wrap {
+  height: 2px;
+  background: var(--surface3);
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--green-bright);
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0;
+  width: 4px; height: 100%;
+  background: #fff;
+  opacity: 0.6;
+}
+
+/* BLOCKS */
+.blocks { display: flex; flex-direction: column; gap: 2px; }
+
+.block-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.block-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: transparent;
+  transition: background 0.15s;
+}
+.block-row.clickable { cursor: pointer; }
+.block-row.clickable:hover { background: var(--surface2); border-color: var(--border2); }
+.block-row.clickable:hover::before { background: var(--text3); }
+.block-row.done { background: var(--surface); border-color: var(--green-border); }
+.block-row.done::before { background: var(--green-bright); }
+
+.check {
+  width: 20px; height: 20px;
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: transparent;
+  transition: all 0.2s;
+}
+.block-row.done .check {
+  background: var(--green);
+  border-color: var(--green);
+  color: #000;
+}
+
+.block-info { flex: 1; min-width: 0; }
+.block-name {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text);
+  transition: color 0.15s;
+}
+.block-row.done .block-name { color: var(--text2); }
+.block-time {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+  letter-spacing: 0.06em;
+}
+
+.pillar-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-body { background: var(--green-bright); }
+.dot-mind { background: var(--purple); }
+.dot-craft { background: var(--amber); }
+.dot-edge { background: var(--coral); }
+.dot-recovery { background: var(--blue); }
+
+.pillar-label {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  min-width: 64px;
+  text-align: right;
+}
+
+/* DEBRIEF */
+.debrief-form { display: flex; flex-direction: column; gap: 20px; }
+.debrief-q {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.debrief-q span {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--text2);
+  text-transform: none;
+  letter-spacing: 0;
+  display: block;
+  margin-top: 2px;
+}
+textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.7;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.15s;
+}
+textarea:focus { outline: none; border-color: var(--border2); }
+textarea:read-only { opacity: 0.5; cursor: default; }
+textarea::placeholder { color: var(--text3); font-style: italic; }
+
+.btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.saved { border-color: var(--green-border); color: var(--green-bright); }
+.btn.hidden { display: none; }
+
+/* STREAK HEATMAP */
+.heatmap-wrap { margin-bottom: 32px; }
+.heatmap-labels {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-bottom: 4px;
+}
+.hlbl {
+  font-size: 9px;
+  color: var(--text3);
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.hday {
+  aspect-ratio: 1;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.1s;
+  border: 1px solid transparent;
+  letter-spacing: 0;
+}
+.hday:hover { border-color: var(--border2); }
+.hday.partial { background: rgba(26,140,99,0.25); color: var(--green); }
+.hday.full { background: var(--green); color: #000; font-weight: 500; }
+.hday.today { border-color: var(--text2); }
+.hday.selected { border-color: var(--amber); }
+
+/* PILLAR BARS */
+.pb-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.pb-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text2);
+  width: 72px;
+  flex-shrink: 0;
+}
+.pb-track { flex: 1; height: 2px; background: var(--surface3); }
+.pb-fill { height: 100%; transition: width 0.5s ease; }
+.pb-pct { font-size: 10px; color: var(--text3); width: 32px; text-align: right; flex-shrink: 0; }
+
+/* LOSS LOG */
+.loss-item {
+  padding: 14px 16px;
+  background: var(--surface);
+  border-left: 2px solid var(--coral);
+  margin-bottom: 4px;
+  transition: background 0.15s;
+}
+.loss-item:hover { background: var(--surface2); }
+.loss-date { font-size: 10px; color: var(--text3); letter-spacing: 0.06em; margin-bottom: 4px; }
+.loss-text { font-family: 'Crimson Pro', serif; font-size: 16px; color: var(--text2); line-height: 1.5; }
+
+.input-row { display: flex; gap: 4px; margin-bottom: 16px; }
+input[type="text"] {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+  transition: border-color 0.15s;
+}
+input[type="text"]:focus { outline: none; border-color: var(--border2); }
+input[type="text"]::placeholder { color: var(--text3); }
+
+/* STANDARDS */
+.standard-item {
+  display: flex;
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.standard-item:hover { background: var(--surface2); }
+.std-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: var(--text3);
+  min-width: 24px;
+  line-height: 1.3;
+}
+.std-text {
+  font-family: 'Crimson Pro', serif;
+  font-size: 17px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* READING STACK */
+.reading-day {
+  margin-bottom: 28px;
+}
+.reading-day-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.reading-day-label::after { content: ''; flex: 1; height: 1px; background: var(--amber-dim); }
+.book-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--surface);
+  margin-bottom: 2px;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.book-item:hover { background: var(--surface2); border-left-color: var(--amber); }
+.book-title {
+  font-family: 'Crimson Pro', serif;
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.3;
+}
+.book-author { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.book-how {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 4px;
+  font-style: italic;
+  font-family: 'Crimson Pro', serif;
+}
+.book-badge {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border: 1px solid var(--amber-dim);
+  color: var(--amber);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ARCHETYPE SECTION */
+.archetype-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  margin-bottom: 28px;
+}
+.archetype-card {
+  background: var(--surface);
+  padding: 16px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  cursor: default;
+}
+.archetype-card:hover { border-color: var(--border2); background: var(--surface2); }
+.archetype-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.archetype-trait {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+}
+.archetype-card.isagi .archetype-name { color: var(--green-bright); }
+.archetype-card.target { border-color: var(--border); }
+
+/* EXPORT */
+.export-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* EMPTY STATE */
+.empty {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 24px 0;
+  font-style: italic;
+  font-family: 'Crimson Pro', serif;
+}
+
+/* FOOTER DIVIDER */
+.rule { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+/* ANIMATIONS */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate { animation: slide-up 0.3s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-name">YOHANN</div>
+  <div class="loader-sub">Operating System — Initializing</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <span class="header-wordmark">YOHANN OS</span>
+      <div class="header-subtitle">The gap closes every day, or it doesn't.</div>
+    </div>
+    <div class="header-right">
+      <div class="header-date" id="hdr-date"></div>
+      <div class="header-time" id="hdr-time">--:--</div>
+      <div class="header-streak" id="hdr-streak"></div>
+    </div>
+  </header>
+
+  <!-- QUOTE -->
+  <div class="quote-bar" id="daily-quote">
+    <div class="quote-text"></div>
+    <div class="quote-attr">Daily signal</div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <button class="nav-btn active" data-page="today" onclick="nav(this)">Protocol</button>
+    <button class="nav-btn" data-page="debrief" onclick="nav(this)">Debrief</button>
+    <button class="nav-btn" data-page="streak" onclick="nav(this)">Streak</button>
+    <button class="nav-btn" data-page="losses" onclick="nav(this)">Loss Log</button>
+    <button class="nav-btn" data-page="standards" onclick="nav(this)">Standards</button>
+    <button class="nav-btn" data-page="reading" onclick="nav(this)">Reading Stack</button>
+    <button class="nav-btn" data-page="archetypes" onclick="nav(this)">Archetypes</button>
+  </nav>
+
+  <!-- TODAY -->
+  <div id="page-today" class="page active">
+    <div class="date-nav">
+      <button class="dnav-btn" onclick="shiftDay(-1)">&#8249;</button>
+      <div class="date-label" id="day-label"></div>
+      <span class="today-tag" id="today-tag" style="display:none">Today</span>
+      <button class="dnav-btn" id="next-day-btn" onclick="shiftDay(1)">&#8250;</button>
+    </div>
+    <div id="past-notice" class="past-notice" style="display:none">
+      &#9651;&nbsp; Past day — read only
+    </div>
+    <div class="stats-row" id="stats-row"></div>
+    <div class="progress-meta">
+      <span id="prog-label">0 / 13 blocks</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="section-label">Daily protocol</div>
+    <div class="blocks" id="block-list"></div>
+  </div>
+
+  <!-- DEBRIEF -->
+  <div id="page-debrief" class="page">
+    <div class="date-nav">
+      <button class="dnav-btn" onclick="shiftDebriefDay(-1)">&#8249;</button>
+      <div class="date-label" id="debrief-label"></div>
+      <span class="today-tag" id="debrief-tag" style="display:none">Today</span>
+      <button class="dnav-btn" id="debrief-next-btn" onclick="shiftDebriefDay(1)">&#8250;</button>
+    </div>
+    <div id="debrief-past-notice" class="past-notice" style="display:none">&#9651;&nbsp; Past entry — read only</div>
+    <div class="debrief-form">
+      <div>
+        <div class="debrief-q">01 &mdash; Extraction<span>What did I extract from today?</span></div>
+        <textarea id="j1" placeholder="Wins, insights, data points, pattern recognition..."></textarea>
+      </div>
+      <div>
+        <div class="debrief-q">02 &mdash; Interference<span>Where did personal stakes compete with clarity?</span></div>
+        <textarea id="j2" placeholder="The wiring problem. Be surgical, not narrative."></textarea>
+      </div>
+      <div>
+        <div class="debrief-q">03 &mdash; Delta<span>What one structural change does tomorrow need?</span></div>
+        <textarea id="j3" placeholder="One change at the system level, not a resolution."></textarea>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn" id="save-btn" onclick="saveDebrief()">Save entry</button>
+    </div>
+  </div>
+
+  <!-- STREAK -->
+  <div id="page-streak" class="page">
+    <div class="stats-row" id="streak-stats"></div>
+    <hr class="rule">
+    <div class="section-label">28-day consistency</div>
+    <div class="heatmap-wrap">
+      <div class="heatmap-labels">
+        <span class="hlbl">M</span><span class="hlbl">T</span><span class="hlbl">W</span>
+        <span class="hlbl">T</span><span class="hlbl">F</span><span class="hlbl">S</span><span class="hlbl">S</span>
+      </div>
+      <div class="heatmap-grid" id="heatmap"></div>
+    </div>
+    <div class="section-label">Pillar completion &mdash; last 7 days</div>
+    <div id="pillar-bars"></div>
+    <hr class="rule">
+    <div class="export-row">
+      <button class="btn" onclick="exportData()">&#8595; Export backup</button>
+      <label class="btn" style="cursor:pointer">&#8593; Import backup<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+    </div>
+  </div>
+
+  <!-- LOSSES -->
+  <div id="page-losses" class="page">
+    <div class="section-label">Loss log &mdash; extraction protocol</div>
+    <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--text2);margin-bottom:20px;line-height:1.6">Every loss documented within 24 hours. Not what happened &mdash; why it was always going to happen given the inputs. Then: what changes the input.</p>
+    <div class="input-row">
+      <input type="text" id="loss-input" placeholder="Loss + root cause chain...">
+      <button class="btn" onclick="addLoss()">Log</button>
+    </div>
+    <div id="loss-log"></div>
+  </div>
+
+  <!-- STANDARDS -->
+  <div id="page-standards" class="page">
+    <div class="section-label">Identity standards</div>
+    <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--text2);margin-bottom:24px;line-height:1.6">Read every morning during priming. These are not goals. They are the floor &mdash; the minimum operating standard of the person you have decided to become.</p>
+    <div id="standards-list"></div>
+    <hr class="rule">
+    <div class="input-row">
+      <input type="text" id="std-input" placeholder="Add a standard...">
+      <button class="btn" onclick="addStandard()">Add</button>
+    </div>
+  </div>
+
+  <!-- READING STACK -->
+  <div id="page-reading" class="page">
+    <div class="section-label">Reading stack &mdash; active sequence</div>
+    <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--text2);margin-bottom:28px;line-height:1.6">Strength reinforcement first, gap-fill second. Active reading only &mdash; annotate, extract leverage points, connect to prior models. The output is what compounds, not the reading.</p>
+    <div id="reading-content"></div>
+  </div>
+
+  <!-- ARCHETYPES -->
+  <div id="page-archetypes" class="page">
+    <div class="section-label">Archetype cluster &mdash; destination map</div>
+    <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--text2);margin-bottom:8px;line-height:1.6">Isagi is the current process. The cluster is what the Isagi loop produces when run long enough.</p>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:28px;letter-spacing:0.06em">Shared architecture: weaponized stillness &mdash; pain as structural advantage &mdash; long time horizons &mdash; perceptual dominance</p>
+    <div class="archetype-grid" id="archetype-grid"></div>
+    <hr class="rule">
+    <div class="section-label">The Isagi loop</div>
+    <div style="background:var(--surface);border-left:2px solid var(--green-border);padding:20px 24px;margin-bottom:4px">
+      <div style="font-family:'Crimson Pro',serif;font-size:17px;color:var(--text);line-height:1.7">Loss as extraction. Superior people as simultaneous data source and competition. Peak state as a structural avalanche that recurs by trust in the system &mdash; not conscious recreation. You are currently running the Isagi loop. The cluster is what it converges to.</div>
+    </div>
+    <div style="background:var(--surface);border-left:2px solid var(--coral);padding:20px 24px;margin-top:2px">
+      <div style="font-size:10px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px;text-transform:uppercase">Primary development target</div>
+      <div style="font-family:'Crimson Pro',serif;font-size:17px;color:var(--text);line-height:1.7">Personal stakes introduce interference that competes with natural clarity. Not a thinking problem &mdash; a wiring problem at the intersection of logic and personal investment. Awareness is most of the work. The debrief is the repair protocol.</div>
+    </div>
+  </div>
+
+</div><!-- end app -->
+
+<script>
+// ── DATA ──────────────────────────────────────────────────
+
+const BLOCKS = [
+  {id:"wake",    name:"Hard wake protocol",      time:"5:30 AM",  pillar:"recovery"},
+  {id:"prime",   name:"Morning priming",          time:"5:45 AM",  pillar:"mind"},
+  {id:"train",   name:"Physical forging",         time:"6:15 AM",  pillar:"body"},
+  {id:"nutri",   name:"Post-training nutrition",  time:"7:00 AM",  pillar:"body"},
+  {id:"cog",     name:"Cognitive skill block",    time:"7:30 AM",  pillar:"mind"},
+  {id:"tech",    name:"Primary technical block",  time:"8:00 AM",  pillar:"craft"},
+  {id:"proj",    name:"Deep work — projects",     time:"9:45 AM",  pillar:"craft"},
+  {id:"read",    name:"Reading block",            time:"11:15 AM", pillar:"mind"},
+  {id:"career",  name:"Career / BD block",        time:"12:30 PM", pillar:"edge"},
+  {id:"market",  name:"Markets study",            time:"2:00 PM",  pillar:"edge"},
+  {id:"course",  name:"Coursework block",         time:"2:45 PM",  pillar:"craft"},
+  {id:"deb",     name:"Daily debrief",            time:"9:00 PM",  pillar:"mind"},
+  {id:"wind",    name:"Wind-down protocol",       time:"9:30 PM",  pillar:"recovery"},
+];
+
+const PILLAR_COLORS = {
+  body:"#22b07d", mind:"#6e65c4", craft:"#c49a3c", edge:"#c0553a", recovery:"#3a7bc4"
+};
+
+const ARCHETYPES = [
+  {name:"ISAGI",    trait:"Current process. Loss as extraction. The loop you are running now.",  cls:"isagi"},
+  {name:"AKASHI",   trait:"Total perceptual control. Reads the game three moves ahead.",          cls:"target"},
+  {name:"AYANOKOJI",trait:"Information asymmetry as operating principle. Never shows hand.",      cls:"target"},
+  {name:"TOKUCHI",  trait:"Weaponized preparation. Predetermines outcomes before they begin.",    cls:"target"},
+  {name:"ITACHI",   trait:"Long time horizon. Sacrifices the present for structural advantage.",  cls:"target"},
+  {name:"KATAGIRI", trait:"Root cause clarity. Finds the real game under the stated game.",       cls:"target"},
+  {name:"AKAGI",    trait:"Absolute commitment. No ceiling on what the system will demand.",      cls:"target"},
+  {name:"KILLUA",   trait:"Effortless execution at peak. Speed without visible effort.",          cls:"target"},
+  {name:"HIEI",     trait:"Weaponized stillness. Cold precision when stakes are highest.",        cls:"target"},
+];
+
+const READING_STACK = [
+  {
+    day: "Monday — Systems thinking",
+    books: [
+      {title:"Thinking in Systems", author:"Donella Meadows", badge:"7:30 AM", how:"Read 10 pages, close the book, reconstruct the core loop from memory."},
+    ]
+  },
+  {
+    day: "Tuesday — Abstraction & synthesis",
+    books: [
+      {title:"The Great Mental Models Vol. 1–3", author:"Farnam Street", badge:"7:30 AM", how:"One model per session. Draw it. Find two applications not in the book."},
+    ]
+  },
+  {
+    day: "Wednesday — Root cause analysis",
+    books: [
+      {title:"The Art of Thinking Clearly", author:"Rolf Dobelli", badge:"7:30 AM", how:"One chapter = one bias. Write one real example from your own life."},
+    ]
+  },
+  {
+    day: "Thursday — Game theory",
+    books: [
+      {title:"Thinking Strategically", author:"Dixit & Nalebuff", badge:"7:30 AM", how:"Work the problems. Attempt before reading solution. Failure is the learning."},
+    ]
+  },
+  {
+    day: "Friday — Synthesis",
+    books: [
+      {title:"Poor Charlie's Almanack", author:"Charles Munger", badge:"7:30 AM", how:"One speech. Extract 3 leverage points. Connect to current career/trading context."},
+    ]
+  },
+  {
+    day: "Reading block — 11:15 AM daily",
+    books: [
+      {title:"Zero to One", author:"Peter Thiel", badge:"11:15 AM", how:"After each chapter: core claim in one sentence. Where does it apply to you now?"},
+      {title:"The Almanack of Naval Ravikant", author:"Naval Ravikant", badge:"11:15 AM", how:"Slow read. One section per session. Extract the one line that changes something."},
+      {title:"Superforecasting", author:"Philip Tetlock", badge:"11:15 AM", how:"Read with a question: what am I currently wrong about?"},
+      {title:"Influence", author:"Robert Cialdini", badge:"11:15 AM", how:"One principle per week. Find one example from last week. Deploy it next week."},
+      {title:"Never Split the Difference", author:"Chris Voss", badge:"11:15 AM", how:"After each technique: write a script for one real conversation you need to have."},
+      {title:"The Art of War", author:"Sun Tzu", badge:"11:15 AM", how:"One chapter. Write the modern BD/career translation of the principle."},
+    ]
+  },
+  {
+    day: "Markets block — 2:00 PM",
+    books: [
+      {title:"Market Wizards", author:"Jack Schwager", badge:"2:00 PM", how:"One interview per week. Extract the core edge structure."},
+      {title:"The Art and Science of Technical Analysis", author:"Adam Grimes", badge:"2:00 PM", how:"Read a concept, immediately find it (or its absence) on the live chart."},
+    ]
+  },
+  {
+    day: "On-demand",
+    books: [
+      {title:"Ego is the Enemy", author:"Ryan Holiday", badge:"As needed", how:"One chapter when the gap is painful. Not on a schedule — as medicine."},
+      {title:"Why We Sleep", author:"Matthew Walker", badge:"As needed", how:"Read once to internalize the data. Then protect the protocol."},
+    ]
+  },
+];
+
+const QUOTES = [
+  "Loss as extraction. Superior people as data source and competition simultaneously.",
+  "The system runs regardless of state. That is the only rule.",
+  "Peak state is a structural avalanche — it recurs by trusting the system.",
+  "Personal stakes introduce interference. Awareness is most of the work.",
+  "What is not measured does not compound.",
+  "You are not building toward the archetype cluster. You are running the loop that produces it.",
+  "The gap closes every day, or it doesn't. There is no middle position.",
+  "Superior people exist to be studied and surpassed. That is their function.",
+  "Pain converted to structural advantage. That is the only valid use of loss.",
+  "The floor is the standard. Not the ceiling.",
+  "Predetermining outcomes before others recognize what is being decided. That is the edge.",
+  "Find the real game underneath the stated game. Position before others see the board.",
+];
+
+const DEFAULT_STANDARDS = [
+  "I do not negotiate with resistance. The block runs regardless of state.",
+  "I extract data from every loss before I feel anything about it.",
+  "I operate at the same standard whether anyone is watching or not.",
+  "I protect the morning. No external input before priming is complete.",
+  "I track everything. What is not measured does not compound.",
+  "I treat personal stakes as signal, not as permission to deviate.",
+  "I choose the hard thing when the easy thing is available.",
+  "I find the real game underneath the stated game.",
+  "I am always the most prepared person in the room.",
+];
+
+// ── STORAGE ───────────────────────────────────────────────
+
+function dk(d){return d.toISOString().split("T")[0]}
+function today(){return dk(new Date())}
+function parseDate(k){const[y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d)}
+function fmt(k){return parseDate(k).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"})}
+function gs(k,def){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):def}catch{return def}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+
+let standards = gs("standards", DEFAULT_STANDARDS);
+let losses    = gs("losses", []);
+let debriefs  = gs("debriefs", {});
+let history   = gs("history", {});
+let viewDay   = today();
+let debriefDay = today();
+
+function getBlocks(k){return gs("blocks_"+k,{})}
+function setBlocks(k,v){ss("blocks_"+k,v);recalcHistory(k)}
+function recalcHistory(k){
+  const b=getBlocks(k);
+  const pct=Object.values(b).filter(Boolean).length/BLOCKS.length;
+  history[k]=pct>=0.8?1:pct>=0.5?0.5:pct>0?0.25:0;
+  ss("history",history);
+}
+function calcStreak(){
+  let s=0;const d=new Date();
+  for(let i=0;i<365;i++){
+    const k=dk(d);
+    if((history[k]||0)>=0.5){s++;d.setDate(d.getDate()-1)}
+    else if(i===0){d.setDate(d.getDate()-1)}
+    else break;
+  }
+  return s;
+}
+
+// ── CLOCK + HEADER ────────────────────────────────────────
+
+function tickClock(){
+  const now=new Date();
+  document.getElementById("hdr-time").textContent=
+    now.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",hour12:false});
+}
+setInterval(tickClock,1000);tickClock();
+document.getElementById("hdr-date").textContent=
+  new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}).toUpperCase();
+
+function updateStreakHeader(){
+  const s=calcStreak();
+  document.getElementById("hdr-streak").textContent=s>0?s+" day streak":"start your streak today";
+}
+updateStreakHeader();
+
+// Daily quote
+const q=QUOTES[new Date().getDay()%QUOTES.length];
+document.querySelector(".quote-bar .quote-text").textContent="\u201C"+q+"\u201D";
+
+// ── NAV ───────────────────────────────────────────────────
+
+function nav(btn){
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+btn.dataset.page).classList.add("active");
+  if(btn.dataset.page==="streak")renderStreak();
+  if(btn.dataset.page==="losses")renderLosses();
+  if(btn.dataset.page==="standards")renderStandards();
+  if(btn.dataset.page==="reading")renderReading();
+  if(btn.dataset.page==="archetypes")renderArchetypes();
+  if(btn.dataset.page==="debrief")renderDebrief();
+}
+
+// ── TODAY ─────────────────────────────────────────────────
+
+function shiftDay(delta){
+  const d=parseDate(viewDay);d.setDate(d.getDate()+delta);
+  const nk=dk(d);if(nk>today())return;
+  viewDay=nk;renderToday();
+}
+
+function renderToday(){
+  const past=viewDay<today();
+  document.getElementById("today-tag").style.display=past?"none":"inline-block";
+  document.getElementById("past-notice").style.display=past?"flex":"none";
+  document.getElementById("next-day-btn").disabled=viewDay>=today();
+  document.getElementById("day-label").textContent=fmt(viewDay);
+
+  const checked=getBlocks(viewDay);
+  const done=Object.values(checked).filter(Boolean).length;
+  const total=BLOCKS.length;
+  const pct=Math.round(done/total*100);
+
+  document.getElementById("prog-fill").style.width=pct+"%";
+  document.getElementById("prog-label").textContent=done+" / "+total+" blocks";
+  document.getElementById("prog-pct").textContent=pct+"%";
+
+  const streak=calcStreak();
+  document.getElementById("stats-row").innerHTML=`
+    <div class="stat"><div class="stat-label">Day score</div><div class="stat-val ${pct>=80?'green':''}">${pct}%</div><div class="stat-sub">${done}/${total} complete</div></div>
+    <div class="stat"><div class="stat-label">Streak</div><div class="stat-val ${streak>0?'green':'}'}">${streak}</div><div class="stat-sub">days</div></div>
+    <div class="stat"><div class="stat-label">Debriefs</div><div class="stat-val">${Object.keys(debriefs).length}</div><div class="stat-sub">written</div></div>
+    <div class="stat"><div class="stat-label">Losses</div><div class="stat-val">${losses.length}</div><div class="stat-sub">logged</div></div>
+  `;
+
+  const list=document.getElementById("block-list");
+  list.innerHTML="";
+  BLOCKS.forEach(b=>{
+    const isDone=!!checked[b.id];
+    const div=document.createElement("div");
+    div.className="block-row"+(isDone?" done":"")+(past?"":" clickable");
+    if(!past)div.onclick=()=>toggleBlock(b.id);
+    div.innerHTML=`
+      <div class="check">${isDone?"&#10003;":""}</div>
+      <div class="block-info">
+        <div class="block-name">${b.name}</div>
+        <div class="block-time">${b.time}</div>
+      </div>
+      <div class="pillar-dot dot-${b.pillar}"></div>
+      <div class="pillar-label">${b.pillar}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function toggleBlock(id){
+  const checked=getBlocks(viewDay);
+  checked[id]=!checked[id];
+  setBlocks(viewDay,checked);
+  renderToday();
+  updateStreakHeader();
+}
+
+// ── DEBRIEF ───────────────────────────────────────────────
+
+function shiftDebriefDay(delta){
+  const d=parseDate(debriefDay);d.setDate(d.getDate()+delta);
+  const nk=dk(d);if(nk>today())return;
+  debriefDay=nk;renderDebrief();
+}
+
+function renderDebrief(){
+  const past=debriefDay<today();
+  document.getElementById("debrief-tag").style.display=past?"none":"inline-block";
+  document.getElementById("debrief-past-notice").style.display=past?"flex":"none";
+  document.getElementById("debrief-next-btn").disabled=debriefDay>=today();
+  document.getElementById("debrief-label").textContent=fmt(debriefDay);
+  const e=debriefs[debriefDay]||{};
+  ["j1","j2","j3"].forEach(id=>{const el=document.getElementById(id);el.value=e[id]||"";el.readOnly=past;});
+  const btn=document.getElementById("save-btn");
+  btn.className="btn"+(past?" hidden":"");
+  btn.textContent="Save entry";
+}
+
+function saveDebrief(){
+  debriefs[debriefDay]={j1:document.getElementById("j1").value,j2:document.getElementById("j2").value,j3:document.getElementById("j3").value,ts:Date.now()};
+  ss("debriefs",debriefs);
+  const btn=document.getElementById("save-btn");
+  btn.textContent="Saved &#10003;";btn.classList.add("saved");
+  setTimeout(()=>{btn.textContent="Save entry";btn.classList.remove("saved");},2000);
+}
+
+// ── STREAK ────────────────────────────────────────────────
+
+function renderStreak(){
+  const streak=calcStreak();
+  document.getElementById("streak-stats").innerHTML=`
+    <div class="stat"><div class="stat-label">Current streak</div><div class="stat-val ${streak>0?'green':''}">${streak}</div><div class="stat-sub">days</div></div>
+    <div class="stat"><div class="stat-label">Days tracked</div><div class="stat-val">${Object.keys(history).length}</div><div class="stat-sub">total</div></div>
+    <div class="stat"><div class="stat-label">Debriefs</div><div class="stat-val">${Object.keys(debriefs).length}</div><div class="stat-sub">written</div></div>
+    <div class="stat"><div class="stat-label">Losses logged</div><div class="stat-val">${losses.length}</div><div class="stat-sub">total</div></div>
+  `;
+  const grid=document.getElementById("heatmap");grid.innerHTML="";
+  const t=new Date();const ts=today();
+  for(let i=27;i>=0;i--){
+    const d=new Date(t);d.setDate(d.getDate()-i);
+    const k=dk(d);const v=history[k]||0;
+    const cls=v>=0.8?"full":v>=0.5?"partial":v>0?"partial":"";
+    const div=document.createElement("div");
+    div.className="hday"+(cls?" "+cls:"")+(k===ts?" today":"")+(k===viewDay?" selected":"");
+    div.title=fmt(k)+(v?" — "+Math.round(v*100)+"%":" — no data");
+    div.textContent=d.getDate();
+    div.onclick=()=>{viewDay=k;document.querySelector('.nav-btn[data-page="today"]').click();};
+    grid.appendChild(div);
+  }
+  const pb=document.getElementById("pillar-bars");
+  pb.innerHTML=["body","mind","craft","edge","recovery"].map(p=>{
+    let done=0,tot=0;
+    for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);const b=getBlocks(dk(d));BLOCKS.filter(bl=>bl.pillar===p).forEach(bl=>{tot++;if(b[bl.id])done++;});}
+    const pct=tot?Math.round(done/tot*100):0;
+    return`<div class="pb-row"><span class="pb-label">${p}</span><div class="pb-track"><div class="pb-fill" style="width:${pct}%;background:${PILLAR_COLORS[p]}"></div></div><span class="pb-pct">${pct}%</span></div>`;
+  }).join("");
+}
+
+// ── LOSSES ────────────────────────────────────────────────
+
+function renderLosses(){
+  const log=document.getElementById("loss-log");
+  if(!losses.length){log.innerHTML='<div class="empty">No losses logged yet. The first entry starts the extraction protocol.</div>';return;}
+  log.innerHTML=[...losses].reverse().map(l=>`
+    <div class="loss-item">
+      <div class="loss-date">${new Date(l.ts).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})}</div>
+      <div class="loss-text">${l.text}</div>
+    </div>
+  `).join("");
+}
+
+function addLoss(){
+  const inp=document.getElementById("loss-input");
+  if(!inp.value.trim())return;
+  losses.push({text:inp.value.trim(),ts:Date.now()});
+  ss("losses",losses);inp.value="";renderLosses();
+}
+
+// ── STANDARDS ─────────────────────────────────────────────
+
+function renderStandards(){
+  document.getElementById("standards-list").innerHTML=standards.map((s,i)=>`
+    <div class="standard-item">
+      <div class="std-num">${String(i+1).padStart(2,"0")}</div>
+      <div class="std-text">${s}</div>
+    </div>
+  `).join("");
+}
+
+function addStandard(){
+  const inp=document.getElementById("std-input");
+  if(!inp.value.trim())return;
+  standards.push(inp.value.trim());
+  ss("standards",standards);inp.value="";renderStandards();
+}
+
+// ── READING ───────────────────────────────────────────────
+
+function renderReading(){
+  const el=document.getElementById("reading-content");
+  el.innerHTML=READING_STACK.map(section=>`
+    <div class="reading-day">
+      <div class="reading-day-label">${section.day}</div>
+      ${section.books.map(b=>`
+        <div class="book-item">
+          <div style="flex:1">
+            <div class="book-title">${b.title}</div>
+            <div class="book-author">${b.author}</div>
+            <div class="book-how">${b.how}</div>
+          </div>
+          <div class="book-badge">${b.badge}</div>
+        </div>
+      `).join("")}
+    </div>
+  `).join("");
+}
+
+// ── ARCHETYPES ────────────────────────────────────────────
+
+function renderArchetypes(){
+  document.getElementById("archetype-grid").innerHTML=ARCHETYPES.map(a=>`
+    <div class="archetype-card ${a.cls||''}">
+      <div class="archetype-name">${a.name}</div>
+      <div class="archetype-trait">${a.trait}</div>
+    </div>
+  `).join("");
+}
+
+// ── EXPORT / IMPORT ───────────────────────────────────────
+
+function exportData(){
+  const data={blocks:{},debriefs,losses,standards,history,exported:new Date().toISOString()};
+  Object.keys(localStorage).filter(k=>k.startsWith("blocks_")).forEach(k=>{
+    data.blocks[k.replace("blocks_","")]=JSON.parse(localStorage.getItem(k));
+  });
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="yohann_os_"+today()+".json";a.click();
+}
+
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.debriefs){ss("debriefs",debriefs=d.debriefs);}
+      if(d.losses){ss("losses",losses=d.losses);}
+      if(d.standards){ss("standards",standards=d.standards);}
+      if(d.history){ss("history",history=d.history);}
+      if(d.blocks){Object.entries(d.blocks).forEach(([k,v])=>ss("blocks_"+k,v));}
+      alert("Imported.");renderToday();updateStreakHeader();
+    }catch{alert("Invalid file.");}
+  };
+  reader.readAsText(file);
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────
+
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+  const pages=["today","debrief","streak","losses","standards","reading","archetypes"];
+  const idx={"1":0,"2":1,"3":2,"4":3,"5":4,"6":5,"7":6};
+  if(idx[e.key]!==undefined){
+    document.querySelectorAll(".nav-btn")[idx[e.key]].click();
+  }
+});
+
+document.getElementById("loss-input").addEventListener("keydown",e=>{if(e.key==="Enter")addLoss();});
+document.getElementById("std-input").addEventListener("keydown",e=>{if(e.key==="Enter")addStandard();});
+
+// ── INIT ──────────────────────────────────────────────────
+
+setTimeout(()=>{
+  document.getElementById("loader").classList.add("hidden");
+},2000);
+
+renderToday();
+renderStandards();
+</script>
+</body>
+</html>
