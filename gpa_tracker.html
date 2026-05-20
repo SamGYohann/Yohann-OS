@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPA Tracker — Yohann OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--s1:#0f0f0f;--s2:#161616;--s3:#1e1e1e;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);
+  --t1:#e8e4dc;--t2:#7a7670;--t3:#3d3a36;
+  --green:#1a8c63;--gb:#22b07d;--gdim:rgba(26,140,99,0.12);--gbdr:rgba(26,140,99,0.35);
+  --amber:#c49a3c;--adim:rgba(196,154,60,0.1);--abdr:rgba(196,154,60,0.3);
+  --coral:#c0553a;--cdim:rgba(192,85,58,0.1);--cbdr:rgba(192,85,58,0.3);
+  --purple:#6e65c4;--pdim:rgba(110,101,196,0.1);--pbdr:rgba(110,101,196,0.3);
+  --blue:#3a7bc4;--bbdr:rgba(58,123,196,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35}
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;transition:opacity 0.8s ease,visibility 0.8s}
+#loader.hidden{opacity:0;visibility:hidden}
+.l-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,88px);letter-spacing:0.15em;animation:lpulse 1.5s ease-in-out infinite alternate;color:var(--purple)}
+.l-sub{font-size:10px;color:var(--t3);letter-spacing:0.3em;text-transform:uppercase;margin-top:8px}
+.l-bar-wrap{width:160px;height:1px;background:var(--b2);margin-top:28px;overflow:hidden}
+.l-bar{height:100%;background:var(--purple);width:0%;animation:lbar 1.8s ease forwards}
+@keyframes lpulse{from{opacity:0.4}to{opacity:1}}
+@keyframes lbar{0%{width:0%}60%{width:70%}100%{width:100%}}
+.app{max-width:900px;margin:0 auto;padding:0 28px 100px;opacity:0;animation:fadein 0.6s ease 2s forwards}
+@keyframes fadein{to{opacity:1}}
+
+.header{padding:44px 0 24px;border-bottom:1px solid var(--b1);margin-bottom:32px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.h-wordmark{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);letter-spacing:0.12em;line-height:1;color:var(--purple)}
+.h-sub{font-family:'Crimson Pro',serif;font-style:italic;font-size:15px;color:var(--t2);margin-top:6px}
+
+.tab-nav{display:flex;gap:2px;margin-bottom:32px;border-bottom:1px solid var(--b1);overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tnb{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:11px 16px;border:none;background:transparent;color:var(--t3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+.tnb:hover{color:var(--t2)}
+.tnb.active{color:var(--purple);border-bottom-color:var(--purple)}
+.tab{display:none}.tab.active{display:block}
+
+.slbl{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.slbl::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:24px}
+.stat{background:var(--s1);padding:14px 16px}
+.stat-l{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.stat-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.05em;color:var(--t1);line-height:1}
+.stat-v.g{color:var(--gb)}.stat-v.a{color:var(--amber)}.stat-v.c{color:var(--coral)}.stat-v.p{color:var(--purple)}
+.stat-s{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* GPA DISPLAY */
+.gpa-hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:24px}
+.gpa-cell{background:var(--s1);padding:20px}
+.gpa-label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.gpa-val{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,72px);letter-spacing:0.05em;line-height:1}
+.gpa-sub{font-size:10px;color:var(--t3);margin-top:5px}
+.gpa-trend{font-size:11px;margin-top:6px;letter-spacing:0.04em}
+.trend-up{color:var(--gb)}.trend-down{color:var(--coral)}.trend-flat{color:var(--amber)}
+
+/* TRAJECTORY CHART */
+.traj-wrap{background:var(--s1);border:1px solid var(--b1);padding:20px;margin-bottom:24px}
+.traj-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.traj-title{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3)}
+.traj-legend{display:flex;gap:14px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t3)}
+.leg-dot{width:6px;height:6px;border-radius:50%}
+
+/* MATH PANEL */
+.math-panel{background:var(--s1);border:1px solid var(--b1);padding:20px;margin-bottom:24px}
+.math-title{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--t3);margin-bottom:14px}
+.math-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-bottom:16px}
+.math-cell{background:var(--s2);padding:14px}
+.math-label{font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px}
+.math-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--t1);line-height:1;letter-spacing:0.05em}
+.math-val.g{color:var(--gb)}.math-val.a{color:var(--amber)}.math-val.c{color:var(--coral)}.math-val.p{color:var(--purple)}
+.math-sub{font-size:10px;color:var(--t3);margin-top:3px}
+.math-needed{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6;padding:14px 16px;background:var(--s2);border-left:2px solid var(--abdr)}
+
+/* NEEDED PER TERM TABLE */
+.scenario-table{width:100%;border-collapse:collapse;margin-bottom:24px}
+.scenario-table th{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);padding:8px 12px;text-align:left;border-bottom:1px solid var(--b1);background:var(--s2)}
+.scenario-table td{padding:10px 12px;border-bottom:1px solid var(--b1);font-size:12px;color:var(--t2);background:var(--s1)}
+.scenario-table tr:hover td{background:var(--s2)}
+.scenario-table .highlight td{background:var(--adim);color:var(--t1)}
+.scenario-table .grade-mix{font-family:'Crimson Pro',serif;font-style:italic;color:var(--t3);font-size:11px}
+
+/* CHAIN */
+.chain-wrap{display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:4px;margin-bottom:24px}
+.chain-node{background:var(--s1);border:1px solid var(--b1);padding:12px 14px;text-align:center;flex-shrink:0;min-width:90px;position:relative}
+.chain-node.completed{border-color:var(--gbdr);background:var(--gdim)}
+.chain-node.current{border-color:var(--abdr);background:var(--adim)}
+.chain-node.locked{opacity:0.4}
+.chain-node.critical{border-color:var(--cbdr)}
+.cn-code{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:var(--t1);letter-spacing:0.06em}
+.cn-term{font-size:9px;color:var(--t3);margin-top:2px;letter-spacing:0.06em}
+.cn-grade{font-family:'Bebas Neue',sans-serif;font-size:18px;margin-top:4px;line-height:1}
+.cn-status{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;margin-top:3px}
+.chain-arrow{font-size:18px;color:var(--t3);padding:0 6px;flex-shrink:0}
+
+/* TRANSCRIPT TABLE */
+.term-block{margin-bottom:20px}
+.term-header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--s2);border:1px solid var(--b1);cursor:pointer;transition:background 0.15s}
+.term-header:hover{background:var(--s3)}
+.term-name{font-size:11px;font-weight:500;color:var(--t1);flex:1;letter-spacing:0.04em}
+.term-gpa-badge{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.05em}
+.term-credits{font-size:10px;color:var(--t3)}
+.term-standing{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border:1px solid;flex-shrink:0}
+.standing-good{border-color:var(--gbdr);color:var(--gb)}
+.standing-warning{border-color:var(--abdr);color:var(--amber)}
+.standing-probation{border-color:var(--cbdr);color:var(--coral)}
+.standing-suspension{border-color:var(--cbdr);color:var(--coral);background:var(--cdim)}
+.standing-current{border-color:var(--bbdr);color:var(--blue)}
+.term-courses{display:none;border:1px solid var(--b1);border-top:none}
+.term-block.open .term-courses{display:block}
+.course-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--b1);transition:background 0.15s}
+.course-row:last-child{border-bottom:none}
+.course-row:hover{background:var(--s2)}
+.course-code{font-size:11px;color:var(--amber);min-width:90px;flex-shrink:0;letter-spacing:0.04em}
+.course-name{font-size:12px;color:var(--t2);flex:1}
+.course-credits{font-size:10px;color:var(--t3);min-width:40px;text-align:center;flex-shrink:0}
+.course-grade{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:32px;text-align:center;flex-shrink:0}
+.grade-A{color:var(--gb)}.grade-B{color:var(--amber)}.grade-C{color:var(--coral)}.grade-D{color:var(--coral)}.grade-F{color:var(--coral)}.grade-W{color:var(--t3)}.grade-IP{color:var(--blue)}.grade-P{color:var(--gb)}
+.course-qp{font-size:10px;color:var(--t3);min-width:40px;text-align:right;flex-shrink:0}
+.course-flag{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 6px;border:1px solid;flex-shrink:0}
+.flag-fire{border-color:var(--cbdr);color:var(--coral)}
+.flag-tier-a{border-color:var(--abdr);color:var(--amber)}
+.flag-repeat{border-color:var(--pbdr);color:var(--purple)}
+.flag-ip{border-color:var(--bbdr);color:var(--blue)}
+
+/* CURRENT TERM */
+.curr-course{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;transition:all 0.15s}
+.curr-course:hover{background:var(--s2)}
+.curr-importance{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border:1px solid;flex-shrink:0;min-width:70px;text-align:center}
+.imp-critical{border-color:var(--cbdr);color:var(--coral)}
+.imp-important{border-color:var(--abdr);color:var(--amber)}
+.imp-standard{border-color:var(--b1);color:var(--t3)}
+.curr-name{font-size:13px;color:var(--t1);flex:1}
+.curr-code{font-size:10px;color:var(--amber);margin-top:1px}
+.curr-grade-select{background:var(--s2);border:1px solid var(--b1);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t1);cursor:pointer;min-width:120px;flex-shrink:0;transition:border-color 0.15s}
+.curr-grade-select:focus{outline:none;border-color:var(--b2)}
+.curr-grade-select option{background:var(--s2)}
+.curr-projected{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:36px;text-align:center;flex-shrink:0}
+.curr-notes{font-size:10px;color:var(--t3);margin-top:2px;font-family:'Crimson Pro',serif;font-style:italic}
+
+/* GRADE MIX */
+.mix-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-bottom:16px}
+.mix-cell{background:var(--s1);border:1px solid var(--b1);padding:12px;text-align:center;cursor:pointer;transition:all 0.15s}
+.mix-cell:hover{background:var(--s2)}
+.mix-cell.active{border-color:var(--abdr);background:var(--adim)}
+.mix-grade{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.05em;line-height:1}
+.mix-gpa{font-size:10px;color:var(--t3);margin-top:4px}
+
+/* ALERT */
+.alert{padding:14px 18px;border-left:3px solid;margin-bottom:16px}
+.alert-red{border-color:var(--coral);background:var(--cdim)}
+.alert-amber{border-color:var(--amber);background:var(--adim)}
+.alert-green{border-color:var(--green);background:var(--gdim)}
+.alert-title{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px}
+.alert-text{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6}
+
+.rule{border:none;border-top:1px solid var(--b1);margin:24px 0}
+.btn{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:10px 18px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--purple);color:var(--purple)}
+input[type="number"],select{background:var(--s2);border:1px solid var(--b1);padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t1);transition:border-color 0.15s}
+input:focus,select:focus{outline:none;border-color:var(--b2)}
+.flbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.empty{font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t3);padding:20px 0}
+</style>
+</head>
+<body>
+<div id="loader">
+  <div class="l-name">GPA</div>
+  <div class="l-sub">Academic Tracker — Yohann OS</div>
+  <div class="l-bar-wrap"><div class="l-bar"></div></div>
+</div>
+
+<div class="app">
+<header class="header">
+  <div>
+    <div class="h-wordmark">GPA Tracker</div>
+    <div class="h-sub">The transcript is the door. The trend is the argument. Spring 2026: 3.40. Fall 2025: 3.67. The upward trajectory is real — now it has to stay real.</div>
+  </div>
+  <div style="font-size:10px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;text-align:right" id="hdr-date"></div>
+</header>
+
+<div class="tab-nav">
+  <button class="tnb active" data-tab="overview" onclick="switchTab(this)">Overview</button>
+  <button class="tnb" data-tab="current" onclick="switchTab(this)">Fall 2026</button>
+  <button class="tnb" data-tab="math" onclick="switchTab(this)">GPA math</button>
+  <button class="tnb" data-tab="chain" onclick="switchTab(this)">FIRE chain</button>
+  <button class="tnb" data-tab="transcript" onclick="switchTab(this)">Full transcript</button>
+  <button class="tnb" data-tab="roadmap" onclick="switchTab(this)">Course roadmap</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="tab-overview" class="tab active">
+  <div id="alert-zone"></div>
+  <div class="gpa-hero" id="gpa-hero"></div>
+  <div class="stats" id="overview-stats"></div>
+  <div class="slbl">GPA trajectory — term by term</div>
+  <div class="traj-wrap">
+    <div class="traj-header">
+      <div class="traj-title">Institutional GPA per term</div>
+      <div class="traj-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Term GPA</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--amber)"></div>Cumulative GPA</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--gb);border:1px dashed"></div>2.9 target</div>
+      </div>
+    </div>
+    <canvas id="traj-canvas" height="120" style="width:100%;display:block"></canvas>
+  </div>
+  <div class="slbl">What the trend says</div>
+  <div id="trend-analysis"></div>
+</div>
+
+<!-- CURRENT TERM -->
+<div id="tab-current" class="tab">
+  <div class="alert alert-red" style="margin-bottom:24px">
+    <div class="alert-title" style="color:var(--coral)">FIRE 311 — The gate that unlocks everything</div>
+    <div class="alert-text">This is the most important course of your academic career. FIRE 311 is the prerequisite for FIRE 312, which gates FIRE 321, which gates FIRE 461. A grade below C here does not just hurt the GPA — it collapses the entire advisor sequence by one full year. This course must be won cleanly, on the first attempt.</div>
+  </div>
+  <div class="slbl">Fall 2026 — project your grades</div>
+  <div id="current-courses"></div>
+  <div class="rule"></div>
+  <div class="stats" id="current-stats"></div>
+  <div class="slbl">What you need from this term</div>
+  <div id="current-needed"></div>
+</div>
+
+<!-- GPA MATH -->
+<div id="tab-math" class="tab">
+  <div class="math-panel" id="math-panel"></div>
+  <div class="slbl">Scenarios — what average do you need per remaining term?</div>
+  <table class="scenario-table" id="scenario-table"></table>
+  <div class="rule"></div>
+  <div class="slbl">Grade mix calculator — what does each combination produce?</div>
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t2);margin-bottom:14px;line-height:1.5">Select a grade mix for a 5-course term (15 credits) to see the resulting term GPA and projected cumulative GPA after that term.</p>
+  <div id="grade-mixer"></div>
+  <div class="rule"></div>
+  <div class="slbl">Simulator — project your GPA</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+    <div><div class="flbl">Remaining VCU GPA credits</div><input type="number" id="sim-remaining" value="45" min="0" max="120" style="width:100%" oninput="runSimulator()"></div>
+    <div><div class="flbl">Average GPA needed per term</div><input type="number" id="sim-avg" value="3.5" min="0" max="4.0" step="0.01" style="width:100%" oninput="runSimulator()"></div>
+    <div><div class="flbl">Target GPA</div><input type="number" id="sim-target" value="2.9" min="0" max="4.0" step="0.01" style="width:100%" oninput="runSimulator()"></div>
+  </div>
+  <div id="sim-result"></div>
+</div>
+
+<!-- FIRE CHAIN -->
+<div id="tab-chain" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">The FIRE prerequisite chain is a single-file sequence. One broken link delays graduation by one full term minimum. Every course requires a C or higher. Withdrawals count as attempts. Two failed attempts on any FIRE course and you are out of the major.</p>
+  <div class="slbl">The chain</div>
+  <div class="chain-wrap" id="chain-viz"></div>
+  <div class="slbl">Course requirements in detail</div>
+  <div id="chain-detail"></div>
+  <div class="rule"></div>
+  <div class="alert alert-amber">
+    <div class="alert-title" style="color:var(--amber)">Two-attempt rule</div>
+    <div class="alert-text">VCU Finance requires a C or higher in FIRE 317, FIRE 321, and FIRE 461, with no more than two attempts each. Withdrawals count as attempts. You do not experiment with these courses. You prepare to win the first time, every time.</div>
+  </div>
+</div>
+
+<!-- TRANSCRIPT -->
+<div id="tab-transcript" class="tab">
+  <div class="stats" id="transcript-stats"></div>
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t2);margin-bottom:20px;line-height:1.5">The full record. Not hidden, not minimized — studied. Every loss is a data point. The upward trajectory starting Fall 2025 is the argument your transcript makes to employers. Protect it.</p>
+  <div id="transcript-list"></div>
+</div>
+
+<!-- ROADMAP -->
+<div id="tab-roadmap" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">Your advisor's sequence, locked in. Graduation target: Fall 2027. Every term has a purpose and a minimum grade standard. The courses that touch the FIRE chain require 3.0+ performance. No exceptions.</p>
+  <div id="roadmap-list"></div>
+</div>
+
+</div>
+
+<script>
+// ── REAL TRANSCRIPT DATA ──────────────────────────────────
+const TRANSCRIPT=[
+  {term:"Fall 2021",gpa:2.308,gpaHrs:13,qp:30,standing:"good",courses:[
+    {code:"BIOL 101",name:"Biological Concepts",cr:3,grade:"B",qp:9},
+    {code:"BIOZ 101",name:"Biological Concepts Lab",cr:1,grade:"B",qp:3},
+    {code:"SOCY 101",name:"Introduction to Sociology",cr:3,grade:"B",qp:9},
+    {code:"STAT 210",name:"Basic Practice of Statistics",cr:3,grade:"D",qp:3},
+    {code:"UNIV 111",name:"Focused Inquiry I",cr:3,grade:"C",qp:6},
+  ]},
+  {term:"Spring 2022",gpa:2.000,gpaHrs:3,qp:6,standing:"warning",courses:[
+    {code:"CHEM 100",name:"Introductory Chemistry",cr:3,grade:"D",qp:0,note:"E"},
+    {code:"ECON 101",name:"Introduction to Political Econ",cr:3,grade:"F",qp:0,note:"E"},
+    {code:"HUMS 202",name:"Choices in Consumer Society",cr:1,grade:"P",qp:0},
+    {code:"STAT 210",name:"Basic Practice of Statistics",cr:3,grade:"F",qp:0,note:"E"},
+    {code:"UNIV 112",name:"Focused Inquiry II",cr:3,grade:"C",qp:6},
+  ]},
+  {term:"Fall 2022",gpa:0.250,gpaHrs:4,qp:1,standing:"probation",courses:[
+    {code:"BIOL 151",name:"Intro to Biological Science I",cr:3,grade:"F",qp:0},
+    {code:"BIOL 201",name:"Human Biology",cr:3,grade:"W",qp:0},
+    {code:"BIOZ 151",name:"Intro Biological Sci Lab I",cr:1,grade:"D",qp:1},
+    {code:"CMSC 210",name:"Computers and Programming",cr:3,grade:"F",qp:0,note:"E"},
+    {code:"PHIS 206",name:"Human Physiology",cr:3,grade:"D",qp:0,note:"E"},
+  ]},
+  {term:"Spring 2023",gpa:2.667,gpaHrs:9,qp:24,standing:"probation",courses:[
+    {code:"BIOL 201",name:"Human Biology",cr:3,grade:"C",qp:6},
+    {code:"ECON 101",name:"Introduction to Political Econ",cr:3,grade:"A",qp:12,note:"I"},
+    {code:"PHIS 206",name:"Human Physiology",cr:3,grade:"C",qp:6,note:"I"},
+    {code:"UNIV 200",name:"Inquiry & Craft of Argument",cr:3,grade:"W",qp:0},
+  ]},
+  {term:"Fall 2023",gpa:1.400,gpaHrs:10,qp:14,standing:"probation",courses:[
+    {code:"CMSC 210",name:"Computers and Programming",cr:3,grade:"W",qp:0},
+    {code:"INNO 491",name:"Topics: GTX Digital Marketing",cr:3,grade:"FI",qp:0},
+    {code:"PSYC 101",name:"Introduction to Psychology",cr:4,grade:"C",qp:8},
+    {code:"UNIV 200",name:"Adv Foc Inq: Lit, Res & Comm",cr:3,grade:"C",qp:6},
+  ]},
+  {term:"Spring 2024",gpa:3.000,gpaHrs:6,qp:18,standing:"probation",courses:[
+    {code:"AFAM 111",name:"Intro to Africana Studies",cr:3,grade:"F",qp:0,note:"E"},
+    {code:"CHEM 100",name:"Introductory Chemistry",cr:3,grade:"C",qp:6,note:"I"},
+    {code:"CMSC 210",name:"Computers and Programming",cr:3,grade:"A",qp:12},
+    {code:"MATH 129",name:"Intro to College Algebra",cr:3,grade:"W",qp:0},
+  ]},
+  {term:"Fall 2024",gpa:2.000,gpaHrs:6,qp:12,standing:"suspension",courses:[
+    {code:"ACCT 203",name:"Introduction to Accounting I",cr:3,grade:"F",qp:0,note:"E"},
+    {code:"AFAM 111",name:"Intro to Africana Studies",cr:3,grade:"C",qp:6,note:"I"},
+    {code:"BUSN 201",name:"Foundations of Business",cr:3,grade:"W",qp:0},
+    {code:"ECON 210",name:"Prin of Econ - Micro",cr:3,grade:"C",qp:6},
+  ]},
+  {term:"Fall 2025",gpa:3.667,gpaHrs:9,qp:33,standing:"good",courses:[
+    {code:"ACCT 203",name:"Introduction to Accounting I",cr:3,grade:"A",qp:12,note:"I"},
+    {code:"CMSC 330",name:"Data Science Skills",cr:3,grade:"A",qp:12},
+    {code:"FIRE 309",name:"Risk Management and Insurance",cr:3,grade:"W",qp:0},
+    {code:"MATH 129",name:"Intro to College Algebra",cr:3,grade:"B",qp:9},
+  ]},
+  {term:"Spring 2026",gpa:3.400,gpaHrs:15,qp:51,standing:"good",courses:[
+    {code:"ACCT 204",name:"Introduction to Accounting II",cr:3,grade:"A",qp:12},
+    {code:"BUSN 205",name:"Intro to the World of Business",cr:3,grade:"B",qp:9},
+    {code:"FIRE 309",name:"Risk Management and Insurance",cr:3,grade:"B",qp:9},
+    {code:"MATH 139",name:"College Algebra w/Applications",cr:3,grade:"B",qp:9},
+    {code:"MKTG 301",name:"Marketing Principles",cr:3,grade:"A",qp:12},
+  ]},
+];
+
+const CURRENT_TERM={
+  term:"Fall 2026",
+  courses:[
+    {code:"FIRE 311",name:"Financial Management",cr:3,importance:"critical",note:"THE gate. C or higher required. First attempt. Unlocks FIRE 312 → 321 → 461."},
+    {code:"INFO 360",name:"Business Information Systems",cr:3,importance:"important",note:"Strong performance here signals analytical capability to employers."},
+    {code:"MGMT 303",name:"Creativity and Ideation",cr:3,importance:"standard",note:"No excuses for anything below a B. This is a manageable course."},
+    {code:"MGMT 310",name:"Managing People in Organizations",cr:3,importance:"standard",note:"No excuses for anything below a B. This is a manageable course."},
+    {code:"BUSN 301",name:"Career and Prof Development",cr:1,importance:"standard",note:"1 credit. Complete it cleanly."},
+  ]
+};
+
+const FIRE_CHAIN=[
+  {code:"BUSN 212",name:"Business Calculus equiv.",term:"Sum 2026",status:"pending",grade:null,note:"Taking at community college. Must pass with C+."},
+  {code:"FIRE 311",name:"Financial Management",term:"Fall 2026",status:"current",grade:null,note:"IN PROGRESS. The gate. C or higher required."},
+  {code:"FIRE 312",name:"Financial Management II",term:"Spr 2027",status:"locked",grade:null,note:"Requires FIRE 311 C+. Opens Spring 2027."},
+  {code:"FIRE 321",name:"Advanced Financial Mgmt",term:"Sum 2027",status:"locked",grade:null,note:"Requires FIRE 312 C+. Two-attempt limit."},
+  {code:"FIRE 461",name:"Financial Policy (Capstone)",term:"Fall 2027",status:"locked",grade:null,note:"Requires FIRE 321 C+. Final gate. Two-attempt limit."},
+];
+
+const ROADMAP=[
+  {term:"Summer 2026",credits:9,targetGPA:3.5,courses:[
+    {code:"MTH-261",name:"= BUSN 212 (Calculus equiv.)",tier:"A",note:"Must pass C+. Unlocks FIRE 311."},
+    {code:"CST-100",name:"= SPCH 221 (Presentations)",tier:"C",note:""},
+    {code:"BUS-240",name:"= BUSN 323",tier:"C",note:""},
+  ]},
+  {term:"Fall 2026",credits:13,targetGPA:3.5,courses:[
+    {code:"FIRE 311",name:"Financial Management",tier:"A",note:"THE gate. Win this cleanly."},
+    {code:"INFO 360",name:"Business Information Systems",tier:"B",note:""},
+    {code:"MGMT 303",name:"Creativity and Ideation",tier:"C",note:""},
+    {code:"MGMT 310",name:"Managing People in Organizations",tier:"C",note:""},
+    {code:"BUSN 301",name:"Career & Prof Development (1cr)",tier:"C",note:""},
+  ]},
+  {term:"Spring 2027",credits:15,targetGPA:3.5,courses:[
+    {code:"FIRE 312",name:"Financial Management II",tier:"A",note:"Two-attempt limit. Prepare."},
+    {code:"FIRE 317",name:"Investments",tier:"A",note:"Two-attempt limit. Prepare."},
+    {code:"FIRE 441",name:"Restricted FIRE Elective",tier:"B",note:""},
+    {code:"SCMA 320",name:"Business Analytics",tier:"B",note:""},
+    {code:"Elective",name:"Approved Finance Elective",tier:"B",note:""},
+  ]},
+  {term:"Summer 2027",credits:3,targetGPA:3.7,courses:[
+    {code:"FIRE 321",name:"Advanced Financial Mgmt",tier:"A",note:"Two-attempt limit. This is 1-of-3 protected courses."},
+  ]},
+  {term:"Fall 2027",credits:15,targetGPA:3.5,courses:[
+    {code:"FIRE 461",name:"Financial Policy (Capstone)",tier:"A",note:"Final gate. Two-attempt limit."},
+    {code:"MGMT 434",name:"Strategic Management",tier:"B",note:"Requires MGMT 310, MKTG 301, FIRE 311, SCMA equiv."},
+    {code:"Elective",name:"Restricted Finance Elective",tier:"B",note:""},
+    {code:"Elective",name:"Approved Finance Elective",tier:"B",note:""},
+    {code:"BUSN 499",name:"Exit Exam (0 cr)",tier:"C",note:""},
+  ]},
+];
+
+const GRADE_PTS={"A":4.0,"A-":3.7,"B+":3.3,"B":3.0,"B-":2.7,"C+":2.3,"C":2.0,"C-":1.7,"D":1.0,"F":0.0,"W":null,"P":null,"FI":null};
+const STANDING_CLASS={good:"standing-good",warning:"standing-warning",probation:"standing-probation",suspension:"standing-suspension",current:"standing-current"};
+const STANDING_LABEL={good:"Good Standing",warning:"Academic Warning",probation:"Continued Probation",suspension:"Academic Suspension",current:"In Progress"};
+
+// ── COMPUTED GLOBALS ──────────────────────────────────────
+// From transcript: 75 GPA hours, 189 quality points, 2.520 cumulative
+const BASE_GPA_HRS = 75;
+const BASE_QP = 189;
+const BASE_GPA = 2.520;
+const TARGET_GPA = 2.9;
+
+function gs(k,def){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):def}catch{return def}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+
+let currentGrades = gs("gpa_current_grades", {});
+let chainGrades = gs("gpa_chain_grades", {});
+
+document.getElementById("hdr-date").textContent = new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}).toUpperCase();
+
+// ── TABS ─────────────────────────────────────────────────
+function switchTab(btn){
+  document.querySelectorAll(".tnb").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+  const t=btn.dataset.tab;
+  if(t==="overview")renderOverview();
+  if(t==="current")renderCurrent();
+  if(t==="math")renderMath();
+  if(t==="chain")renderChain();
+  if(t==="transcript")renderTranscript();
+  if(t==="roadmap")renderRoadmap();
+}
+
+// ── CALCULATE PROJECTED GPA ───────────────────────────────
+function calcProjectedGPA(){
+  let addedHrs=0, addedQP=0;
+  CURRENT_TERM.courses.forEach(c=>{
+    const g=currentGrades[c.code];
+    const gp=GRADE_PTS[g];
+    if(gp!=null&&g){
+      addedHrs+=c.cr;
+      addedQP+=gp*c.cr;
+    }
+  });
+  const totalHrs=BASE_GPA_HRS+addedHrs;
+  const totalQP=BASE_QP+addedQP;
+  return totalHrs>0?(totalQP/totalHrs):BASE_GPA;
+}
+
+function calcTermGPA(){
+  let hrs=0,qp=0;
+  CURRENT_TERM.courses.forEach(c=>{
+    const g=currentGrades[c.code];
+    const gp=GRADE_PTS[g];
+    if(gp!=null&&g){hrs+=c.cr;qp+=gp*c.cr;}
+  });
+  return hrs>0?(qp/hrs):null;
+}
+
+// ── OVERVIEW ─────────────────────────────────────────────
+function renderOverview(){
+  const projected=calcProjectedGPA();
+  const termGPA=calcTermGPA();
+
+  // Alerts
+  let alerts="";
+  if(BASE_GPA<2.5)alerts+=`<div class="alert alert-amber" style="margin-bottom:16px"><div class="alert-title" style="color:var(--amber)">Upward trajectory — protect it</div><div class="alert-text">Your GPA history includes Academic Suspension (Fall 2024). You fought back with a 3.67 in Fall 2025 and a 3.40 in Spring 2026. The trend is now your strongest argument to employers. A single bad term here reverses the narrative. Protect it at all costs.</div></div>`;
+  alerts+=`<div class="alert alert-green" style="margin-bottom:16px"><div class="alert-title" style="color:var(--gb)">Spring 2026: 3.40 — Fall 2025: 3.67 — Two strong terms</div><div class="alert-text">This is the real story. After returning from suspension, you have posted back-to-back strong terms. The academic identity is shifting. Fall 2026 is where that shift becomes permanent — or doesn't.</div></div>`;
+  document.getElementById("alert-zone").innerHTML=alerts;
+
+  document.getElementById("gpa-hero").innerHTML=`
+    <div class="gpa-cell">
+      <div class="gpa-label">Cumulative GPA</div>
+      <div class="gpa-val" style="color:${BASE_GPA>=2.9?"var(--gb)":BASE_GPA>=2.5?"var(--amber)":"var(--coral)"}">${BASE_GPA.toFixed(3)}</div>
+      <div class="gpa-sub">75 GPA hours — 189 quality points</div>
+      <div class="gpa-trend trend-up">&#8593; From 1.850 low to 2.520 — trending upward</div>
+    </div>
+    <div class="gpa-cell">
+      <div class="gpa-label">Target GPA</div>
+      <div class="gpa-val" style="color:var(--purple)">2.900</div>
+      <div class="gpa-sub">Minimum viable for employer credibility</div>
+      <div class="gpa-trend" style="color:var(--t3)">Gap: ${(TARGET_GPA-BASE_GPA).toFixed(3)} points</div>
+    </div>
+    <div class="gpa-cell">
+      <div class="gpa-label">Projected after Fall 2026</div>
+      <div class="gpa-val" style="color:${projected>=2.9?"var(--gb)":projected>=2.7?"var(--amber)":"var(--coral)"}">${projected.toFixed(3)}</div>
+      <div class="gpa-sub">${termGPA?"Based on projected grades":"Enter grades in Fall 2026 tab"}</div>
+      <div class="gpa-trend ${projected>BASE_GPA?"trend-up":projected<BASE_GPA?"trend-down":"trend-flat"}">${projected>BASE_GPA?"&#8593; Rising":"&#8594; Holding"}</div>
+    </div>
+  `;
+
+  document.getElementById("overview-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">GPA hours</div><div class="stat-v">${BASE_GPA_HRS}</div><div class="stat-s">at VCU</div></div>
+    <div class="stat"><div class="stat-l">Quality points</div><div class="stat-v">${BASE_QP}</div><div class="stat-s">accumulated</div></div>
+    <div class="stat"><div class="stat-l">Spring 2026</div><div class="stat-v g">3.40</div><div class="stat-s">last term</div></div>
+    <div class="stat"><div class="stat-l">Terms to grad</div><div class="stat-v a">4</div><div class="stat-s">target Fall 2027</div></div>
+  `;
+
+  // Draw trajectory chart
+  const terms=TRANSCRIPT.map(t=>({term:t.term,termGPA:t.gpa,cumGPA:null}));
+  let cumHrs=0,cumQP=0;
+  TRANSCRIPT.forEach((t,i)=>{
+    cumHrs+=t.gpaHrs;cumQP+=t.qp;
+    terms[i].cumGPA=cumHrs>0?cumQP/cumHrs:0;
+  });
+  const canvas=document.getElementById("traj-canvas");
+  const ctx=canvas.getContext("2d");
+  canvas.width=canvas.offsetWidth*2;canvas.height=240;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const W=canvas.width,H=canvas.height;
+  const pad={l:40,r:20,t:20,b:30};
+  const gw=W-pad.l-pad.r,gh=H-pad.t-pad.b;
+  const minGPA=0,maxGPA=4.0;
+  const toX=(i)=>pad.l+i/(terms.length-1)*gw;
+  const toY=(g)=>pad.t+gh-(g-minGPA)/(maxGPA-minGPA)*gh;
+
+  // Grid lines
+  [1,2,2.5,2.9,3,3.5,4].forEach(g=>{
+    ctx.beginPath();ctx.moveTo(pad.l,toY(g));ctx.lineTo(pad.l+gw,toY(g));
+    ctx.strokeStyle=g===2.9?"rgba(34,176,125,0.3)":"rgba(255,255,255,0.04)";
+    ctx.lineWidth=g===2.9?1.5:1;ctx.setLineDash(g===2.9?[4,4]:[]);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=g===2.9?"rgba(34,176,125,0.6)":"rgba(61,58,54,0.8)";
+    ctx.font=`${18}px 'JetBrains Mono'`;ctx.textAlign="right";
+    ctx.fillText(g.toFixed(1),pad.l-6,toY(g)+5);
+  });
+
+  // Cumulative line
+  ctx.beginPath();
+  terms.forEach((t,i)=>{i===0?ctx.moveTo(toX(i),toY(t.cumGPA)):ctx.lineTo(toX(i),toY(t.cumGPA));});
+  ctx.strokeStyle="rgba(196,154,60,0.7)";ctx.lineWidth=2;ctx.stroke();
+
+  // Term GPA bars / dots
+  terms.forEach((t,i)=>{
+    const x=toX(i),y=toY(t.termGPA);
+    ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);
+    ctx.fillStyle=t.termGPA>=3?"rgba(34,176,125,0.9)":t.termGPA>=2?"rgba(196,154,60,0.9)":"rgba(192,85,58,0.9)";
+    ctx.fill();
+  });
+
+  // X labels
+  ctx.fillStyle="rgba(61,58,54,0.9)";ctx.font="16px 'JetBrains Mono'";ctx.textAlign="center";
+  terms.forEach((t,i)=>{
+    const short=t.term.replace("Spring","Spr").replace("Summer","Sum").replace("Fall","Fll").replace("20","'");
+    ctx.fillText(short,toX(i),H-4);
+  });
+
+  document.getElementById("trend-analysis").innerHTML=`
+    <div style="background:var(--s1);border:1px solid var(--b1);padding:18px 20px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <div><div style="font-size:9px;color:var(--t3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:5px">Academic low</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--coral)">1.850</div><div style="font-size:10px;color:var(--t3)">Fall 2022 cumulative</div></div>
+        <div><div style="font-size:9px;color:var(--t3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:5px">Current</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--amber)">2.520</div><div style="font-size:10px;color:var(--t3)">After Spring 2026</div></div>
+        <div><div style="font-size:9px;color:var(--t3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:5px">Recovery</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gb)">+0.670</div><div style="font-size:10px;color:var(--t3)">Points gained from low</div></div>
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--b1);font-family:'Crimson Pro',serif;font-style:italic;font-size:15px;color:var(--t2);line-height:1.6">The transcript tells a story of someone who struggled in the wrong major, hit a ceiling, was removed, came back, and immediately posted two of their best terms ever. That story — the recovery arc with a steep upward trajectory — is a more compelling narrative to the right employer than a flat 3.2 with no adversity.</div>
+    </div>
+  `;
+}
+
+// ── CURRENT TERM ─────────────────────────────────────────
+function renderCurrent(){
+  const grades=["","A","B+","B","B-","C+","C"];
+  document.getElementById("current-courses").innerHTML=CURRENT_TERM.courses.map(c=>{
+    const g=currentGrades[c.code]||"";
+    const gp=GRADE_PTS[g];
+    return`<div class="curr-course">
+      <div class="curr-importance imp-${c.importance}">${c.importance}</div>
+      <div style="flex:1;min-width:0">
+        <div class="curr-name">${c.name}</div>
+        <div class="curr-code">${c.code} — ${c.cr} credit${c.cr>1?"s":""}</div>
+        <div class="curr-notes">${c.note}</div>
+      </div>
+      <select class="curr-grade-select" onchange="updateCurrentGrade('${c.code}',this.value)">
+        ${grades.map(gr=>`<option value="${gr}" ${g===gr?"selected":""}>${gr||"— Project grade —"}</option>`).join("")}
+      </select>
+      <div class="curr-projected grade-${g||'IP'}">${gp!=null&&g?gp.toFixed(1):"—"}</div>
+    </div>`;
+  }).join("");
+
+  const projected=calcProjectedGPA();
+  const termGPA=calcTermGPA();
+  const termCredits=CURRENT_TERM.courses.reduce((a,c)=>{
+    const g=currentGrades[c.code];
+    return a+(GRADE_PTS[g]!=null&&g?c.cr:0);
+  },0);
+
+  document.getElementById("current-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">Projected term GPA</div><div class="stat-v ${termGPA>=3.5?"g":termGPA>=3?"a":"c"}">${termGPA?termGPA.toFixed(2):"—"}</div><div class="stat-s">${termCredits} credits projected</div></div>
+    <div class="stat"><div class="stat-l">Projected cumulative</div><div class="stat-v ${projected>=2.9?"g":projected>=2.7?"a":"c"}">${projected.toFixed(3)}</div><div class="stat-s">after this term</div></div>
+    <div class="stat"><div class="stat-l">Gap to 2.90</div><div class="stat-v ${projected>=2.9?"g":"c"}">${projected>=2.9?"Done":(TARGET_GPA-projected).toFixed(3)}</div><div class="stat-s">${projected>=2.9?"Target reached":"remaining"}</div></div>
+    <div class="stat"><div class="stat-l">FIRE 311 grade</div><div class="stat-v ${currentGrades["FIRE 311"]?"g":"c"}">${currentGrades["FIRE 311"]||"—"}</div><div class="stat-s">${currentGrades["FIRE 311"]?"projected":"not set"}</div></div>
+  `;
+
+  // Needed message
+  const remainingAfterFall=45; // estimate
+  const neededAfterFall=remainingAfterFall>0?(TARGET_GPA*(BASE_GPA_HRS+13+remainingAfterFall)-BASE_QP)/remainingAfterFall:0;
+  document.getElementById("current-needed").innerHTML=`
+    <div style="background:var(--s1);border-left:2px solid var(--abdr);padding:14px 18px;margin-bottom:2px">
+      <div style="font-size:9px;color:var(--amber);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">What this term needs to produce</div>
+      <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6">A 3.5+ term GPA this semester advances the cumulative meaningfully and gives the remaining FIRE courses more margin. The minimum viable outcome is 3.0 with a clean FIRE 311 pass. Anything below 3.0 makes the 2.9 target increasingly difficult on the remaining runway.</div>
+    </div>
+    <div style="background:var(--s1);border-left:2px solid var(--cbdr);padding:14px 18px;margin-top:2px">
+      <div style="font-size:9px;color:var(--coral);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">The non-negotiable</div>
+      <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6">FIRE 311 with a C or higher. That is the only outcome that keeps the advisor sequence intact. A D or F here does not just hurt the GPA — it collapses Spring 2027 and pushes graduation into Fall 2028. Win this course. Everything else is secondary.</div>
+    </div>
+  `;
+}
+
+function updateCurrentGrade(code,grade){
+  currentGrades[code]=grade;ss("gpa_current_grades",currentGrades);renderCurrent();
+}
+
+// ── GPA MATH ─────────────────────────────────────────────
+function renderMath(){
+  const currentHrs=BASE_GPA_HRS;
+  const currentQP=BASE_QP;
+  const currentGPA=BASE_GPA;
+  const target=TARGET_GPA;
+
+  // What average do you need over R remaining credits to hit 2.9?
+  // needed = (target*(C+R) - currentQP) / R
+  const calcNeeded=(remainingHrs)=>{
+    return(target*(currentHrs+remainingHrs)-currentQP)/remainingHrs;
+  };
+
+  document.getElementById("math-panel").innerHTML=`
+    <div class="math-title">The GPA formula — exact numbers</div>
+    <div class="math-grid">
+      <div class="math-cell"><div class="math-label">Current GPA hours (C)</div><div class="math-val">${currentHrs}</div><div class="math-sub">VCU institutional only</div></div>
+      <div class="math-cell"><div class="math-label">Current quality points</div><div class="math-val">${currentQP}</div><div class="math-sub">accumulated</div></div>
+      <div class="math-cell"><div class="math-label">Current GPA</div><div class="math-val a">${currentGPA.toFixed(3)}</div><div class="math-sub">as of Spring 2026</div></div>
+      <div class="math-cell"><div class="math-label">Target GPA</div><div class="math-val p">2.900</div><div class="math-sub">minimum viable</div></div>
+      <div class="math-cell"><div class="math-label">Gap</div><div class="math-val c">${(target-currentGPA).toFixed(3)}</div><div class="math-sub">points to close</div></div>
+      <div class="math-cell"><div class="math-label">Est. remaining hrs</div><div class="math-val">~45</div><div class="math-sub">Fall 26 through Fall 27</div></div>
+    </div>
+    <div class="math-needed">Required average GPA over ~45 remaining credits to graduate at 2.90: <strong style="color:var(--amber);font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.05em">${calcNeeded(45).toFixed(2)}</strong> — That is 2 A's and 3 B's every single term, minimum. Some terms need 3 A's and 2 B's. This is achievable — your last two terms prove it. But there is no margin for a bad term.</div>
+  `;
+
+  const scenarios=[
+    {remaining:30,label:"30 credits left",note:"If you run out of runway fast"},
+    {remaining:40,label:"40 credits left",note:""},
+    {remaining:45,label:"45 credits left",note:"Most likely scenario",highlight:true},
+    {remaining:50,label:"50 credits left",note:""},
+    {remaining:60,label:"60 credits left",note:"If you add credits"},
+  ];
+
+  document.getElementById("scenario-table").innerHTML=`
+    <thead><tr><th>Remaining credits</th><th>Avg GPA needed</th><th>Grade mix (5-course term)</th><th>Feasibility</th></tr></thead>
+    <tbody>${scenarios.map(s=>{
+      const needed=calcNeeded(s.remaining);
+      const feasible=needed<=3.0?"Achievable":needed<=3.5?"Requires focus":needed<=3.8?"Very hard":needed<=4.0?"Extreme":"Impossible";
+      const feasColor=needed<=3.0?"var(--gb)":needed<=3.5?"var(--amber)":needed<=4.0?"var(--coral)":"var(--coral)";
+      const mix=needed<=3.0?"3 A, 2 B":needed<=3.3?"3 A, 1 B, 1 B+":needed<=3.5?"3 A, 2 B+":needed<=3.7?"3 A, 1 B, 1 A-":needed<=4.0?"4 A, 1 A-":"Not possible";
+      return`<tr class="${s.highlight?"highlight":""}"><td>${s.label}${s.note?`<div class="grade-mix">${s.note}</div>`:""}</td><td style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${feasColor};letter-spacing:0.05em">${needed.toFixed(2)}</td><td class="grade-mix">${mix}</td><td style="color:${feasColor};font-size:11px">${feasible}</td></tr>`;
+    }).join("")}</tbody>
+  `;
+
+  // Grade mixer
+  const gradeOptions=["A","A-","B+","B","B-","C+","C"];
+  let mixGrades=gs("gpa_mix",["B","B","B","B","B"]);
+
+  function renderMixer(){
+    const termGPA=mixGrades.reduce((a,g)=>a+(GRADE_PTS[g]||0),0)/mixGrades.length;
+    const projQP=currentQP+termGPA*15;
+    const projHrs=currentHrs+15;
+    const projGPA=projQP/projHrs;
+    document.getElementById("grade-mixer").innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-bottom:14px">
+        ${mixGrades.map((g,i)=>`
+          <div>
+            <div style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;text-align:center">Course ${i+1}</div>
+            <select style="width:100%;text-align:center" onchange="updateMix(${i},this.value)">
+              ${gradeOptions.map(go=>`<option value="${go}" ${g===go?"selected":""}>${go}</option>`).join("")}
+            </select>
+          </div>
+        `).join("")}
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--b1);padding:16px;display:flex;gap:24px;align-items:center">
+        <div><div style="font-size:9px;color:var(--t3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">Term GPA</div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${termGPA>=3.5?"var(--gb)":termGPA>=3?"var(--amber)":"var(--coral)"};letter-spacing:0.05em">${termGPA.toFixed(2)}</div></div>
+        <div style="flex:1"><div style="font-size:9px;color:var(--t3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">Projected cumulative after this term</div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${projGPA>=2.9?"var(--gb)":projGPA>=2.7?"var(--amber)":"var(--coral)"};letter-spacing:0.05em">${projGPA.toFixed(3)}</div><div style="font-size:10px;color:var(--t3);margin-top:2px">${(projGPA-currentGPA>=0?"↑ +":"↓ ")+(projGPA-currentGPA).toFixed(3)} from current ${currentGPA.toFixed(3)}</div></div>
+      </div>
+    `;
+  }
+
+  window.updateMix=(i,v)=>{mixGrades[i]=v;ss("gpa_mix",mixGrades);renderMixer();};
+  renderMixer();
+  runSimulator();
+}
+
+function runSimulator(){
+  const remaining=parseFloat(document.getElementById("sim-remaining")?.value)||45;
+  const avg=parseFloat(document.getElementById("sim-avg")?.value)||3.5;
+  const target=parseFloat(document.getElementById("sim-target")?.value)||2.9;
+  const projQP=BASE_QP+avg*remaining;
+  const projHrs=BASE_GPA_HRS+remaining;
+  const projGPA=projQP/projHrs;
+  const needed=(target*(BASE_GPA_HRS+remaining)-BASE_QP)/remaining;
+  const el=document.getElementById("sim-result");
+  if(!el)return;
+  el.innerHTML=`
+    <div style="background:var(--s1);border:1px solid ${projGPA>=target?"var(--gbdr)":"var(--cbdr)"};padding:16px 20px;display:flex;gap:24px;flex-wrap:wrap">
+      <div><div style="font-size:9px;color:var(--t3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">Projected final GPA</div><div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:${projGPA>=target?"var(--gb)":projGPA>=target-0.2?"var(--amber)":"var(--coral)"};letter-spacing:0.05em">${projGPA.toFixed(3)}</div></div>
+      <div><div style="font-size:9px;color:var(--t3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">Actually needed per credit</div><div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:${needed<=avg?"var(--gb)":"var(--coral)"};letter-spacing:0.05em">${needed.toFixed(2)}</div></div>
+      <div style="flex:1;min-width:200px"><div style="font-size:9px;color:var(--t3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px">Verdict</div><div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6">${projGPA>=target?"At "+avg.toFixed(2)+" average over "+remaining+" credits, you reach "+target.toFixed(2)+". This is achievable with "+remaining/15|0 +" terms of "+avg.toFixed(2)+" performance.":"At "+avg.toFixed(2)+" average over "+remaining+" credits, you reach "+projGPA.toFixed(3)+" — "+Math.abs(projGPA-target).toFixed(3)+" short of the "+target.toFixed(2)+" target. Increase the average or add credits."}</div></div>
+    </div>
+  `;
+}
+
+// ── FIRE CHAIN ───────────────────────────────────────────
+function renderChain(){
+  const statusColor={completed:"var(--gb)",current:"var(--amber)",locked:"var(--t3)",critical:"var(--coral)"};
+  document.getElementById("chain-viz").innerHTML=FIRE_CHAIN.map((n,i)=>`
+    ${i>0?'<div class="chain-arrow">&#8594;</div>':""}
+    <div class="chain-node ${n.status} ${n.status==="current"?"critical":""}">
+      <div class="cn-code">${n.code}</div>
+      <div class="cn-term">${n.term}</div>
+      <div class="cn-grade" style="color:${statusColor[n.status]}">${n.status==="completed"?"✓":n.status==="current"?"NOW":n.status==="locked"?"🔒":"?"}</div>
+      <div class="cn-status" style="color:${statusColor[n.status]}">${n.status==="current"?"in progress":n.status}</div>
+    </div>
+  `).join("");
+
+  document.getElementById("chain-detail").innerHTML=FIRE_CHAIN.map(n=>`
+    <div style="display:flex;gap:0;background:var(--b1);margin-bottom:2px">
+      <div style="background:var(--s1);padding:13px 16px;min-width:120px;border-right:1px solid var(--b1)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${n.status==="current"?"var(--amber)":n.status==="locked"?"var(--t3)":"var(--gb)"};letter-spacing:0.06em">${n.code}</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">${n.term}</div>
+      </div>
+      <div style="background:var(--s1);padding:13px 16px;flex:1;border-right:1px solid var(--b1)">
+        <div style="font-size:12px;color:var(--t1)">${n.name}</div>
+        <div style="font-family:'Crimson Pro',serif;font-style:italic;font-size:13px;color:var(--t3);margin-top:2px">${n.note}</div>
+      </div>
+      <div style="background:var(--s1);padding:13px 16px;min-width:100px;text-align:center">
+        <div style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px">Status</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${n.status==="current"?"var(--amber)":n.status==="locked"?"var(--t3)":"var(--gb)"}">${n.status==="current"?"Active":n.status==="locked"?"Locked":"Done"}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ── TRANSCRIPT ───────────────────────────────────────────
+function renderTranscript(){
+  const totalHrs=TRANSCRIPT.reduce((a,t)=>a+t.gpaHrs,0);
+  const totalQP=TRANSCRIPT.reduce((a,t)=>a+t.qp,0);
+  const cumGPA=totalHrs>0?totalQP/totalHrs:0;
+  document.getElementById("transcript-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">Total terms</div><div class="stat-v">${TRANSCRIPT.length}</div><div class="stat-s">at VCU</div></div>
+    <div class="stat"><div class="stat-l">GPA hours</div><div class="stat-v">${totalHrs}</div><div class="stat-s">graded credits</div></div>
+    <div class="stat"><div class="stat-l">Cumulative GPA</div><div class="stat-v a">${cumGPA.toFixed(3)}</div><div class="stat-s">institutional</div></div>
+    <div class="stat"><div class="stat-l">Best term</div><div class="stat-v g">3.667</div><div class="stat-s">Fall 2025</div></div>
+  `;
+
+  document.getElementById("transcript-list").innerHTML=TRANSCRIPT.map((t,idx)=>`
+    <div class="term-block" id="tb-${idx}">
+      <div class="term-header" onclick="toggleTerm(${idx})">
+        <div class="term-name">${t.term}</div>
+        <div class="term-gpa-badge" style="color:${t.gpa>=3?"var(--gb)":t.gpa>=2.5?"var(--amber)":"var(--coral)"}">${t.gpa.toFixed(3)}</div>
+        <div class="term-credits">${t.gpaHrs} GPA hrs</div>
+        <div class="term-standing ${STANDING_CLASS[t.standing]}">${STANDING_LABEL[t.standing]}</div>
+      </div>
+      <div class="term-courses">
+        ${t.courses.map(c=>{
+          const gradeKey=c.grade.replace("+","p").replace("-","m").replace("FI","F");
+          const gcls=c.grade==="A"||c.grade==="A-"?"grade-A":c.grade.startsWith("B")?"grade-B":c.grade==="C"||c.grade==="C+"||c.grade==="C-"?"grade-C":c.grade==="D"?"grade-D":c.grade==="F"||c.grade==="FI"?"grade-F":c.grade==="W"?"grade-W":"grade-IP";
+          const isFire=c.code.startsWith("FIRE");
+          return`<div class="course-row">
+            <div class="course-code">${c.code}</div>
+            <div class="course-name">${c.name}</div>
+            <div class="course-credits">${c.cr}cr</div>
+            <div class="course-grade ${gcls}">${c.grade}</div>
+            <div class="course-qp">${c.qp.toFixed(2)} QP</div>
+            ${isFire?'<div class="course-flag flag-fire">FIRE</div>':""}
+            ${c.note==="I"?'<div class="course-flag flag-repeat">Repeat</div>':""}
+          </div>`;
+        }).join("")}
+        <div style="display:flex;justify-content:space-between;padding:8px 16px;background:var(--s2);font-size:10px;color:var(--t3)">
+          <span>Term: ${t.gpaHrs} GPA hrs — ${t.qp} QP — ${t.gpa.toFixed(3)} GPA</span>
+        </div>
+      </div>
+    </div>
+  `).join("")+`
+    <div class="term-block" id="tb-current">
+      <div class="term-header" onclick="toggleTerm('current')">
+        <div class="term-name">Fall 2026 — IN PROGRESS</div>
+        <div class="term-gpa-badge" style="color:var(--blue)">—</div>
+        <div class="term-credits">13 credits</div>
+        <div class="term-standing standing-current">In Progress</div>
+      </div>
+      <div class="term-courses">
+        ${CURRENT_TERM.courses.map(c=>`
+          <div class="course-row">
+            <div class="course-code">${c.code}</div>
+            <div class="course-name">${c.name}</div>
+            <div class="course-credits">${c.cr}cr</div>
+            <div class="course-grade grade-IP">${currentGrades[c.code]||"—"}</div>
+            <div class="course-qp" style="color:${c.importance==="critical"?"var(--coral)":"var(--t3)}"}">${c.importance}</div>
+            ${c.code==="FIRE 311"?'<div class="course-flag flag-fire">GATE</div>':""}
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function toggleTerm(idx){
+  const el=document.getElementById("tb-"+idx);
+  if(el)el.classList.toggle("open");
+}
+
+// ── ROADMAP ──────────────────────────────────────────────
+function renderRoadmap(){
+  const tierColor={A:"var(--coral)",B:"var(--amber)",C:"var(--t3)"};
+  const tierLabel={A:"Must beat",B:"Must pass",C:"No excuses"};
+  document.getElementById("roadmap-list").innerHTML=ROADMAP.map((term,ti)=>`
+    <div style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--s2);border:1px solid var(--b1);margin-bottom:2px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.08em;color:${ti===1?"var(--amber)":"var(--t1)"}">${term.term}</div>
+        <div style="font-size:10px;color:var(--t3)">${term.credits} credits</div>
+        <div style="flex:1"></div>
+        <div style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase">Target: </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${term.targetGPA>=3.5?"var(--gb)":"var(--amber)"}">${term.targetGPA.toFixed(1)}+</div>
+      </div>
+      ${term.courses.map(c=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;background:var(--s1);border:1px solid var(--b1);border-top:none;transition:background 0.15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='var(--s1)'">
+          <div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border:1px solid ${tierColor[c.tier]};color:${tierColor[c.tier]};min-width:80px;text-align:center;flex-shrink:0">${tierLabel[c.tier]}</div>
+          <div style="font-size:11px;color:var(--amber);min-width:80px;flex-shrink:0;letter-spacing:0.04em">${c.code}</div>
+          <div style="font-size:12px;color:var(--t1);flex:1">${c.name}</div>
+          ${c.note?`<div style="font-family:'Crimson Pro',serif;font-style:italic;font-size:11px;color:var(--t3);max-width:200px;text-align:right">${c.note}</div>`:""}
+        </div>
+      `).join("")}
+    </div>
+  `).join("");
+}
+
+// ── INIT ─────────────────────────────────────────────────
+setTimeout(()=>{document.getElementById("loader").classList.add("hidden");},1800);
+renderOverview();
+</script>
+</body>
+</html>

@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baki Protocol -- Yohann OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--s1:#0f0f0f;--s2:#161616;--s3:#1e1e1e;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);
+  --t1:#e8e4dc;--t2:#7a7670;--t3:#3d3a36;
+  --gb:#22b07d;--green:#1a8c63;--gdim:rgba(26,140,99,0.12);--gbdr:rgba(26,140,99,0.35);
+  --amber:#c49a3c;--adim:rgba(196,154,60,0.1);--abdr:rgba(196,154,60,0.3);
+  --coral:#c0553a;--cdim:rgba(192,85,58,0.1);--cbdr:rgba(192,85,58,0.3);
+  --purple:#6e65c4;--pbdr:rgba(110,101,196,0.3);
+  --blue:#3a7bc4;--bbdr:rgba(58,123,196,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35}
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;transition:opacity 0.8s,visibility 0.8s}
+#loader.hidden{opacity:0;visibility:hidden}
+.l-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,100px);letter-spacing:0.15em;animation:lpulse 1.5s ease-in-out infinite alternate;color:var(--coral)}
+.l-sub{font-size:10px;color:var(--t3);letter-spacing:0.3em;text-transform:uppercase;margin-top:8px}
+.l-bar-wrap{width:180px;height:1px;background:var(--b2);margin-top:28px;overflow:hidden}
+.l-bar{height:100%;background:var(--coral);width:0%;animation:lbar 1.8s ease forwards}
+@keyframes lpulse{from{opacity:0.4}to{opacity:1}}
+@keyframes lbar{0%{width:0%}60%{width:70%}100%{width:100%}}
+.app{max-width:920px;margin:0 auto;padding:0 28px 100px;opacity:0;animation:fadein 0.6s ease 2s forwards}
+@keyframes fadein{to{opacity:1}}
+.header{padding:44px 0 24px;border-bottom:1px solid var(--b1);margin-bottom:32px}
+.header-row{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:16px}
+.h-wordmark{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,7vw,72px);letter-spacing:0.12em;line-height:1;color:var(--coral)}
+.h-sub{font-family:'Crimson Pro',serif;font-style:italic;font-size:15px;color:var(--t2);margin-top:6px}
+.h-phase{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;color:var(--amber);text-align:right}
+.h-phasenum{font-size:10px;color:var(--t3);letter-spacing:0.15em;text-transform:uppercase;margin-top:2px;text-align:right}
+.gap-banner{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:32px}
+.gap-cell{background:var(--s1);padding:18px}
+.gap-label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.gap-val{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);letter-spacing:0.05em;line-height:1}
+.gap-sub{font-size:10px;color:var(--t3);margin-top:4px}
+.gap-arrow{color:var(--coral);font-size:11px;margin-top:6px;letter-spacing:0.04em}
+.tab-nav{display:flex;gap:2px;margin-bottom:32px;border-bottom:1px solid var(--b1);overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tnb{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:11px 16px;border:none;background:transparent;color:var(--t3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+.tnb:hover{color:var(--t2)}
+.tnb.active{color:var(--coral);border-bottom-color:var(--coral)}
+.tab{display:none}.tab.active{display:block}
+.slbl{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.slbl::after{content:'';flex:1;height:1px;background:var(--b1)}
+.stats{display:grid;gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:24px}
+.s4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.s3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.stat{background:var(--s1);padding:14px 16px}
+.stat-l{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.stat-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.05em;color:var(--t1);line-height:1}
+.stat-v.g{color:var(--gb)}.stat-v.a{color:var(--amber)}.stat-v.c{color:var(--coral)}
+.stat-s{font-size:10px;color:var(--t3);margin-top:2px}
+.phase-card{background:var(--s1);border:1px solid var(--b1);padding:20px;margin-bottom:2px;position:relative;overflow:hidden}
+.phase-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.phase-card.active::before{background:var(--coral)}
+.phase-card.next::before{background:var(--amber)}
+.phase-card.future::before{background:var(--t3);opacity:0.4}
+.phase-num{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.phase-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.08em;color:var(--t1);line-height:1;margin-bottom:8px}
+.phase-name.active{color:var(--coral)}.phase-name.next{color:var(--amber)}
+.phase-duration{font-size:10px;color:var(--t3);margin-bottom:8px;letter-spacing:0.06em}
+.phase-desc{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6;margin-bottom:10px}
+.phase-targets{display:flex;gap:8px;flex-wrap:wrap}
+.pt{font-size:10px;padding:3px 10px;border:1px solid var(--b1);color:var(--t3);letter-spacing:0.06em}
+.workout-day{background:var(--s1);border:1px solid var(--b1);margin-bottom:2px}
+.wd-header{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;transition:background 0.15s}
+.wd-header:hover{background:var(--s2)}
+.wd-day{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.08em;min-width:90px;flex-shrink:0}
+.wd-name{font-size:13px;color:var(--t1);flex:1}
+.wd-focus{font-size:10px;color:var(--t3);margin-top:1px}
+.wd-type{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border:1px solid;flex-shrink:0}
+.type-strength{border-color:var(--gbdr);color:var(--gb)}
+.type-conditioning{border-color:var(--cbdr);color:var(--coral)}
+.type-hybrid{border-color:var(--abdr);color:var(--amber)}
+.type-rest{border-color:var(--b1);color:var(--t3)}
+.wd-body{display:none;border-top:1px solid var(--b1);padding:16px}
+.workout-day.open .wd-body{display:block}
+.ex-table{width:100%;border-collapse:collapse}
+.ex-table th{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);padding:6px 10px;text-align:left;border-bottom:1px solid var(--b1);background:var(--s2)}
+.ex-table td{padding:10px 10px;border-bottom:1px solid var(--b1);font-size:12px;color:var(--t2)}
+.ex-table tr:last-child td{border-bottom:none}
+.ex-table tr:hover td{background:var(--s2)}
+.ex-name{color:var(--t1);font-weight:400}
+.ex-why{font-family:'Crimson Pro',serif;font-style:italic;font-size:11px;color:var(--t3);margin-top:2px}
+.ex-baki{color:var(--coral);font-size:10px;letter-spacing:0.06em;margin-top:2px}
+.baki-note{background:var(--cdim);border-left:2px solid var(--cbdr);padding:10px 14px;margin-top:12px;font-family:'Crimson Pro',serif;font-size:14px;color:var(--t2);line-height:1.6}
+.macro-wrap{display:flex;align-items:center;gap:20px;background:var(--s1);border:1px solid var(--b1);padding:20px;margin-bottom:16px}
+.macro-cal{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:0.05em;color:var(--coral);line-height:1}
+.macro-cal-label{font-size:9px;color:var(--t3);letter-spacing:0.15em;text-transform:uppercase}
+.macro-bars{flex:1}
+.mb-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.mb-label{font-size:10px;color:var(--t2);min-width:70px;flex-shrink:0}
+.mb-track{flex:1;height:4px;background:var(--s3)}
+.mb-fill{height:100%}
+.mb-val{font-family:'Bebas Neue',sans-serif;font-size:18px;min-width:60px;text-align:right;flex-shrink:0;letter-spacing:0.05em}
+.meal-card{background:var(--s1);border:1px solid var(--b1);padding:16px;margin-bottom:2px}
+.meal-time{font-size:9px;color:var(--coral);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px}
+.meal-name{font-size:13px;color:var(--t1);margin-bottom:6px}
+.meal-item{font-size:12px;color:var(--t2);display:flex;justify-content:space-between;gap:10px;margin-bottom:3px}
+.meal-cal{font-size:11px;color:var(--t3);flex-shrink:0}
+.supp-card{background:var(--s1);border:1px solid var(--b1);padding:16px;margin-bottom:2px;display:flex;gap:14px;align-items:flex-start}
+.supp-time{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--coral);min-width:70px;flex-shrink:0;margin-top:1px}
+.supp-name{font-size:13px;color:var(--t1);margin-bottom:3px}
+.supp-dose{font-size:10px;color:var(--amber);margin-bottom:3px;letter-spacing:0.04em}
+.supp-why{font-family:'Crimson Pro',serif;font-size:13px;color:var(--t3);line-height:1.5}
+.pr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;margin-bottom:24px}
+.pr-card{background:var(--s1);border:1px solid var(--b1);padding:16px;transition:all 0.15s}
+.pr-card:hover{background:var(--s2)}
+.pr-lift{font-size:10px;color:var(--amber);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px}
+.pr-val{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:var(--t1);line-height:1}
+.pr-unit{font-size:11px;color:var(--t3);margin-top:2px}
+.pr-date{font-size:10px;color:var(--t3);margin-top:4px}
+.pr-input-row{display:flex;gap:6px;margin-top:8px}
+.pr-input-row input{flex:1;background:var(--s2);border:1px solid var(--b1);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t1)}
+.pr-input-row input:focus{outline:none;border-color:var(--b2)}
+.pr-input-row button{padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.pr-input-row button:hover{border-color:var(--coral);color:var(--coral)}
+.sb-tracker{background:var(--s1);border:1px solid var(--b1);padding:20px;margin-bottom:24px}
+.sb-week-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sb-week-num{font-size:10px;color:var(--t3);min-width:60px;letter-spacing:0.06em}
+.sb-rounds-display{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.05em;min-width:50px;text-align:center}
+.sb-bar-wrap{flex:1;height:4px;background:var(--s3)}
+.sb-bar-fill{height:100%;background:var(--coral);transition:width 0.4s ease}
+.sb-controls{display:flex;gap:4px}
+.sb-btn{width:26px;height:26px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:'JetBrains Mono',monospace}
+.sb-btn:hover{border-color:var(--coral);color:var(--coral)}
+.sb-target{font-size:10px;color:var(--t3);min-width:50px;text-align:right}
+.lift-log-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--b1);font-size:12px}
+.lift-log-row:last-child{border-bottom:none}
+.lift-log-ex{color:var(--t1);flex:1;min-width:0}
+.lift-log-input{background:var(--s2);border:1px solid var(--b1);padding:5px 8px;width:65px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t1);text-align:center;flex-shrink:0}
+.lift-log-input:focus{outline:none;border-color:var(--b2)}
+.lift-log-prev{font-size:10px;color:var(--t3);min-width:80px;text-align:right;flex-shrink:0}
+.lift-log-pr{font-size:9px;color:var(--amber);letter-spacing:0.06em;flex-shrink:0}
+.session-card{background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;position:relative;overflow:hidden}
+.session-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.session-card.completed::before{background:var(--gb)}
+.session-card.skipped::before{background:var(--coral)}
+.session-header{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;transition:background 0.15s}
+.session-header:hover{background:var(--s2)}
+.session-date{font-size:10px;color:var(--t3);min-width:80px;flex-shrink:0}
+.session-name{font-size:13px;color:var(--t1);flex:1}
+.session-status{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border:1px solid;flex-shrink:0}
+.ss-done{border-color:var(--gbdr);color:var(--gb)}
+.ss-skip{border-color:var(--cbdr);color:var(--coral)}
+.session-body{display:none;padding:12px 16px;border-top:1px solid var(--b1)}
+.session-card.open .session-body{display:block}
+.checkin-card{display:flex;align-items:center;gap:0;background:var(--b1);margin-bottom:2px}
+.ci-date{background:var(--s1);padding:12px 16px;min-width:90px;border-right:1px solid var(--b1);font-size:10px;color:var(--t3)}
+.ci-weight{background:var(--s1);padding:12px 16px;min-width:100px;text-align:center;border-right:1px solid var(--b1)}
+.ci-wval{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--amber);line-height:1}
+.ci-wlabel{font-size:9px;color:var(--t3)}
+.ci-delta{background:var(--s1);padding:12px 16px;min-width:80px;text-align:center;border-right:1px solid var(--b1)}
+.ci-deltaval{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1}
+.ci-notes-col{background:var(--s1);padding:12px 16px;flex:1;font-family:'Crimson Pro',serif;font-size:13px;color:var(--t3);line-height:1.4}
+input[type="number"],input[type="text"],input[type="date"],select,textarea{background:var(--s2);border:1px solid var(--b1);padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t1);transition:border-color 0.15s;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--b2)}
+input::placeholder,textarea::placeholder{color:var(--t3)}
+select option{background:var(--s2);color:var(--t1)}
+textarea{min-height:60px;resize:vertical;font-family:'Crimson Pro',serif;font-size:14px;line-height:1.6}
+.flbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.btn{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:10px 18px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--coral);color:var(--coral)}
+.btn.saved{border-color:var(--gbdr);color:var(--gb)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.form-full{grid-column:1/-1}
+.alert{padding:14px 18px;border-left:3px solid;margin-bottom:16px}
+.alert-red{border-color:var(--coral);background:var(--cdim)}
+.alert-green{border-color:var(--green);background:var(--gdim)}
+.alert-amber{border-color:var(--amber);background:var(--adim)}
+.alert-title{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px}
+.alert-text{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6}
+.rule{border:none;border-top:1px solid var(--b1);margin:24px 0}
+.empty{font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t3);padding:16px 0}
+</style>
+</head>
+<body>
+<div id="loader">
+  <div class="l-name">Baki Protocol</div>
+  <div class="l-sub">Physical Transformation -- Yohann OS</div>
+  <div class="l-bar-wrap"><div class="l-bar"></div></div>
+</div>
+
+<div class="app">
+<header class="header">
+  <div class="header-row">
+    <div>
+      <div class="h-wordmark">Baki Protocol</div>
+      <div class="h-sub">5'7" -- 157lbs -- 23% body fat. The body being built will be considered a specimen unlike any other.</div>
+    </div>
+    <div>
+      <div class="h-phasenum">Current phase</div>
+      <div class="h-phase">Phase 1 -- The Cut</div>
+    </div>
+  </div>
+  <div class="gap-banner">
+    <div class="gap-cell">
+      <div class="gap-label">Current</div>
+      <div class="gap-val" style="color:var(--coral)" id="current-weight-display">157</div>
+      <div class="gap-sub">lbs -- 23% body fat</div>
+      <div class="gap-arrow">~36lbs fat / 121lbs lean mass</div>
+    </div>
+    <div class="gap-cell">
+      <div class="gap-label">Phase 1 target</div>
+      <div class="gap-val" style="color:var(--amber)">138</div>
+      <div class="gap-sub">lbs -- ~12% body fat</div>
+      <div class="gap-arrow">Cut 19lbs in 16 weeks</div>
+    </div>
+    <div class="gap-cell">
+      <div class="gap-label">Baki standard</div>
+      <div class="gap-val" style="color:var(--gb)">155+</div>
+      <div class="gap-sub">lbs -- 8-10% body fat</div>
+      <div class="gap-arrow">Dense lean mass on clean canvas</div>
+    </div>
+  </div>
+</header>
+
+<div class="tab-nav">
+  <button class="tnb active" data-tab="overview" onclick="switchTab(this)">Overview</button>
+  <button class="tnb" data-tab="program" onclick="switchTab(this)">Program</button>
+  <button class="tnb" data-tab="log" onclick="switchTab(this)">Session log</button>
+  <button class="tnb" data-tab="prs" onclick="switchTab(this)">PRs</button>
+  <button class="tnb" data-tab="shadowbox" onclick="switchTab(this)">Shadow boxing</button>
+  <button class="tnb" data-tab="nutrition" onclick="switchTab(this)">Nutrition</button>
+  <button class="tnb" data-tab="progress" onclick="switchTab(this)">Progress</button>
+  <button class="tnb" data-tab="supplements" onclick="switchTab(this)">Supplements</button>
+  <button class="tnb" data-tab="rules" onclick="switchTab(this)">Baki rules</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="tab-overview" class="tab active">
+  <div class="alert alert-red">
+    <div class="alert-title" style="color:var(--coral)">Current assessment -- honest</div>
+    <div class="alert-text">23% body fat. Cardiovascular base gone -- 10 seconds of shadow boxing winds you. The back has width potential but no density. Midsection fat is the primary visual blocker. Verdict: cut first, hard, for 16 weeks. Reveal the structure. Then build on clean canvas. The frame is there. The excavation starts now.</div>
+  </div>
+  <div class="alert alert-amber">
+    <div class="alert-title" style="color:var(--amber)">Three additions vs the standard program</div>
+    <div class="alert-text">Neck training (Baki's neck is a signature feature -- almost nobody trains it), forearm work (wrist curls, reverse curls -- Baki's forearms are iconic), and power cleans (Baki is an athlete, not a bodybuilder -- functional explosive power is built into the program). These are not optional. They are what separates the Baki physique from a generic gym body.</div>
+  </div>
+  <div class="stats s4" id="overview-stats"></div>
+  <div class="slbl">The three-phase plan</div>
+  <div id="phase-overview"></div>
+  <div class="rule"></div>
+  <div class="slbl">16-week cut timeline</div>
+  <div id="cut-timeline"></div>
+</div>
+
+<!-- PROGRAM -->
+<div id="tab-program" class="tab">
+  <div class="alert alert-red" style="margin-bottom:24px">
+    <div class="alert-title" style="color:var(--coral)">Phase 1 -- Cut protocol (weeks 1-16)</div>
+    <div class="alert-text">5 training days, 2 active/rest days. Heavy compounds preserved to signal muscle retention during the deficit. Cardio after every strength session -- non-negotiable. Neck and forearm work integrated. Power cleans on Friday. Shadow boxing scaled weekly on Saturday.</div>
+  </div>
+  <div class="slbl">Weekly split</div>
+  <div id="program-split"></div>
+</div>
+
+<!-- SESSION LOG -->
+<div id="tab-log" class="tab">
+  <div class="stats s4" id="log-stats"></div>
+  <div class="slbl">Log today's session</div>
+  <div class="form-grid">
+    <div><div class="flbl">Date</div><input type="date" id="log-date"></div>
+    <div><div class="flbl">Session type</div>
+      <select id="log-type">
+        <option>Upper -- Push + Neck</option>
+        <option>Conditioning + Core</option>
+        <option>Lower -- Squat/Hinge</option>
+        <option>Upper -- Pull + Forearms</option>
+        <option>Full Body -- Power + Cleans</option>
+        <option>Active Recovery</option>
+        <option>Rest</option>
+      </select>
+    </div>
+    <div><div class="flbl">Duration (min)</div><input type="number" id="log-duration" placeholder="60"></div>
+    <div><div class="flbl">Energy (1-5)</div>
+      <select id="log-energy">
+        <option value="5">5 -- Locked in</option>
+        <option value="4">4 -- Good</option>
+        <option value="3" selected>3 -- Average</option>
+        <option value="2">2 -- Struggled</option>
+        <option value="1">1 -- Should have rested</option>
+      </select>
+    </div>
+    <div><div class="flbl">Cardio done?</div>
+      <select id="log-cardio">
+        <option value="yes">Yes -- full session</option>
+        <option value="partial">Partial</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+    <div><div class="flbl">Status</div>
+      <select id="log-status">
+        <option value="completed">Completed</option>
+        <option value="skipped">Skipped</option>
+      </select>
+    </div>
+  </div>
+  <div class="slbl">Lift tracker -- log weights and reps</div>
+  <div id="lift-logger"></div>
+  <div style="margin-top:12px"><div class="flbl">Session notes</div><textarea id="log-notes" placeholder="What moved well, what was hard, what to adjust next session..."></textarea></div>
+  <div style="margin-top:10px"><button class="btn" onclick="logSession()">+ Log session</button></div>
+  <div class="rule"></div>
+  <div class="slbl">Session history</div>
+  <div id="session-history"></div>
+  <div class="rule"></div>
+  <button class="btn" onclick="exportData()">&#8595; Export</button>
+  &nbsp;<label class="btn" style="cursor:pointer">&#8593; Import<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+</div>
+
+<!-- PRs -->
+<div id="tab-prs" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">Personal records are the clearest signal that the system is working. A PR means the muscle is growing stronger despite the deficit. During a cut you should be maintaining or slightly improving strength -- if PRs are dropping significantly, something is wrong with nutrition or recovery.</p>
+  <div class="slbl">Current PRs -- update after every breakthrough</div>
+  <div class="pr-grid" id="pr-grid"></div>
+  <div class="rule"></div>
+  <div class="slbl">PR history log</div>
+  <div id="pr-history"></div>
+</div>
+
+<!-- SHADOW BOXING -->
+<div id="tab-shadowbox" class="tab">
+  <div class="alert alert-red" style="margin-bottom:24px">
+    <div class="alert-title" style="color:var(--coral)">You described being the fastest people knew</div>
+    <div class="alert-text">That capacity is not gone. It is buried under 23% body fat and a deconditioned cardiovascular system. The Saturday shadow boxing protocol is the excavation. You start at 3 rounds in Week 1. You add 1 round per week. By Week 16 you are doing 18 rounds. By the end of Phase 1 the engine that used to make you the fastest person in the room is rebuilt -- and sitting on top of a leaner, stronger body.</div>
+  </div>
+  <div class="stats s3" id="sb-stats"></div>
+  <div class="slbl">Shadow boxing progression -- 16 weeks</div>
+  <div class="sb-tracker" id="sb-tracker"></div>
+  <div class="rule"></div>
+  <div class="slbl">Round quality log</div>
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t2);margin-bottom:14px;line-height:1.5">After each Saturday session, rate the quality of your rounds. Not how hard you went -- how clean the movement was. Combinations, footwork, breathing rhythm.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+    <div><div class="flbl">Week</div><input type="number" id="sb-week" placeholder="1" min="1" max="16"></div>
+    <div><div class="flbl">Rounds completed</div><input type="number" id="sb-rounds-done" placeholder="3" min="0" max="30"></div>
+    <div><div class="flbl">Quality (1-5)</div>
+      <select id="sb-quality">
+        <option value="5">5 -- Sharp, controlled, breathing managed</option>
+        <option value="4">4 -- Good form, some fatigue</option>
+        <option value="3" selected>3 -- Getting through it</option>
+        <option value="2">2 -- Survival mode</option>
+        <option value="1">1 -- Gassed immediately</option>
+      </select>
+    </div>
+    <div style="grid-column:1/-1"><div class="flbl">Notes</div><textarea id="sb-notes" placeholder="Movement quality, what combinations you worked, breathing rhythm, how it compared to last week..."></textarea></div>
+  </div>
+  <button class="btn" onclick="logShadowBox()">+ Log session</button>
+  <div class="rule"></div>
+  <div id="sb-log"></div>
+</div>
+
+<!-- NUTRITION -->
+<div id="tab-nutrition" class="tab">
+  <div class="slbl">Phase 1 -- Cut macros</div>
+  <div class="macro-wrap">
+    <div>
+      <div class="macro-cal">1800</div>
+      <div class="macro-cal-label">kcal / day</div>
+    </div>
+    <div class="macro-bars">
+      <div class="mb-row"><div class="mb-label">Protein</div><div class="mb-track"><div class="mb-fill" style="width:39%;background:var(--gb)"></div></div><div class="mb-val" style="color:var(--gb)">175g</div></div>
+      <div class="mb-row"><div class="mb-label">Carbs</div><div class="mb-track"><div class="mb-fill" style="width:33%;background:var(--amber)"></div></div><div class="mb-val" style="color:var(--amber)">150g</div></div>
+      <div class="mb-row"><div class="mb-label">Fat</div><div class="mb-track"><div class="mb-fill" style="width:28%;background:var(--coral)"></div></div><div class="mb-val" style="color:var(--coral)">55g</div></div>
+    </div>
+  </div>
+  <div style="background:var(--s1);border-left:2px solid var(--abdr);padding:12px 16px;margin-bottom:20px;font-family:'Crimson Pro',serif;font-size:14px;color:var(--t2);line-height:1.6">Aggressive deficit for 157lb at 23% BF. 1,800 kcal puts you at ~700-800 calorie deficit from TDEE with training. High protein preserves muscle during the cut. Do not drop below 1,700 kcal. If weight stops moving for 2+ weeks, drop carbs by 20g -- not total calories.</div>
+  <div class="slbl">Daily meal framework</div>
+  <div id="meal-plan"></div>
+  <div class="rule"></div>
+  <div class="slbl">Nutrition rules</div>
+  <div id="nutrition-rules"></div>
+</div>
+
+<!-- PROGRESS -->
+<div id="tab-progress" class="tab">
+  <div class="slbl">Weekly check-in</div>
+  <div class="form-grid">
+    <div><div class="flbl">Date</div><input type="date" id="ci-date"></div>
+    <div><div class="flbl">Weight (lbs)</div><input type="number" id="ci-weight" placeholder="157" step="0.1"></div>
+    <div><div class="flbl">Body fat % (if known)</div><input type="number" id="ci-bf" placeholder="23" step="0.1"></div>
+    <div><div class="flbl">Waist (inches)</div><input type="number" id="ci-waist" placeholder="34" step="0.25"></div>
+    <div><div class="flbl">Chest (inches)</div><input type="number" id="ci-chest" placeholder="" step="0.25"></div>
+    <div><div class="flbl">How you feel (1-5)</div>
+      <select id="ci-feel">
+        <option value="5">5 -- Specimen energy</option>
+        <option value="4">4 -- Progressing</option>
+        <option value="3" selected>3 -- Neutral</option>
+        <option value="2">2 -- Rough week</option>
+        <option value="1">1 -- Struggled</option>
+      </select>
+    </div>
+    <div class="form-full"><div class="flbl">Notes</div><textarea id="ci-notes" placeholder="Visible changes, strength improvements, energy levels, anything notable..."></textarea></div>
+  </div>
+  <button class="btn" onclick="logCheckin()">+ Log check-in</button>
+  <div class="rule"></div>
+  <div class="stats s4" id="progress-stats"></div>
+  <div class="slbl">Progress log</div>
+  <div id="progress-log"></div>
+  <div class="rule"></div>
+  <div class="slbl">Weight trajectory</div>
+  <canvas id="weight-canvas" height="100" style="width:100%;display:block;background:var(--s1);border:1px solid var(--b1)"></canvas>
+</div>
+
+<!-- SUPPLEMENTS -->
+<div id="tab-supplements" class="tab">
+  <div class="alert alert-green" style="margin-bottom:24px">
+    <div class="alert-title" style="color:var(--gb)">You already have two of the most important ones</div>
+    <div class="alert-text">Magnesium glycinate and D3+K2 are already in your protocol from your wellness stack. They are not gym supplements -- they are nervous system and hormonal infrastructure. The gym stack builds on top of what is already running.</div>
+  </div>
+  <div id="supp-list"></div>
+</div>
+
+<!-- BAKI RULES -->
+<div id="tab-rules" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">Baki does not train to look good. He trains because there is something to prove -- to himself, to the standard, to anyone who has underestimated what this vessel can become. These are the operating rules of the protocol.</p>
+  <div id="baki-rules-list"></div>
+</div>
+
+</div>
+
+<script>
+var PROGRAM=[
+  {day:"Monday",name:"Upper -- Push + Neck",type:"strength",color:"var(--gb)",focus:"Chest, shoulders, triceps, neck",
+   exercises:[
+     {name:"Barbell Bench Press",sets:"4",reps:"6-8",rest:"2-3 min",why:"Primary chest thickness builder. Control the eccentric 3 seconds down.",baki:"Chest density that shows through a shirt."},
+     {name:"Incline Dumbbell Press",sets:"3",reps:"10-12",rest:"90s",why:"Upper chest emphasis. Full range, no partial reps.",baki:""},
+     {name:"Overhead Press (barbell)",sets:"4",reps:"6-8",rest:"2-3 min",why:"Shoulder strength and size. Brace the core the entire set.",baki:"Boulder shoulders. Baki's shoulder-to-waist ratio is elite."},
+     {name:"Lateral Raises",sets:"4",reps:"15-20",rest:"60s",why:"Side delt width. Slow and controlled -- no swinging.",baki:"Width that shows from every angle."},
+     {name:"Cable Tricep Pushdown",sets:"3",reps:"12-15",rest:"60s",why:"Full extension every rep. Lateral head development.",baki:""},
+     {name:"Neck Harness -- Lateral Flexion",sets:"3",reps:"15/side",rest:"45s",why:"Neck thickness. Most people never train this. Baki's neck is a signature feature of his silhouette.",baki:"BAKI ADDITION: The thick neck that makes the whole physique look powerful."},
+     {name:"Neck Bridge (Wrestler bridge)",sets:"2",reps:"30-45s hold",rest:"60s",why:"Posterior neck development and cervical strength. Start gentle.",baki:""},
+     {name:"Cardio -- Incline treadmill",sets:"1",reps:"20 min",rest:"--",why:"Speed 3.5, incline 10-12. LISS fat burning after strength work.",baki:""},
+   ],
+   bakinote:"Push plus neck. The combination that builds a physique that reads powerful before anyone sees your arms. Neck training takes 8 minutes and changes the entire silhouette. It is mandatory."},
+  {day:"Tuesday",name:"Conditioning + Core",type:"conditioning",color:"var(--coral)",focus:"Engine rebuild, cardiovascular base, core density",
+   exercises:[
+     {name:"Jump rope",sets:"5",reps:"3 min on / 1 min off",rest:"1 min",why:"Rebuilds the cardiovascular engine. If you cannot yet -- skip in place and build up.",baki:"This is how you get the speed back."},
+     {name:"Battle ropes",sets:"4",reps:"30s on / 30s off",rest:"--",why:"Upper body cardiovascular conditioning. Full effort every interval.",baki:""},
+     {name:"Sled push or rowing machine",sets:"4",reps:"200m or 3 min",rest:"90s",why:"Full body cardiovascular load. No technique to hide behind.",baki:"Baki does not separate conditioning from training."},
+     {name:"Ab wheel rollout",sets:"3",reps:"8-12",rest:"60s",why:"Start from knees. Full extension target. Best core movement available.",baki:"The abs that show at 12% body fat are built here."},
+     {name:"Hanging leg raises",sets:"3",reps:"12-15",rest:"60s",why:"Controlled -- no swinging. Lower ab and hip flexor development.",baki:""},
+     {name:"Dragon flag (or progression)",sets:"3",reps:"5-8",rest:"90s",why:"Advanced core. Start with tuck version. This builds the dense, functional core Baki has -- not surface abs.",baki:"BAKI ADDITION: Dragon flags build the kind of core that looks like anatomy diagrams."},
+     {name:"Farmer carry",sets:"4",reps:"40m",rest:"60s",why:"Heavy. Grip, core, traps, cardiovascular -- all in one movement.",baki:""},
+   ],
+   bakinote:"Tuesday is the engine room. Shadow boxing wound you in 10 seconds. Tuesday is why that stops. By week 8 the jump rope rounds will start feeling like nothing. That is the engine coming back."},
+  {day:"Wednesday",name:"Lower -- Squat and Hinge",type:"strength",color:"var(--gb)",focus:"Quads, hamstrings, glutes, calves",
+   exercises:[
+     {name:"Barbell Back Squat",sets:"4",reps:"6-8",rest:"2-3 min",why:"King of lower body. Full depth. The legs Baki has are built from heavy compound loading.",baki:"Baki's thighs look like anatomy diagrams. This is why."},
+     {name:"Romanian Deadlift",sets:"4",reps:"8-10",rest:"2 min",why:"Hamstring and glute development. Feel the stretch at the bottom.",baki:""},
+     {name:"Leg Press",sets:"3",reps:"12-15",rest:"90s",why:"Quad volume. Full range -- do not lock out at top.",baki:""},
+     {name:"Walking Lunges",sets:"3",reps:"12 per leg",rest:"90s",why:"Unilateral leg development. Add dumbbells when bodyweight becomes easy.",baki:""},
+     {name:"Nordic Hamstring Curl",sets:"3",reps:"6-8",rest:"90s",why:"ADDITION: Most powerful hamstring builder available. Eccentric focused. Prevents hamstring tears.",baki:"Posterior chain density that shows with every step."},
+     {name:"Standing Calf Raise",sets:"4",reps:"15-20",rest:"60s",why:"Full range -- stretch at bottom, squeeze at top. Baki's calves are built.",baki:""},
+     {name:"Cardio -- Stairmaster",sets:"1",reps:"20 min",rest:"--",why:"Level 6-8. Lower body LISS cardio after lower body lifting.",baki:""},
+   ],
+   bakinote:"The legs carry everything. A powerful lower body does not just look impressive -- it generates the ground force that makes every other movement more athletic. Do not skip leg day."},
+  {day:"Thursday",name:"Upper -- Pull + Forearms",type:"strength",color:"var(--gb)",focus:"Lats, back thickness, biceps, forearms",
+   exercises:[
+     {name:"Pull-ups or Lat Pulldown",sets:"4",reps:"6-8 or 10-12",rest:"2 min",why:"Pull-ups if you can. Lat pulldown until you can. Dead hang to chin over bar -- full range.",baki:"The lat width that makes waist look smaller."},
+     {name:"Barbell Row (Pendlay or bent-over)",sets:"4",reps:"6-8",rest:"2 min",why:"Back thickness. Drive elbows back, not hands. The thickness that shows from behind.",baki:"Your back photos show width potential but zero density. This is where that changes."},
+     {name:"Single-arm Dumbbell Row",sets:"3",reps:"10-12 per side",rest:"90s",why:"Full range of motion. Chest on bench for stability.",baki:""},
+     {name:"Face Pulls",sets:"3",reps:"15-20",rest:"60s",why:"Rear delts and external rotation. Critical for shoulder health and posterior shoulder development.",baki:""},
+     {name:"Barbell Curl",sets:"3",reps:"10-12",rest:"60s",why:"Controlled. Supinate at the top. Bicep peak development.",baki:""},
+     {name:"Hammer Curls",sets:"3",reps:"10-12",rest:"60s",why:"Brachialis development. The thickness in the arm that makes it look dense.",baki:""},
+     {name:"Wrist Curls",sets:"3",reps:"15-20",rest:"45s",why:"BAKI ADDITION: Forearm flexor development. Baki's forearms are one of the most iconic features of his physique.",baki:"Forearms are visible in every outfit. Most people never train them directly."},
+     {name:"Reverse Curls",sets:"3",reps:"12-15",rest:"45s",why:"BAKI ADDITION: Forearm extensor and brachialis. Builds the thick forearm look from every angle.",baki:""},
+     {name:"Cardio -- Row machine",sets:"1",reps:"20 min",rest:"--",why:"Moderate pace. Focus on breathing rhythm.",baki:""},
+   ],
+   bakinote:"Pull plus forearms. The back is what makes a physique look dominant from behind. The forearms are what make it look dangerous up close. Both get trained on Thursday. Do not rush the forearm work -- it is 12 minutes that changes the entire arm."},
+  {day:"Friday",name:"Full Body -- Power and Cleans",type:"hybrid",color:"var(--amber)",focus:"Explosive power, full-body density",
+   exercises:[
+     {name:"Power Clean",sets:"4",reps:"3-5",rest:"2-3 min",why:"BAKI ADDITION: Full-body explosive power. Baki is an athlete -- his power is functional and athletic, not just aesthetic. Power cleans build the kind of dense, functional muscle that looks like it works.",baki:"This is the movement that separates a Baki physique from a generic gym physique. Athletic, explosive, dense."},
+     {name:"Deadlift",sets:"4",reps:"4-6",rest:"3 min",why:"King lift. Every muscle fires. The density Baki has starts here.",baki:"Heavy deadlifts are non-negotiable."},
+     {name:"Dips (weighted if possible)",sets:"4",reps:"8-10",rest:"2 min",why:"Full range. Lock out at top. Lower until arms at 90 degrees.",baki:""},
+     {name:"Chin-ups",sets:"4",reps:"6-8",rest:"2 min",why:"Supinated grip. Full range. Bicep and lat together.",baki:""},
+     {name:"Arnold Press",sets:"3",reps:"10-12",rest:"90s",why:"Full rotation. Three-dimensional shoulder development.",baki:""},
+     {name:"Neck Harness -- Forward Flexion",sets:"3",reps:"15-20",rest:"45s",why:"Anterior neck development. Pairs with Monday's lateral and bridge work for full neck development.",baki:""},
+     {name:"HIIT intervals",sets:"8",reps:"30s sprint / 90s walk",rest:"--",why:"Treadmill or bike. All-out on the sprint. This is the fat burner that accelerates the cut.",baki:""},
+   ],
+   bakinote:"Friday is the synthesis. Power clean, deadlift, dips, chin-ups. Every major movement pattern. The HIIT at the end burns the most fat of any session in the week. Do not skip it because you are tired from the deadlifts. That is exactly when it matters most."},
+  {day:"Saturday",name:"Active Recovery + Shadow Boxing",type:"rest",color:"var(--t3)",focus:"Cardiovascular conditioning rebuild, mobility",
+   exercises:[
+     {name:"Walk -- 45-60 min",sets:"1",reps:"continuous",rest:"--",why:"Brisk pace. Outside if possible. LISS cardio that burns fat without stressing recovery.",baki:""},
+     {name:"Shadow boxing -- scaled weekly",sets:"see tracker",reps:"3 min rounds / 1 min rest",rest:"1 min between rounds",why:"Week 1: 3 rounds. Add 1 round per week. By week 16: 18 rounds. This is how the engine comes back.",baki:"You used to be the fastest person people knew. This is how you get that back -- and put it on top of a body that looks like it earned it."},
+     {name:"Mobility -- hips, thoracic, hamstrings",sets:"1",reps:"15 min",rest:"--",why:"Consistent mobility work prevents injury and improves movement quality in every lift.",baki:""},
+     {name:"Grip training -- plate pinches",sets:"3",reps:"30s hold",rest:"60s",why:"ADDITION: Grip strength compounds the forearm work from Thursday. Baki's grip is part of the physique.",baki:""},
+   ],
+   bakinote:"Saturday is not a day off. It is a lower-intensity training day. The shadow boxing is the most psychologically important session of the week -- it is the direct reconnection to who you used to be, and the building of who you are becoming."},
+  {day:"Sunday",name:"Full Rest",type:"rest",color:"var(--t3)",focus:"Recovery, nutrition, sleep",
+   exercises:[
+     {name:"Full rest",sets:"--",reps:"--",rest:"--",why:"Sleep 8 hours. Eat on target. The adaptation happens here.",baki:""},
+     {name:"Meal prep",sets:"--",reps:"--",rest:"--",why:"Cook proteins in bulk. This is the most important nutrition habit for hitting macros consistently.",baki:""},
+     {name:"Supplement compliance",sets:"--",reps:"--",rest:"--",why:"Magnesium glycinate before bed. D3+K2 with morning meal. Creatine any time.",baki:""},
+   ],
+   bakinote:"Recovery is where the adaptation happens. The training is the signal. Sleep and food are the response. Without Sunday, Friday's work is partially wasted."},
+];
+
+var PR_LIFTS=[
+  {id:"bench",name:"Bench Press",unit:"lbs"},
+  {id:"squat",name:"Back Squat",unit:"lbs"},
+  {id:"deadlift",name:"Deadlift",unit:"lbs"},
+  {id:"ohp",name:"Overhead Press",unit:"lbs"},
+  {id:"row",name:"Barbell Row",unit:"lbs"},
+  {id:"pullup",name:"Pull-ups",unit:"reps"},
+  {id:"clean",name:"Power Clean",unit:"lbs"},
+  {id:"dip",name:"Weighted Dips",unit:"lbs added"},
+];
+
+var LIFT_LOG_EXERCISES=[
+  "Barbell Bench Press","Barbell Back Squat","Deadlift","Romanian Deadlift",
+  "Overhead Press","Barbell Row","Pull-ups","Power Clean",
+  "Incline Dumbbell Press","Dips","Chin-ups","Lateral Raises",
+];
+
+var MEALS=[
+  {time:"Morning -- 7:30 AM",name:"Pre-training fuel",items:[
+    {food:"4 whole eggs scrambled",cals:280},
+    {food:"1 cup oats with water",cals:150},
+    {food:"1 banana",cals:90},
+  ]},
+  {time:"Post-training -- 10:30 AM",name:"Recovery window",items:[
+    {food:"1 scoop whey protein in water",cals:120},
+    {food:"1 cup white rice",cals:200},
+    {food:"4oz chicken breast",cals:185},
+  ]},
+  {time:"Lunch -- 1:00 PM",name:"Midday refuel",items:[
+    {food:"6oz salmon or tilapia",cals:240},
+    {food:"2 cups broccoli",cals:60},
+    {food:"1/2 cup sweet potato",cals:90},
+  ]},
+  {time:"Afternoon -- 4:00 PM",name:"Top-up",items:[
+    {food:"Greek yogurt non-fat plain",cals:100},
+    {food:"1 tbsp peanut butter",cals:95},
+  ]},
+  {time:"Dinner -- 7:30 PM",name:"Final meal",items:[
+    {food:"6oz lean ground beef or chicken",cals:240},
+    {food:"Large salad with olive oil",cals:170},
+  ]},
+];
+
+var SUPPLEMENTS=[
+  {time:"Morning",name:"D3 + K2",dose:"5,000 IU D3 + 100mcg K2 (MK-7)",why:"Already in your stack. Corrects vitamin D deficiency which suppresses testosterone and muscle protein synthesis. Take with breakfast."},
+  {time:"Morning",name:"Creatine Monohydrate",dose:"5g daily -- any time",why:"Most evidence-backed performance supplement available. Increases strength output 5-15%, improves recovery, cognitive benefits. No cycling needed."},
+  {time:"Pre-workout",name:"Black coffee",dose:"1-2 cups, 30 min before training",why:"Increases power output, reduces perceived effort, burns more fat during cardio. Free, effective. Do not use after 2PM."},
+  {time:"Post-workout",name:"Whey Protein",dose:"25-30g in water",why:"Hits the post-training protein synthesis window. Fast-digesting. Supplement to meals -- not a meal replacement."},
+  {time:"With food",name:"Ashwagandha (KSM-66)",dose:"600mg daily with food",why:"Reduces chronically elevated cortisol from academic, career, and financial stress. High cortisol during a cut accelerates muscle loss. Directly protects the lean mass you are fighting to keep."},
+  {time:"Evening",name:"Magnesium Glycinate",dose:"400mg, 30-60 min before sleep",why:"Already in your stack. Promotes parasympathetic recovery, improves sleep quality, reduces chronic tension. Most important supplement for sleep and recovery quality."},
+];
+
+var BAKI_RULES=[
+  "The cut is not optional. You cannot build this physique on top of 23% body fat. Reveal the structure first. Then forge it. The sequence is not negotiable.",
+  "The three additions are mandatory. Neck training, forearm work, and power cleans are not optional accessories. They are what separates the Baki physique from a generic gym body. They stay in the program.",
+  "Cardiovascular conditioning is rebuilt through weekly accumulation. 3 rounds of shadow boxing in week 1. 18 rounds in week 16. The engine does not come back in one brutal session -- it comes back one round at a time.",
+  "The compound lifts do not go away during the cut. Bench, squat, deadlift, row, press, clean. Heavy. This is the signal to the body that the muscle is necessary. Without the signal, the muscle goes with the fat.",
+  "Protein is the foundation. 175g minimum per day. If you miss a macro, let it be carbs or fat. Never protein.",
+  "Sleep is a training variable. 8 hours protects testosterone, growth hormone, and muscle retention during the deficit. Less than 6 hours and the cut becomes muscle loss, not fat loss.",
+  "Track your lifts every session. Progressive overload is the only mechanism by which muscle is built and retained. If you do not track, you do not know if you are progressing.",
+  "The PRs tell you whether the system is working. During a cut you should maintain or slightly improve on compounds. If PRs are dropping significantly for multiple weeks, the deficit is too aggressive or recovery is insufficient.",
+  "Progress photos matter more than the scale. The scale fluctuates. Photos do not lie. Every Sunday, same lighting, same pose. Compare month to month.",
+  "The vessel being built is not for aesthetics. It is infrastructure. A high-performance body produces higher-quality decisions, better emotional regulation, more energy for every other pillar of the system. The training is not separate from the OS. It IS the OS.",
+];
+
+function gs(k,d){try{var v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch(e){return d;}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function today(){return new Date().toISOString().split("T")[0];}
+
+var sessions=gs("baki_sessions",[]);
+var checkins=gs("baki_checkins",[]);
+var prs=gs("baki_prs",{});
+var prHistory=gs("baki_pr_history",[]);
+var sbLog=gs("baki_sb",[]);
+var sbRounds=gs("baki_sb_rounds",{});
+var liftData=gs("baki_lift_data",{});
+
+function switchTab(btn){
+  document.querySelectorAll(".tnb").forEach(function(b){b.classList.remove("active");});
+  btn.classList.add("active");
+  document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
+  document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+  var t=btn.dataset.tab;
+  if(t==="overview")renderOverview();
+  if(t==="program")renderProgram();
+  if(t==="log")renderLog();
+  if(t==="prs")renderPRs();
+  if(t==="shadowbox")renderShadowBox();
+  if(t==="nutrition")renderNutrition();
+  if(t==="progress")renderProgress();
+  if(t==="supplements")renderSupplements();
+  if(t==="rules")renderRules();
+}
+
+function renderOverview(){
+  var latest=checkins.length?checkins[checkins.length-1]:null;
+  var cw=latest?latest.weight:157;
+  var sw=checkins.length?checkins[0].weight:157;
+  var lost=Math.max(0,sw-cw).toFixed(1);
+  var wksIn=checkins.length;
+  var done=sessions.filter(function(s){return s.status==="completed";}).length;
+  var color=cw<=138?"var(--gb)":cw<=148?"var(--amber)":"var(--coral)";
+  document.getElementById("current-weight-display").textContent=cw;
+  document.getElementById("current-weight-display").style.color=color;
+  document.getElementById("overview-stats").innerHTML=
+    '<div class="stat"><div class="stat-l">Current weight</div><div class="stat-v a">'+cw+'</div><div class="stat-s">lbs</div></div>'+
+    '<div class="stat"><div class="stat-l">Lost so far</div><div class="stat-v '+(lost>0?"g":"c")+'">'+lost+'</div><div class="stat-s">lbs since start</div></div>'+
+    '<div class="stat"><div class="stat-l">Sessions done</div><div class="stat-v">'+done+'</div><div class="stat-s">completed</div></div>'+
+    '<div class="stat"><div class="stat-l">Weeks in</div><div class="stat-v">'+wksIn+'</div><div class="stat-s">of 16</div></div>';
+
+  var phases=[
+    {num:"Phase 01",name:"The Cut",status:"active",duration:"16 weeks",tw:"138 lbs",tbf:"~12%",desc:"Aggressive deficit. High protein. Heavy compounds preserved. Cardio mandatory. Neck, forearm, and power clean work integrated. Cardiovascular base rebuilt from zero via shadow boxing protocol.",targets:["1,800 kcal/day","175g protein","5x/week training","20 min cardio every session","3 rounds shadow boxing -- scaling to 18 by week 16"]},
+    {num:"Phase 02",name:"Lean Bulk",status:"next",duration:"20 weeks",tw:"155+ lbs",tbf:"~14%",desc:"Small surplus 200-300 kcal above maintenance. Maximum muscle gain with minimal fat regain. Compounds loaded progressively. This is where Baki's density gets built on the clean canvas.",targets:["2,400-2,600 kcal/day","175g protein","5-6x/week training","Progressive overload tracked weekly","Body fat ceiling: 16%"]},
+    {num:"Phase 03",name:"The Refinement",status:"future",duration:"12 weeks",tw:"150-155 lbs",tbf:"8-10%",desc:"Final cut from ~14% to 8-10%. The Baki physique. Dense, dry, every muscle group mapped. Cardiovascular system fully rebuilt. The specimen phase.",targets:["1,900-2,000 kcal/day","180g protein","6x/week training","Daily morning cardio added","Shadow boxing: full rounds, full speed"]},
+  ];
+
+  document.getElementById("phase-overview").innerHTML=phases.map(function(p){
+    return '<div class="phase-card '+p.status+'">'+
+      '<div class="phase-num">'+p.num+(p.status==="active"?' -- <span style="color:var(--coral);font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:0.1em">YOU ARE HERE</span>':'')+'</div>'+
+      '<div class="phase-name '+p.status+'">'+p.name+'</div>'+
+      '<div class="phase-duration">'+p.duration+' -- target: '+p.tw+' @ '+p.tbf+'</div>'+
+      '<div class="phase-desc">'+p.desc+'</div>'+
+      '<div class="phase-targets">'+p.targets.map(function(t){return '<div class="pt">'+t+'</div>';}).join("")+'</div>'+
+    '</div>';
+  }).join("");
+
+  var wksGone=Math.min(wksIn,16);
+  var pct=Math.round(wksGone/16*100);
+  document.getElementById("cut-timeline").innerHTML=
+    '<div style="background:var(--s1);border:1px solid var(--b1);padding:18px 20px">'+
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-bottom:6px"><span>Week 0 -- 157 lbs / 23% BF</span><span>Week 16 -- 138 lbs / ~12% BF</span></div>'+
+    '<div style="height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:8px"><div style="width:'+pct+'%;height:100%;background:var(--coral);border-radius:3px;transition:width 0.5s"></div></div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3)"><span>Week '+wksGone+' of 16</span><span>'+(100-pct)+'% remaining</span></div>'+
+    '<div style="margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+
+    [4,8,12,16].map(function(w){
+      return '<div style="text-align:center;background:var(--s2);padding:8px">'+
+        '<div style="font-size:9px;color:var(--t3);margin-bottom:2px">Week '+w+'</div>'+
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:'+(wksGone>=w?"var(--gb)":"var(--t3)")+'">'+
+        (157-Math.round((157-138)/16*w))+'</div>'+
+        '<div style="font-size:9px;color:var(--t3)">lbs target</div></div>';
+    }).join("")+'</div></div>';
+}
+
+function renderProgram(){
+  document.getElementById("program-split").innerHTML=PROGRAM.map(function(day,i){
+    return '<div class="workout-day" id="wd-'+i+'">'+
+      '<div class="wd-header" onclick="toggleWorkout('+i+')">'+
+      '<div class="wd-day" style="color:'+day.color+'">'+day.day+'</div>'+
+      '<div><div class="wd-name">'+day.name+'</div><div class="wd-focus">'+day.focus+'</div></div>'+
+      '<div class="wd-type type-'+day.type+'">'+day.type+'</div>'+
+      '</div>'+
+      '<div class="wd-body">'+
+      '<table class="ex-table"><thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Rest</th></tr></thead><tbody>'+
+      day.exercises.map(function(e){
+        return '<tr><td>'+
+          '<div class="ex-name">'+e.name+'</div>'+
+          (e.why?'<div class="ex-why">'+e.why+'</div>':'')+
+          (e.baki?'<div class="ex-baki">'+e.baki+'</div>':'')+
+          '</td><td>'+e.sets+'</td><td>'+e.reps+'</td><td>'+e.rest+'</td></tr>';
+      }).join("")+
+      '</tbody></table>'+
+      '<div class="baki-note">'+day.bakinote+'</div>'+
+      '</div></div>';
+  }).join("");
+}
+
+function toggleWorkout(i){document.getElementById("wd-"+i).classList.toggle("open");}
+
+function renderLog(){
+  var completed=sessions.filter(function(s){return s.status==="completed";}).length;
+  var skipped=sessions.filter(function(s){return s.status==="skipped";}).length;
+  var withCardio=sessions.filter(function(s){return s.cardio==="yes"&&s.status==="completed";}).length;
+  var avgE=sessions.length?Math.round(sessions.reduce(function(a,s){return a+s.energy;},0)/sessions.length*10)/10:0;
+  document.getElementById("log-stats").innerHTML=
+    '<div class="stat"><div class="stat-l">Sessions done</div><div class="stat-v g">'+completed+'</div><div class="stat-s">completed</div></div>'+
+    '<div class="stat"><div class="stat-l">Skipped</div><div class="stat-v '+(skipped>0?"c":"")+'">'+skipped+'</div><div class="stat-s">missed</div></div>'+
+    '<div class="stat"><div class="stat-l">Cardio rate</div><div class="stat-v '+(completed>0?(withCardio/completed>=0.8?"g":"c"):"")+'">'+
+    (completed>0?Math.round(withCardio/completed*100):0)+'%</div><div class="stat-s">with cardio</div></div>'+
+    '<div class="stat"><div class="stat-l">Avg energy</div><div class="stat-v a">'+(avgE||"--")+'</div><div class="stat-s">out of 5</div></div>';
+
+  var sessionType=document.getElementById("log-type").value;
+  var dayProgram=PROGRAM.filter(function(d){return d.name===sessionType;})[0];
+  var liftExs=dayProgram?dayProgram.exercises.filter(function(e){return e.rest!=="--"&&e.name!=="Full rest"&&e.name!=="Meal prep"&&e.name!=="Supplement compliance";}):[];
+
+  document.getElementById("lift-logger").innerHTML=liftExs.length?liftExs.map(function(e){
+    var sessionKey=sessionType+"_"+today();
+    var prev=liftData[e.name]?liftData[e.name][liftData[e.name].length-1]:null;
+    var isPR=false;
+    if(prev&&prs[e.name]&&prev.weight>prs[e.name].weight)isPR=true;
+    return '<div class="lift-log-row">'+
+      '<div class="lift-log-ex">'+e.name+'<div style="font-size:9px;color:var(--t3)">'+(e.sets||"")+'x'+(e.reps||"")+'</div></div>'+
+      '<input class="lift-log-input" id="lift-w-'+e.name.replace(/[^a-z]/gi,'_')+'" placeholder="lbs" type="number">'+
+      '<input class="lift-log-input" id="lift-r-'+e.name.replace(/[^a-z]/gi,'_')+'" placeholder="reps" type="number">'+
+      '<div class="lift-log-prev">'+(prev?'prev: '+prev.weight+'x'+prev.reps:'first time')+'</div>'+
+      '</div>';
+  }).join(""):'<div class="empty">Select a session type above to see the lift tracker.</div>';
+
+  var hist=document.getElementById("session-history");
+  if(!sessions.length){hist.innerHTML='<div class="empty">No sessions logged yet.</div>';return;}
+  hist.innerHTML=[...sessions].reverse().map(function(s){
+    var liftSummary=s.lifts?Object.entries(s.lifts).slice(0,3).map(function(kv){return kv[0].split('_')[0]+': '+kv[1].weight+'x'+kv[1].reps;}).join(", "):"";
+    return '<div class="session-card '+s.status+'" id="sc-'+s.id+'">'+
+      '<div class="session-header" onclick="toggleSession(\''+s.id+'\')">'+
+      '<div class="session-date">'+s.date+'</div>'+
+      '<div class="session-name">'+s.type+'</div>'+
+      '<div style="font-size:10px;color:var(--t3)">'+(s.duration?s.duration+"min":"")+'</div>'+
+      '<div style="font-size:10px;color:'+(s.cardio==="yes"?"var(--gb)":"var(--coral)")+'">'+(s.cardio==="yes"?"cardio done":"no cardio")+'</div>'+
+      '<div class="session-status '+(s.status==="completed"?"ss-done":"ss-skip")+'" >'+s.status+'</div>'+
+      '</div>'+
+      (s.notes||liftSummary?'<div class="session-body" id="sb-'+s.id+'">'+
+      (liftSummary?'<div style="font-size:11px;color:var(--amber);margin-bottom:6px">'+liftSummary+'</div>':'')+
+      (s.notes?'<div style="font-family:\'Crimson Pro\',serif;font-size:14px;color:var(--t2);line-height:1.6">'+s.notes+'</div>':'')+'</div>':"")+
+    '</div>';
+  }).join("");
+}
+
+function toggleSession(id){document.getElementById("sc-"+id).classList.toggle("open");}
+
+function logSession(){
+  var type=document.getElementById("log-type").value;
+  var lifts={};
+  var dayProgram=PROGRAM.filter(function(d){return d.name===type;})[0];
+  if(dayProgram){
+    dayProgram.exercises.forEach(function(e){
+      if(e.rest==="--")return;
+      var key=e.name.replace(/[^a-z]/gi,'_');
+      var wEl=document.getElementById("lift-w-"+key);
+      var rEl=document.getElementById("lift-r-"+key);
+      if(wEl&&rEl&&wEl.value&&rEl.value){
+        lifts[e.name]={weight:parseFloat(wEl.value),reps:parseInt(rEl.value),date:today()};
+        if(!liftData[e.name])liftData[e.name]=[];
+        liftData[e.name].push({weight:parseFloat(wEl.value),reps:parseInt(rEl.value),date:today()});
+        if(!prs[e.name]||parseFloat(wEl.value)>prs[e.name].weight){
+          prs[e.name]={weight:parseFloat(wEl.value),reps:parseInt(rEl.value),date:today()};
+          prHistory.push({exercise:e.name,weight:parseFloat(wEl.value),reps:parseInt(rEl.value),date:today()});
+        }
+      }
+    });
+    ss("baki_lift_data",liftData);ss("baki_prs",prs);ss("baki_pr_history",prHistory);
+  }
+  sessions.push({
+    id:Date.now(),date:document.getElementById("log-date").value||today(),
+    type:type,duration:parseInt(document.getElementById("log-duration").value)||0,
+    energy:parseInt(document.getElementById("log-energy").value)||3,
+    cardio:document.getElementById("log-cardio").value,
+    status:document.getElementById("log-status").value,
+    notes:document.getElementById("log-notes").value.trim(),
+    lifts:lifts,ts:Date.now()
+  });
+  ss("baki_sessions",sessions);
+  document.getElementById("log-notes").value="";
+  document.getElementById("log-duration").value="";
+  renderLog();
+}
+
+document.getElementById("log-type").addEventListener("change",function(){renderLog();});
+
+function renderPRs(){
+  document.getElementById("pr-grid").innerHTML=PR_LIFTS.map(function(lift){
+    var pr=prs[lift.name];
+    return '<div class="pr-card">'+
+      '<div class="pr-lift">'+lift.name+'</div>'+
+      '<div class="pr-val">'+(pr?pr.weight:"--")+'</div>'+
+      '<div class="pr-unit">'+lift.unit+(lift.unit==="reps"?"":" ("+lift.unit+")")+(pr&&lift.unit!=="reps"?' x '+pr.reps+' reps':'')+'</div>'+
+      '<div class="pr-date">'+(pr?'Set: '+pr.date:'No data yet')+'</div>'+
+      '<div class="pr-input-row">'+
+      '<input type="number" id="pr-input-'+lift.id+'" placeholder="New PR ('+lift.unit+')" style="width:100%">'+
+      '<button onclick="updatePR(\''+lift.name+'\',\''+lift.id+'\')">Set PR</button>'+
+      '</div></div>';
+  }).join("");
+
+  var hist=document.getElementById("pr-history");
+  if(!prHistory.length){hist.innerHTML='<div class="empty">No PRs logged yet. They will auto-populate as you log sessions.</div>';return;}
+  hist.innerHTML=[...prHistory].reverse().slice(0,20).map(function(p){
+    return '<div style="display:flex;align-items:center;gap:0;background:var(--b1);margin-bottom:2px">'+
+      '<div style="background:var(--s1);padding:10px 14px;min-width:90px;border-right:1px solid var(--b1);font-size:10px;color:var(--t3)">'+p.date+'</div>'+
+      '<div style="background:var(--s1);padding:10px 14px;flex:1;font-size:12px;color:var(--t1);border-right:1px solid var(--b1)">'+p.exercise+'</div>'+
+      '<div style="background:var(--adim);padding:10px 14px;font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--amber);min-width:80px;text-align:center;border-right:1px solid var(--b1)">'+p.weight+'</div>'+
+      '<div style="background:var(--s1);padding:10px 14px;font-size:11px;color:var(--t3);min-width:60px;text-align:center">x'+p.reps+'</div>'+
+    '</div>';
+  }).join("");
+}
+
+function updatePR(name,id){
+  var inp=document.getElementById("pr-input-"+id);
+  if(!inp||!inp.value)return;
+  var val=parseFloat(inp.value);
+  prs[name]={weight:val,reps:1,date:today()};
+  prHistory.push({exercise:name,weight:val,reps:1,date:today()});
+  ss("baki_prs",prs);ss("baki_pr_history",prHistory);
+  inp.value="";renderPRs();
+}
+
+function renderShadowBox(){
+  var totalRounds=Object.values(sbRounds).reduce(function(a,b){return a+b;},0);
+  var weeksLogged=Object.keys(sbRounds).length;
+  var currentWeekTarget=Math.min(weeksLogged+3,18);
+  document.getElementById("sb-stats").innerHTML=
+    '<div class="stat"><div class="stat-l">Total rounds logged</div><div class="stat-v a">'+totalRounds+'</div><div class="stat-s">cumulative</div></div>'+
+    '<div class="stat"><div class="stat-l">Current week target</div><div class="stat-v c">'+currentWeekTarget+'</div><div class="stat-s">rounds this Saturday</div></div>'+
+    '<div class="stat"><div class="stat-l">Sessions logged</div><div class="stat-v">'+sbLog.length+'</div><div class="stat-s">total</div></div>';
+
+  var rows="";
+  for(var w=1;w<=16;w++){
+    var target=w+2;
+    var done=sbRounds["w"+w]||0;
+    var pct=Math.min(100,Math.round(done/target*100));
+    rows+='<div class="sb-week-row">'+
+      '<div class="sb-week-num">Week '+w+'</div>'+
+      '<button class="sb-btn" onclick="adjustSB(\'w'+w+'\',-1)">-</button>'+
+      '<div class="sb-rounds-display" style="color:'+(done>=target?"var(--gb)":done>0?"var(--amber)":"var(--t3)")+'">'+done+'</div>'+
+      '<button class="sb-btn" onclick="adjustSB(\'w'+w+'\',1)">+</button>'+
+      '<div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="sb-target">/ '+target+' rounds</div>'+
+    '</div>';
+  }
+  document.getElementById("sb-tracker").innerHTML=rows;
+
+  var log=document.getElementById("sb-log");
+  if(!sbLog.length){log.innerHTML='<div class="empty">No shadow boxing sessions logged yet.</div>';return;}
+  log.innerHTML=[...sbLog].reverse().map(function(s){
+    return '<div style="display:flex;align-items:flex-start;gap:0;background:var(--b1);margin-bottom:2px">'+
+      '<div style="background:var(--s1);padding:10px 14px;min-width:80px;border-right:1px solid var(--b1);font-size:10px;color:var(--t3)">Week '+s.week+'</div>'+
+      '<div style="background:var(--s1);padding:10px 14px;min-width:80px;text-align:center;border-right:1px solid var(--b1)">'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:var(--coral)">'+s.rounds+'</div>'+
+      '<div style="font-size:9px;color:var(--t3)">rounds</div></div>'+
+      '<div style="background:var(--s1);padding:10px 14px;min-width:60px;text-align:center;border-right:1px solid var(--b1)">'+
+      '<div style="font-size:12px;color:var(--amber)">'+s.quality+'/5</div>'+
+      '<div style="font-size:9px;color:var(--t3)">quality</div></div>'+
+      '<div style="background:var(--s1);padding:10px 14px;flex:1;font-family:\'Crimson Pro\',serif;font-size:13px;color:var(--t3);line-height:1.4">'+(s.notes||"--")+'</div>'+
+    '</div>';
+  }).join("");
+}
+
+function adjustSB(key,delta){
+  sbRounds[key]=Math.max(0,(sbRounds[key]||0)+delta);
+  ss("baki_sb_rounds",sbRounds);renderShadowBox();
+}
+
+function logShadowBox(){
+  var week=parseInt(document.getElementById("sb-week").value)||1;
+  var rounds=parseInt(document.getElementById("sb-rounds-done").value)||0;
+  var quality=parseInt(document.getElementById("sb-quality").value)||3;
+  var notes=document.getElementById("sb-notes").value.trim();
+  sbRounds["w"+week]=rounds;
+  sbLog.push({week:week,rounds:rounds,quality:quality,notes:notes,date:today(),ts:Date.now()});
+  ss("baki_sb_rounds",sbRounds);ss("baki_sb",sbLog);
+  document.getElementById("sb-week").value="";
+  document.getElementById("sb-rounds-done").value="";
+  document.getElementById("sb-notes").value="";
+  renderShadowBox();
+}
+
+function renderNutrition(){
+  document.getElementById("meal-plan").innerHTML=MEALS.map(function(m){
+    var total=m.items.reduce(function(a,i){return a+i.cals;},0);
+    return '<div class="meal-card">'+
+      '<div class="meal-time">'+m.time+'</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">'+
+      '<div class="meal-name">'+m.name+'</div>'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--amber)">'+total+' kcal</div></div>'+
+      '<div>'+m.items.map(function(i){return '<div class="meal-item"><span>'+i.food+'</span><span class="meal-cal">'+i.cals+' kcal</span></div>';}).join("")+'</div>'+
+    '</div>';
+  }).join("");
+
+  document.getElementById("nutrition-rules").innerHTML=[
+    {t:"Protein first, always",d:"Build every meal around the protein source. Chicken, beef, fish, eggs, Greek yogurt. Then add carbs and fat around it."},
+    {t:"Do not drink calories",d:"Water, black coffee, plain tea. No juice, no soda, no energy drinks with sugar. Liquid calories are the most common cut-sabotager."},
+    {t:"Meal prep Sunday",d:"Cook proteins in bulk on Sunday. When food is ready you eat what is there. When it is not, you improvise badly."},
+    {t:"Weigh daily, trend weekly",d:"Morning, after bathroom, before eating. Daily fluctuations of 1-3lbs are meaningless. The 2-week trend is what matters."},
+    {t:"If the scale stalls for 2+ weeks",d:"Drop carbs by 20g. Do not drop total calories dramatically. Protein stays at 175g no matter what."},
+  ].map(function(r,i){
+    return '<div style="display:flex;gap:14px;padding:12px 16px;background:var(--s1);border:1px solid var(--b1);margin-bottom:2px">'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--t3);min-width:24px;line-height:1.3">'+(i+1)+'</div>'+
+      '<div><div style="font-size:12px;color:var(--t1);margin-bottom:2px">'+r.t+'</div>'+
+      '<div style="font-family:\'Crimson Pro\',serif;font-size:14px;color:var(--t3);line-height:1.5">'+r.d+'</div></div></div>';
+  }).join("");
+}
+
+function logCheckin(){
+  var weight=parseFloat(document.getElementById("ci-weight").value);
+  if(!weight){alert("Weight required.");return;}
+  checkins.push({
+    id:Date.now(),date:document.getElementById("ci-date").value||today(),weight:weight,
+    bf:parseFloat(document.getElementById("ci-bf").value)||null,
+    waist:parseFloat(document.getElementById("ci-waist").value)||null,
+    chest:parseFloat(document.getElementById("ci-chest").value)||null,
+    feel:parseInt(document.getElementById("ci-feel").value)||3,
+    notes:document.getElementById("ci-notes").value.trim(),ts:Date.now()
+  });
+  ss("baki_checkins",checkins);
+  ["ci-weight","ci-bf","ci-waist","ci-chest","ci-notes"].forEach(function(id){document.getElementById(id).value="";});
+  renderProgress();renderOverview();
+}
+
+function renderProgress(){
+  var latest=checkins.length?checkins[checkins.length-1]:null;
+  var start=checkins.length?checkins[0]:null;
+  var cw=latest?latest.weight:157;
+  var sw=start?start.weight:157;
+  var lost=Math.max(0,sw-cw).toFixed(1);
+  var toGo=Math.max(0,cw-138).toFixed(1);
+  var pct=Math.min(100,sw>138?Math.round((sw-cw)/(sw-138)*100):0);
+  document.getElementById("progress-stats").innerHTML=
+    '<div class="stat"><div class="stat-l">Current weight</div><div class="stat-v a">'+cw+'</div><div class="stat-s">lbs</div></div>'+
+    '<div class="stat"><div class="stat-l">Lost</div><div class="stat-v g">'+lost+'</div><div class="stat-s">lbs since start</div></div>'+
+    '<div class="stat"><div class="stat-l">To target</div><div class="stat-v c">'+toGo+'</div><div class="stat-s">lbs to 138</div></div>'+
+    '<div class="stat"><div class="stat-l">Cut progress</div><div class="stat-v '+(pct>=50?"g":"a")+'">'+pct+'%</div><div class="stat-s">of Phase 1</div></div>';
+
+  var log=document.getElementById("progress-log");
+  if(!checkins.length){log.innerHTML='<div class="empty">No check-ins yet.</div>';return;}
+  log.innerHTML=[...checkins].reverse().map(function(c,i,arr){
+    var prev=i<arr.length-1?arr[i+1]:null;
+    var delta=prev?(c.weight-prev.weight).toFixed(1):null;
+    return '<div class="checkin-card">'+
+      '<div class="ci-date">'+c.date+'</div>'+
+      '<div class="ci-weight"><div class="ci-wval">'+c.weight+'</div><div class="ci-wlabel">lbs</div></div>'+
+      (delta!==null?'<div class="ci-delta"><div class="ci-deltaval" style="color:'+(parseFloat(delta)<=0?"var(--gb)":"var(--coral)")+'">'+
+      (parseFloat(delta)<=0?delta:"+"+delta)+'</div><div class="ci-wlabel">change</div></div>':"")+
+      (c.waist?'<div class="ci-delta"><div class="ci-deltaval" style="font-size:16px;color:var(--t2)">'+c.waist+'"</div><div class="ci-wlabel">waist</div></div>':"")+
+      '<div class="ci-notes-col">'+(c.notes||"--")+'</div>'+
+    '</div>';
+  }).join("");
+
+  if(checkins.length>1){
+    var canvas=document.getElementById("weight-canvas");
+    var ctx=canvas.getContext("2d");
+    canvas.width=canvas.offsetWidth*2;canvas.height=200;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    var W=canvas.width,H=canvas.height;
+    var pl=50,pr=20,pt=20,pb=30;
+    var weights=checkins.map(function(c){return c.weight;});
+    var minW=Math.min.apply(null,weights.concat([138]))-2;
+    var maxW=Math.max.apply(null,weights.concat([157]))+2;
+    var toX=function(i){return pl+i/(checkins.length-1)*(W-pl-pr);};
+    var toY=function(w){return pt+(H-pt-pb)*(1-(w-minW)/(maxW-minW));};
+    ctx.beginPath();ctx.moveTo(pl,toY(138));ctx.lineTo(W-pr,toY(138));
+    ctx.strokeStyle="rgba(34,176,125,0.3)";ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="rgba(34,176,125,0.5)";ctx.font="18px 'JetBrains Mono'";ctx.textAlign="left";
+    ctx.fillText("138 target",pl+4,toY(138)-5);
+    ctx.beginPath();
+    checkins.forEach(function(c,i){i===0?ctx.moveTo(toX(i),toY(c.weight)):ctx.lineTo(toX(i),toY(c.weight));});
+    ctx.strokeStyle="var(--amber)";ctx.lineWidth=2;ctx.stroke();
+    checkins.forEach(function(c,i){
+      ctx.beginPath();ctx.arc(toX(i),toY(c.weight),4,0,Math.PI*2);
+      ctx.fillStyle="var(--amber)";ctx.fill();
+    });
+  }
+}
+
+function renderSupplements(){
+  document.getElementById("supp-list").innerHTML=SUPPLEMENTS.map(function(s){
+    return '<div class="supp-card">'+
+      '<div class="supp-time">'+s.time+'</div>'+
+      '<div><div class="supp-name">'+s.name+'</div>'+
+      '<div class="supp-dose">'+s.dose+'</div>'+
+      '<div class="supp-why">'+s.why+'</div></div></div>';
+  }).join("");
+}
+
+function renderRules(){
+  document.getElementById("baki-rules-list").innerHTML=BAKI_RULES.map(function(r,i){
+    return '<div style="display:flex;gap:16px;padding:14px 16px;background:var(--s1);border:1px solid var(--b1);border-left:3px solid var(--coral);margin-bottom:2px">'+
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--t3);min-width:28px;line-height:1.3;flex-shrink:0">'+(i<9?"0"+(i+1):i+1)+'</div>'+
+      '<div style="font-family:\'Crimson Pro\',serif;font-size:16px;color:var(--t1);line-height:1.6">'+r+'</div></div>';
+  }).join("");
+}
+
+function exportData(){
+  var blob=new Blob([JSON.stringify({sessions:sessions,checkins:checkins,prs:prs,prHistory:prHistory,sbLog:sbLog,sbRounds:sbRounds,liftData:liftData,exported:new Date().toISOString()},null,2)],{type:"application/json"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="baki_protocol_"+today()+".json";a.click();
+}
+function importData(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var d=JSON.parse(e.target.result);
+      if(d.sessions){ss("baki_sessions",sessions=d.sessions);}
+      if(d.checkins){ss("baki_checkins",checkins=d.checkins);}
+      if(d.prs){ss("baki_prs",prs=d.prs);}
+      if(d.prHistory){ss("baki_pr_history",prHistory=d.prHistory);}
+      if(d.sbLog){ss("baki_sb",sbLog=d.sbLog);}
+      if(d.sbRounds){ss("baki_sb_rounds",sbRounds=d.sbRounds);}
+      if(d.liftData){ss("baki_lift_data",liftData=d.liftData);}
+      renderOverview();alert("Imported.");
+    }catch(err){alert("Invalid file.");}
+  };
+  reader.readAsText(file);
+}
+
+setTimeout(function(){document.getElementById("loader").classList.add("hidden");},1800);
+document.getElementById("log-date").value=today();
+document.getElementById("ci-date").value=today();
+renderOverview();
+</script>
+</body>
+</html>

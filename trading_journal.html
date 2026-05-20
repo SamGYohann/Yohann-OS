@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Journal — Yohann OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--s1:#0f0f0f;--s2:#161616;--s3:#1e1e1e;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);
+  --t1:#e8e4dc;--t2:#7a7670;--t3:#3d3a36;
+  --green:#1a8c63;--gb:#22b07d;--gdim:rgba(26,140,99,0.12);--gbdr:rgba(26,140,99,0.35);
+  --amber:#c49a3c;--adim:rgba(196,154,60,0.1);--abdr:rgba(196,154,60,0.3);
+  --coral:#c0553a;--cdim:rgba(192,85,58,0.1);--cbdr:rgba(192,85,58,0.3);
+  --purple:#6e65c4;--pdim:rgba(110,101,196,0.1);--pbdr:rgba(110,101,196,0.3);
+  --blue:#3a7bc4;--bdim:rgba(58,123,196,0.1);--bbdr:rgba(58,123,196,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35}
+
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;transition:opacity 0.8s ease,visibility 0.8s}
+#loader.hidden{opacity:0;visibility:hidden}
+.l-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,88px);letter-spacing:0.15em;animation:lpulse 1.5s ease-in-out infinite alternate}
+.l-sub{font-size:10px;color:var(--t3);letter-spacing:0.3em;text-transform:uppercase;margin-top:8px}
+.l-bar-wrap{width:160px;height:1px;background:var(--b2);margin-top:28px;overflow:hidden}
+.l-bar{height:100%;background:var(--gb);width:0%;animation:lbar 1.8s ease forwards}
+@keyframes lpulse{from{opacity:0.4}to{opacity:1}}
+@keyframes lbar{0%{width:0%}60%{width:70%}100%{width:100%}}
+
+.app{max-width:900px;margin:0 auto;padding:0 28px 100px;opacity:0;animation:fadein 0.6s ease 2s forwards}
+@keyframes fadein{to{opacity:1}}
+
+/* HEADER */
+.header{padding:44px 0 24px;border-bottom:1px solid var(--b1);margin-bottom:32px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.h-wordmark{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);letter-spacing:0.12em;line-height:1}
+.h-sub{font-family:'Crimson Pro',serif;font-style:italic;font-size:15px;color:var(--t2);margin-top:6px}
+.h-date{font-size:10px;color:var(--t3);letter-spacing:0.12em;text-transform:uppercase;text-align:right}
+
+/* DREAM BANNER */
+.dream-banner{border-left:3px solid var(--abdr);padding:16px 20px;background:var(--adim);margin-bottom:32px}
+.dream-quote{font-family:'Crimson Pro',serif;font-style:italic;font-size:18px;color:var(--t1);line-height:1.6}
+.dream-attr{font-size:9px;color:var(--t3);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px}
+
+/* NAV */
+.tab-nav{display:flex;gap:2px;margin-bottom:32px;border-bottom:1px solid var(--b1);overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tnb{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:11px 16px;border:none;background:transparent;color:var(--t3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+.tnb:hover{color:var(--t2)}
+.tnb.active{color:var(--gb);border-bottom-color:var(--gb)}
+.tab{display:none}.tab.active{display:block}
+
+/* SLBL */
+.slbl{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.slbl::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:24px}
+.stat{background:var(--s1);padding:14px 16px}
+.stat-l{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.stat-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.05em;color:var(--t1);line-height:1}
+.stat-v.g{color:var(--gb)}.stat-v.a{color:var(--amber)}.stat-v.c{color:var(--coral)}.stat-v.p{color:var(--purple)}
+.stat-s{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* GATE */
+.gate-wrap{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
+.gate-item{display:flex;align-items:center;gap:14px;padding:13px 16px;background:var(--s1);border:1px solid var(--b1);transition:all 0.15s;cursor:pointer;position:relative;overflow:hidden}
+.gate-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--t3);opacity:0.3;transition:all 0.15s}
+.gate-item.met::before{background:var(--gb);opacity:1}
+.gate-item:hover{background:var(--s2)}
+.gate-check{width:20px;height:20px;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all 0.2s}
+.gate-item.met .gate-check{background:var(--green);border-color:var(--green);color:#000}
+.gate-lbl{font-size:12px;color:var(--t1);flex:1;line-height:1.4}
+.gate-req{font-size:9px;color:var(--t3);letter-spacing:0.08em;text-transform:uppercase;min-width:110px;text-align:right;flex-shrink:0}
+.gate-progress{margin-bottom:8px}
+.gate-progress-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-bottom:4px}
+.gate-bar-wrap{height:3px;background:var(--s3);overflow:hidden}
+.gate-bar-fill{height:100%;background:var(--gb);transition:width 0.5s ease}
+
+/* RULE CARD */
+.rule-card{background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;position:relative;overflow:hidden}
+.rule-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.rule-card.hard::before{background:var(--coral)}
+.rule-card.mind::before{background:var(--purple)}
+.rule-card.process::before{background:var(--amber)}
+.rule-card.protocol::before{background:var(--gb)}
+.rule-header{padding:13px 16px 13px 20px;cursor:pointer;display:flex;align-items:flex-start;gap:12px}
+.rule-type{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:2px 8px;border:1px solid;flex-shrink:0;margin-top:1px}
+.type-hard{border-color:var(--cbdr);color:var(--coral)}
+.type-mind{border-color:var(--pbdr);color:var(--purple)}
+.type-process{border-color:var(--abdr);color:var(--amber)}
+.type-protocol{border-color:var(--gbdr);color:var(--gb)}
+.rule-title{font-size:13px;color:var(--t1);flex:1;line-height:1.4}
+.rule-body{display:none;padding:0 20px 14px 20px;border-top:1px solid var(--b1)}
+.rule-card.open .rule-body{display:block}
+.rule-text{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.7;margin-top:12px}
+.rule-yohann{font-size:10px;color:var(--t3);letter-spacing:0.06em;margin-top:8px;font-style:italic;font-family:'Crimson Pro',serif}
+
+/* PHASE */
+.phase-card{background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;padding:16px 20px;position:relative;overflow:hidden}
+.phase-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.phase-card.current::before{background:var(--gb)}
+.phase-card.locked::before{background:var(--t3);opacity:0.3}
+.phase-card.locked{opacity:0.5}
+.phase-num{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:0.2em;color:var(--t3);text-transform:uppercase;margin-bottom:4px}
+.phase-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.08em;color:var(--t1);line-height:1;margin-bottom:6px}
+.phase-name.green{color:var(--gb)}
+.phase-desc{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6}
+.phase-tasks{margin-top:10px;display:flex;flex-direction:column;gap:4px}
+.phase-task{font-size:11px;color:var(--t3);display:flex;align-items:flex-start;gap:8px}
+.phase-task::before{content:'—';flex-shrink:0}
+
+/* FORM */
+.add-form{background:var(--s1);border:1px solid var(--b1);padding:20px;margin-bottom:24px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.form-full{grid-column:1/-1}
+.flbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+input[type="text"],input[type="number"],input[type="date"],select,textarea{width:100%;background:var(--s2);border:1px solid var(--b1);padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t1);transition:border-color 0.15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--b2)}
+input::placeholder,textarea::placeholder{color:var(--t3)}
+select option{background:var(--s2);color:var(--t1)}
+textarea{min-height:60px;resize:vertical;font-size:12px;line-height:1.5;font-family:'Crimson Pro',serif}
+
+.btn{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:10px 18px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--gb);color:var(--gb)}
+.btn.danger:hover{border-color:var(--cbdr);color:var(--coral)}
+
+/* TRADE LOG */
+.trade-list{display:flex;flex-direction:column;gap:2px}
+.trade-card{background:var(--s1);border:1px solid var(--b1);transition:all 0.15s;position:relative;overflow:hidden}
+.trade-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.trade-card.win::before{background:var(--gb)}
+.trade-card.loss::before{background:var(--coral)}
+.trade-card.flat::before{background:var(--t3)}
+.trade-card.violation::before{background:var(--purple)}
+.trade-header{display:flex;align-items:center;gap:12px;padding:12px 16px 12px 20px;cursor:pointer}
+.trade-date{font-size:10px;color:var(--t3);min-width:80px;flex-shrink:0}
+.trade-inst{font-size:11px;color:var(--amber);min-width:28px;letter-spacing:0.06em;flex-shrink:0}
+.trade-dir{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;min-width:42px;flex-shrink:0}
+.dir-long{color:var(--gb)}.dir-short{color:var(--coral)}
+.trade-setup{font-size:12px;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trade-viol{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--pbdr);color:var(--purple);flex-shrink:0}
+.trade-pnl{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:70px;text-align:right;flex-shrink:0}
+.pnl-win{color:var(--gb)}.pnl-loss{color:var(--coral)}.pnl-flat{color:var(--t3)}
+.trade-body{display:none;padding:0 20px 14px 20px;border-top:1px solid var(--b1)}
+.trade-card.open .trade-body{display:block}
+.trade-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;margin-bottom:10px}
+.tm-label{font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px}
+.tm-val{font-size:12px;color:var(--t2)}
+.trade-journal-text{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6;margin-top:8px;padding-top:8px;border-top:1px solid var(--b1)}
+
+/* CHARTS */
+.chart-wrap{background:var(--s1);border:1px solid var(--b1);padding:20px;margin-bottom:16px}
+.chart-title{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:14px}
+.bar-chart{display:flex;gap:4px;align-items:flex-end;height:80px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:1px 1px 0 0;min-height:2px;transition:height 0.3s ease}
+.bar-lbl{font-size:9px;color:var(--t3);text-align:center}
+.equity-wrap{height:60px;background:var(--s2);position:relative;overflow:hidden}
+.equity-line{position:absolute;bottom:0;left:0;height:100%;display:flex;align-items:flex-end}
+
+/* STUDY CHECKLIST */
+.study-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;cursor:pointer;transition:background 0.15s}
+.study-item:hover{background:var(--s2)}
+.study-check{width:18px;height:18px;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;transition:all 0.15s}
+.study-item.done .study-check{background:var(--green);border-color:var(--green);color:#000}
+.study-lbl{font-size:12px;color:var(--t1);flex:1;line-height:1.4}
+.study-item.done .study-lbl{color:var(--t2)}
+.study-sub{font-size:10px;color:var(--t3);margin-top:2px;font-family:'Crimson Pro',serif;font-style:italic}
+
+/* ARCHETYPE CALLOUT */
+.arch-callout{background:var(--s1);border:1px solid var(--b1);padding:20px;margin-bottom:24px;display:flex;gap:20px;align-items:flex-start}
+.arch-name-big{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.1em;line-height:1;flex-shrink:0}
+.arch-text{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.7}
+
+/* PROTOCOL */
+.protocol-item{padding:14px 20px;background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;display:flex;gap:14px;align-items:flex-start}
+.proto-num{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--t3);line-height:1;flex-shrink:0;min-width:28px}
+.proto-content{}
+.proto-title{font-size:12px;color:var(--t1);margin-bottom:3px}
+.proto-desc{font-family:'Crimson Pro',serif;font-size:14px;color:var(--t3);line-height:1.5}
+
+.rule{border:none;border-top:1px solid var(--b1);margin:24px 0}
+.empty{font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t3);padding:20px 0}
+.tag{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border:1px solid;display:inline-block}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="l-name">Edge Lab</div>
+  <div class="l-sub">Trading Journal — Yohann OS</div>
+  <div class="l-bar-wrap"><div class="l-bar"></div></div>
+</div>
+
+<div class="app">
+
+<header class="header">
+  <div>
+    <div class="h-wordmark">Edge Lab</div>
+    <div class="h-sub">No prop spend until the sim data makes failure informative instead of random.</div>
+  </div>
+  <div class="h-date" id="hdr-date"></div>
+</header>
+
+<div class="dream-banner">
+  <div class="dream-quote">"Four monitors. City lights at 2AM. The view from the top — not because you got lucky, but because you built a machine and trusted it long enough for it to compound. That is the only version of this worth having."</div>
+  <div class="dream-attr">The dream — the reason the system runs</div>
+</div>
+
+<div class="tab-nav">
+  <button class="tnb active" data-tab="dashboard" onclick="switchTab(this)">Dashboard</button>
+  <button class="tnb" data-tab="log" onclick="switchTab(this)">Trade log</button>
+  <button class="tnb" data-tab="add" onclick="switchTab(this)">Log a trade</button>
+  <button class="tnb" data-tab="rules" onclick="switchTab(this)">Your rules</button>
+  <button class="tnb" data-tab="phases" onclick="switchTab(this)">Phase map</button>
+  <button class="tnb" data-tab="study" onclick="switchTab(this)">Study checklist</button>
+  <button class="tnb" data-tab="premarket" onclick="switchTab(this)">Pre-session</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="tab-dashboard" class="tab active">
+  <div class="stats" id="main-stats"></div>
+  <div class="slbl">Evaluation gate progress</div>
+  <div id="gate-overall" style="margin-bottom:12px"></div>
+  <div class="gate-wrap" id="gate-list"></div>
+  <div class="rule"></div>
+  <div class="slbl">Equity curve — cumulative P&L (points)</div>
+  <div class="chart-wrap">
+    <canvas id="equity-canvas" height="80" style="width:100%;display:block"></canvas>
+  </div>
+  <div class="slbl">Win/loss by instrument</div>
+  <div class="stats" id="inst-stats"></div>
+  <div class="rule"></div>
+  <div class="slbl">This week</div>
+  <div id="week-summary"></div>
+</div>
+
+<!-- TRADE LOG -->
+<div id="tab-log" class="tab">
+  <div class="stats" id="log-stats"></div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <select id="filter-inst" onchange="renderLog()" style="width:auto"><option value="all">All instruments</option><option value="ES">ES only</option><option value="NQ">NQ only</option></select>
+    <select id="filter-outcome" onchange="renderLog()" style="width:auto"><option value="all">All outcomes</option><option value="win">Wins</option><option value="loss">Losses</option><option value="violation">Violations</option></select>
+  </div>
+  <div class="trade-list" id="trade-list"></div>
+  <div class="rule"></div>
+  <button class="btn" onclick="exportData()">&#8595; Export journal</button>
+  &nbsp;<label class="btn" style="cursor:pointer">&#8593; Import<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+</div>
+
+<!-- ADD TRADE -->
+<div id="tab-add" class="tab">
+  <div class="arch-callout">
+    <div class="arch-name-big" style="color:var(--amber)">ISAGI</div>
+    <div class="arch-text">Every trade logged is a data point. Every loss is extraction. The journal is not a record — it is the mechanism by which you convert experience into edge. Log with surgical precision. No narrative, no justification — just data.</div>
+  </div>
+  <div class="add-form">
+    <div class="form-grid">
+      <div><div class="flbl">Date</div><input type="date" id="t-date"></div>
+      <div><div class="flbl">Session time</div>
+        <select id="t-session">
+          <option value="pre">Pre-market (8–9:30 AM)</option>
+          <option value="open" selected>Open (9:30–11 AM)</option>
+          <option value="midday">Midday (11 AM–1 PM)</option>
+          <option value="afternoon">Afternoon (1–3 PM)</option>
+        </select>
+      </div>
+      <div><div class="flbl">Instrument</div>
+        <select id="t-inst">
+          <option value="ES">ES (S&P 500 Futures)</option>
+          <option value="NQ">NQ (Nasdaq Futures)</option>
+        </select>
+      </div>
+      <div><div class="flbl">Direction</div>
+        <select id="t-dir">
+          <option value="long">Long</option>
+          <option value="short">Short</option>
+        </select>
+      </div>
+      <div><div class="flbl">Setup name</div>
+        <select id="t-setup">
+          <option value="trend_continuation">Trend continuation</option>
+          <option value="pullback">Pullback to key level</option>
+          <option value="breakout">Breakout / breakdown</option>
+          <option value="reversal">Reversal at extreme</option>
+          <option value="vwap_reclaim">VWAP reclaim</option>
+          <option value="open_drive">Opening drive</option>
+          <option value="other">Other (define in notes)</option>
+        </select>
+      </div>
+      <div><div class="flbl">P&L (points)</div><input type="number" id="t-pnl" placeholder="e.g. 4.5 or -2.25" step="0.25"></div>
+      <div><div class="flbl">Entry price</div><input type="text" id="t-entry" placeholder="e.g. 5,240.25"></div>
+      <div><div class="flbl">Exit price</div><input type="text" id="t-exit" placeholder="e.g. 5,244.75"></div>
+      <div><div class="flbl">Stop loss set?</div>
+        <select id="t-stop">
+          <option value="yes">Yes — stop was set before entry</option>
+          <option value="no">No — I did not set a stop</option>
+          <option value="mental">Mental stop only</option>
+        </select>
+      </div>
+      <div><div class="flbl">Rule violations</div>
+        <select id="t-viol">
+          <option value="0">0 — Clean execution</option>
+          <option value="1">1 — Minor deviation</option>
+          <option value="2">2+ — Serious violation</option>
+        </select>
+      </div>
+      <div class="form-full"><div class="flbl">Violation type (if any)</div>
+        <select id="t-violtype">
+          <option value="none">None</option>
+          <option value="revenge">Revenge trade after loss</option>
+          <option value="fomo">FOMO entry — chased the move</option>
+          <option value="overhold">Overholding winner past target</option>
+          <option value="no_stop">Entered without a stop</option>
+          <option value="sized_up">Sized up after a win</option>
+          <option value="early_exit">Exited early — fear of loss</option>
+          <option value="outside_setup">Outside documented setup</option>
+          <option value="tired">Traded tired / distracted</option>
+        </select>
+      </div>
+      <div class="form-full"><div class="flbl">Pre-trade thesis — what did you see and why did you take it?</div>
+        <textarea id="t-thesis" placeholder="Describe the setup. What was the market telling you? What was your entry rationale?"></textarea>
+      </div>
+      <div class="form-full"><div class="flbl">Post-trade debrief — what actually happened?</div>
+        <textarea id="t-debrief" placeholder="What did the market do? Did the thesis play out? What would you do differently? Extract the data point."></textarea>
+      </div>
+      <div class="form-full"><div class="flbl">Emotional state before entry (1 = completely calm, 5 = reactive/emotional)</div>
+        <select id="t-emotion">
+          <option value="1">1 — Calm. Clear. No interference.</option>
+          <option value="2">2 — Mostly clear. Minor background noise.</option>
+          <option value="3">3 — Some interference. Personal stakes present.</option>
+          <option value="4">4 — Reactive. Should have waited.</option>
+          <option value="5">5 — Should not have traded this session.</option>
+        </select>
+      </div>
+      <div class="form-full"><div class="flbl">Sleep quality last night</div>
+        <select id="t-sleep">
+          <option value="good">Good — 7.5h+</option>
+          <option value="ok">OK — 6–7.5h</option>
+          <option value="poor">Poor — under 6h</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="addTrade()">+ Log trade</button>
+  </div>
+  <div style="background:var(--s1);border-left:2px solid var(--cbdr);padding:14px 18px">
+    <div style="font-size:9px;color:var(--coral);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Hard stop rule</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6">If your emotional state was 4 or 5, or if you slept under 6 hours — this trade should not have been taken. Log it anyway, but tag it accurately. The data protects you.</div>
+  </div>
+</div>
+
+<!-- RULES -->
+<div id="tab-rules" class="tab">
+  <div class="arch-callout">
+    <div class="arch-name-big" style="color:var(--purple)">AYANOKOJI</div>
+    <div class="arch-text">The rules are not constraints. They are the mechanism by which you predetermine outcomes before the market can impose random ones. You follow them not because you are disciplined — but because you understand what happens to traders who don't.</div>
+  </div>
+  <div id="rules-list"></div>
+</div>
+
+<!-- PHASE MAP -->
+<div id="tab-phases" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">You are at Phase 1. This is not a limitation — it is the correct position for someone who has not yet built a verified edge. The goal is not to trade. The goal is to earn the right to trade.</p>
+  <div id="phase-list"></div>
+  <div class="rule"></div>
+  <div class="slbl">The data says</div>
+  <div style="background:var(--s1);border-left:2px solid var(--cbdr);padding:16px 20px;margin-bottom:2px">
+    <div style="font-size:9px;color:var(--coral);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Brazil futures study — 97% of persistent day traders lost money</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6">The academic base rate is brutal. This is not pessimism — it is the map. Most traders fail because they move to live capital before their edge is proven in data. You will not make that mistake. The sim data has to be good enough that failure becomes informative instead of random.</div>
+  </div>
+  <div style="background:var(--s1);border-left:2px solid var(--gbdr);padding:16px 20px;margin-top:2px">
+    <div style="font-size:9px;color:var(--gb);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Your advantage</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6">You think in systems naturally. You read cause/effect chains underneath surface appearances. You extract information from losses the way most people extract confidence from wins. These are not motivational claims — they are structural advantages that compound over time when paired with a disciplined process. The process has to come first.</div>
+  </div>
+</div>
+
+<!-- STUDY CHECKLIST -->
+<div id="tab-study" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">You have zero trading experience. That is not a disadvantage — it means you have no bad habits to unlearn. This checklist is your curriculum. Complete it in sequence before touching any sim account.</p>
+  <div class="slbl">Phase 1 — Market structure foundations</div>
+  <div id="study-phase1" class="gate-wrap"></div>
+  <div class="slbl" style="margin-top:20px">Phase 2 — Instrument-specific knowledge</div>
+  <div id="study-phase2" class="gate-wrap"></div>
+  <div class="slbl" style="margin-top:20px">Phase 3 — Trading psychology</div>
+  <div id="study-phase3" class="gate-wrap"></div>
+  <div class="slbl" style="margin-top:20px">Phase 4 — Sim readiness</div>
+  <div id="study-phase4" class="gate-wrap"></div>
+</div>
+
+<!-- PRE-SESSION -->
+<div id="tab-premarket" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">Run this before every sim session. Not optional. The session does not start until this protocol is complete.</p>
+  <div id="protocol-list"></div>
+  <div class="rule"></div>
+  <div class="slbl">Session kill switches</div>
+  <div id="kill-switches"></div>
+</div>
+
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────
+
+const EVAL_GATES=[
+  {id:"g1",label:"100+ tagged sim trades logged",req:"Sample size",detail:"You need statistical significance. Fewer than 100 trades is not a sample — it is a streak. Track every single one."},
+  {id:"g2",label:"3 consecutive profitable sim months",req:"Consistency",detail:"One good month is variance. Three consecutive months is evidence. This gate exists because the market will give you a hot streak early to destroy you."},
+  {id:"g3",label:"20 straight sessions — zero hard-rule violations",req:"Discipline",detail:"The rules are not suggestions. Twenty clean sessions means the rules are internalized, not followed consciously. That is the difference between discipline and structure."},
+  {id:"g4",label:"Largest single green day < 20% of monthly net P&L",req:"Risk control",detail:"Big days are a trap. They create false confidence and lead to oversizing. Your edge should be consistent, not spiked."},
+  {id:"g5",label:"Max drawdown < 35% of monthly gross profit",req:"Drawdown mgmt",detail:"If you cannot protect profit, you cannot trade live. This gate measures whether you know when to stop."},
+  {id:"g6",label:"Positive expectancy after commission assumptions",req:"Verified edge",detail:"Win rate alone means nothing. You need positive expected value per trade after realistic cost assumptions. Calculate this monthly."},
+  {id:"g7",label:"80%+ of trades from documented setups only",req:"Setup discipline",detail:"Random entries are not trading — they are gambling with extra steps. If you cannot name the setup before you enter, you do not have a thesis. No thesis means no entry."},
+];
+
+const RULES=[
+  {type:"hard",title:"No trade without a defined stop loss set before entry",body:"Not a mental stop. Not 'I'll exit if it goes against me.' A hard stop placed in the platform before the order is filled. Every single time. No exceptions.\n\nWhy this is your specific rule: You think in systems. A system without defined failure conditions is not a system — it is wishful thinking. The stop is your failure condition. Set it first.",yohann:"This maps directly to your natural architecture. You predetermine outcomes. A trade without a stop is a trade where the market predetermines the outcome for you."},
+  {type:"hard",title:"No trading when emotional state is 4 or 5",body:"If you rate your pre-session emotional state at 4 or higher in the log, the session is a study session. No execution. Watch the tape, document levels, do not touch the entry button.\n\nYour specific wiring problem: personal stakes introduce interference that competes with natural clarity. In trading, 'personal stakes' means the P&L number. Once you start feeling the number, you stop reading the market. You are now trading your feelings, not price action.",yohann:"The Ayanokoji principle: information asymmetry as operating standard. The moment you are emotional, the market has more information about your behavior than you do about its. That is the wrong asymmetry."},
+  {type:"hard",title:"No trading after 2 consecutive losses in a session",body:"Two losses in a row means the session is over. Close the platform. Do not look for a 'recovery trade.' The recovery trade is always the worst trade of the day.\n\nWhy: The revenge pattern is the most common account killer for systematic thinkers who have an ego investment in being right. You will want to prove the market wrong. That impulse is the signal to stop.",yohann:"This is the Isagi protocol applied to trading. Isagi loses, extracts the data, and stops the sequence that led to the loss. He does not immediately re-enter the same situation to prove a point."},
+  {type:"hard",title:"No trading during the first 15 minutes of open (9:30–9:45)",body:"The opening 15 minutes is not a trading window — it is an observation window. Price discovery is violent, spreads are wide, and algos are hunting retail stops. Watch. Mark levels. Wait.\n\nFor your schedule as a student: the open session (9:30–11 AM) is your primary sim window. Protect it by not destroying it in the first 15 minutes.",yohann:"Tokuchi does not move first. He reads the field and lets others reveal their positions before committing. The first 15 minutes is the field revealing itself."},
+  {type:"hard",title:"No trades under 6 hours of sleep",body:"Sleep deprivation impairs decision-making and increases risky choices. The research is unambiguous. If you slept under 6 hours, the sim account is closed for that day. Study mode only.\n\nThis is non-negotiable because your nervous system dysregulation history means sleep quality directly affects your baseline clarity — which is the first thing that gets attacked when the market moves against you.",yohann:"Your supplement protocol (magnesium glycinate, D3/K2) exists precisely to regulate this. The sleep gate in the journal is the enforcement mechanism."},
+  {type:"mind",title:"Treat every loss as an extraction problem, not a failure",body:"After every losing trade: before you feel anything, open the journal and answer three questions. What did the market actually do? What did I expect it to do? What is the gap between those two things telling me?\n\nThe loss is data. The data is the edge. The edge is the view.",yohann:"This is the Isagi loop applied to trading. Loss as extraction is not a mindset — it is a protocol. The journal is the protocol."},
+  {type:"mind",title:"Personal stakes create noise. Label it, do not act on it",body:"When you notice yourself watching the P&L number instead of price action — you have left the trade. You are now managing feelings, not a position.\n\nThe protocol: notice the shift, label it internally ('personal stakes interference'), and either return to reading price action or exit the trade cleanly. Never stay in a trade you are no longer reading.",yohann:"This is your primary psychological development target. It is not a trading problem. It is a wiring problem at the intersection of logic and personal investment. Trading just makes it expensive if unmanaged."},
+  {type:"mind",title:"Superior traders are data sources, not threats",body:"When you study someone who is clearly better than you — a trader whose journal you read, a video of clean execution — extract the framework. What do they know that you do not? What structural advantage are they operating from?\n\nThis is the Isagi principle: superior people as simultaneous data source and competition. Not envy. Reconnaissance.",yohann:"Your natural architecture reads cause/effect chains underneath surface appearances. Apply that to studying other traders. What is the real game they are playing?"},
+  {type:"process",title:"One setup at a time — depth before breadth",body:"You are at zero experience. The temptation will be to learn everything simultaneously. Resist it.\n\nChoose one setup. Study it until you can explain it, identify it on a live chart, and describe exactly why it works structurally. Then add the next one. Broad surface knowledge is worthless. Deep setup mastery is the edge.",yohann:"This mirrors your reading protocol exactly — strength reinforcement before gap-fill. The same principle applies to setups. Master one before adding another."},
+  {type:"process",title:"Chart review before entry — write the thesis first",body:"Before entering any sim trade: write one sentence that explains why you are taking this trade. What is the setup? What is the structural reason it should work? What invalidates it?\n\nIf you cannot write that sentence, you do not have a thesis. If you do not have a thesis, you do not have a trade.",yohann:"Backward induction — your core cognitive skill. Start from the trade outcome and work backward. What would have to be true for this to work? Is that thing present on the chart right now?"},
+  {type:"process",title:"Weekly review — pattern extraction from the log",body:"Every Friday: pull the week's trades. Find the pattern. What setup had the highest win rate? Which sessions were cleanest? Where did the wiring problem appear?\n\nThe weekly review is not about motivation. It is about extracting structural information from the data set. The journal is only useful if you read it.",yohann:"This is your weekly debrief protocol applied to trading. Same format, same discipline. What did I extract? Where did interference appear? What changes the system?"},
+  {type:"protocol",title:"Prop firm first attempt — Topstep 50K Standard Path only",body:"When you are ready to attempt a funded evaluation — which is only after all 7 gates are met — your first attempt is Topstep 50K Standard Path.\n\nReason: Rule transparency is best. Cost of first mistake is low. The daily-loss structure makes self-control concrete.\n\nBudget for multiple failed evaluations. This is not pessimism — it is the war budget. Plan as if failure is normal until the data proves otherwise.",yohann:"Topstep's $3,000 profit target, $1,000 daily loss limit, and 5-contract max. These are your constraints. Constraints are good. Constraints force precision."},
+  {type:"protocol",title:"No prop spend from emergency or tuition money",body:"The challenge fund is a separate budget line. Current target: $2,000 allocated specifically to prop firm attempts. This money comes from savings after the emergency buffer is fully funded.\n\nIf the emergency buffer is not funded, the challenge fund does not exist yet. This is the sequencing. Do not compress it.",yohann:"Capital protocol from your master plan: no prop fees from money needed for rent, food, car, tuition, or emergency savings. Non-negotiable."},
+];
+
+const PHASES=[
+  {num:"Phase 01",name:"Pure study",status:"current",desc:"Zero sim trading. Build the knowledge base first. You cannot execute what you do not understand. This phase ends when the study checklist is complete and you can explain market structure, ES/NQ mechanics, and at least one documented setup from first principles.",tasks:["Complete the full study checklist","Read Market Wizards — one interview per week","Read The Art and Science of Technical Analysis — Adam Grimes","Watch 20 live market sessions without trading — just observe and mark levels","Write your setup definitions before touching a sim account"]},
+  {num:"Phase 02",name:"Sim foundation",status:"locked",desc:"First 30 sim sessions. No performance pressure. The goal is execution practice — entering, managing, and exiting without violating the rules. P&L is irrelevant. Clean execution is the only metric.",tasks:["30 sessions minimum","Every session logged with pre/post debrief","No violation tolerance — two violations ends the session","Review every session recording if using a platform that supports it","Weekly pattern extraction — not P&L, execution quality"]},
+  {num:"Phase 03",name:"Sim consistency",status:"locked",desc:"Sessions 31–100+. Now tracking P&L alongside execution. Looking for positive expectancy, consistent setup adherence, and emotional stability across different market conditions. All 7 gates must be met before advancing.",tasks:["All 7 evaluation gates must be green","Three consecutive profitable months","20 straight clean sessions","Document your edge in writing — if you cannot write it, you do not have it","Topstep 50K Standard Path — first attempt only after this phase is complete"]},
+  {num:"Phase 04",name:"First evaluation",status:"locked",desc:"Topstep 50K Standard Path. $3,000 profit target. $1,000 daily loss limit. 5-contract max. Budget for multiple attempts — plan as if failure is normal until your data proves otherwise.",tasks:["Budget: $500–$1,100 for first evaluation cycle","Apply the exact same rules as sim — nothing changes","Daily loss limit is the hard stop — not a suggestion","If you fail: 48-hour review before purchasing a reset","Journal every session identically to sim"]},
+  {num:"Phase 05",name:"The view",status:"locked",desc:"Consistent funded account payouts. Multiple accounts. Salary still running. Capital compounding. 12 months of payout consistency before considering leaving employment. The view is a consequence — not a shortcut.",tasks:["12 months payout consistency minimum before job exit","Salary + payouts compounding simultaneously","No lifestyle inflation until the trading income is provably stable","The Jesko is the long-horizon marker — not the first milestone","Keep running the system. The system produced the view."]},
+];
+
+const STUDY_ITEMS={
+  phase1:[
+    {id:"s1",label:"What are futures contracts and how do they differ from stocks",sub:"ES = S&P 500 futures. NQ = Nasdaq-100 futures. Understand leverage, contract size, tick value."},
+    {id:"s2",label:"Understand tick size and point value for ES and NQ",sub:"ES: 0.25 ticks, $12.50/tick. NQ: 0.25 ticks, $5.00/tick. This is how you calculate real P&L."},
+    {id:"s3",label:"Market structure: higher highs, higher lows, lower highs, lower lows",sub:"The most fundamental concept in price action. Master this before anything else."},
+    {id:"s4",label:"Support and resistance — what they actually are structurally",sub:"Not lines on a chart. Areas where supply and demand have previously shifted."},
+    {id:"s5",label:"Trend identification on multiple timeframes",sub:"The daily tells you the story. The 1-hour tells you the chapter. The 5-minute tells you the sentence."},
+    {id:"s6",label:"VWAP — what it is and why institutions use it",sub:"Volume Weighted Average Price. The most important intraday reference level for futures."},
+    {id:"s7",label:"Opening range and opening drive dynamics",sub:"The first 30 minutes sets the tone for the day. Learn to read it before trading it."},
+    {id:"s8",label:"Volume profile basics — point of control, value area",sub:"Where most volume traded. Price tends to revisit these levels."},
+  ],
+  phase2:[
+    {id:"s9",label:"ES contract specifications — full details",sub:"Margin requirements, trading hours, settlement, expiration. Know your instrument."},
+    {id:"s10",label:"NQ contract specifications — full details",sub:"Same as above for NQ. Know how it moves differently from ES."},
+    {id:"s11",label:"Pre-market context: overnight highs/lows, gap analysis",sub:"Where did price close yesterday? Where is it now? The gap tells a story."},
+    {id:"s12",label:"Economic calendar — which events move ES/NQ",sub:"FOMC, CPI, NFP, GDP. Know the dates. Do not trade into major releases as a beginner."},
+    {id:"s13",label:"How to read a DOM (Depth of Market) without over-relying on it",sub:"Order flow context. Useful but not a crutch."},
+    {id:"s14",label:"Correlation between ES and NQ — when they diverge and why",sub:"When one leads and the other lags, there is information in the gap."},
+  ],
+  phase3:[
+    {id:"s15",label:"Read Market Wizards — extract each trader's core edge structure",sub:"One interview per week. What do they know that others don't? What is the structural source of their edge?"},
+    {id:"s16",label:"Understand why 97% of persistent day traders lose money",sub:"Read the Brazil futures study summary. Understand the failure modes before you can avoid them."},
+    {id:"s17",label:"Map your specific psychological risk: personal stakes interference",sub:"Your wiring problem is documented. Apply it to trading scenarios. What does it look like when it appears?"},
+    {id:"s18",label:"Define your revenge trading trigger — what does it feel like before it happens?",sub:"The pattern always has a pre-signal. Find yours before it costs you. Log emotional state every session."},
+    {id:"s19",label:"Read Ego is the Enemy — apply to trading identity specifically",sub:"The most dangerous trader is the one who needs to be right. Identify where that lives in you."},
+  ],
+  phase4:[
+    {id:"s20",label:"Choose a sim platform and paper trade for one full week without logging",sub:"Tradovate, NinjaTrader, or Thinkorswim. Get comfortable with the mechanics before you count anything."},
+    {id:"s21",label:"Define your first setup in writing — one paragraph, no vagueness",sub:"If you cannot write it clearly, you do not understand it well enough to trade it."},
+    {id:"s22",label:"Set your session rules in writing — entry criteria, stop, target, max trades/day",sub:"The rules must exist before the session starts. Not during. Not after."},
+    {id:"s23",label:"Run one full sim week with all rules enforced — log every session",sub:"This is the first real data. Not the first trades. The first data."},
+    {id:"s24",label:"Review week one — extract the pattern from the log",sub:"What worked? What violated? What does the emotional state data show? What changes?"},
+  ],
+};
+
+const PROTOCOL_STEPS=[
+  {title:"Check sleep quality",desc:"Did you hit 7.5h+? If under 6h — this is a study session only. Close the platform."},
+  {title:"Check emotional state",desc:"Rate yourself 1–5 right now, before charts. If you are at 3+, identify why. If 4–5, session is observation only."},
+  {title:"Review overnight levels",desc:"Overnight high and low. Gap from yesterday's close. Any major economic events today?"},
+  {title:"Mark key levels on the daily chart",desc:"Previous day high, low, close. Weekly high and low. Major S/R zones. VWAP from yesterday."},
+  {title:"Identify the trend context",desc:"Is ES/NQ in an uptrend, downtrend, or range on the daily? This is your directional bias."},
+  {title:"Define the setups you will look for today",desc:"Name them. Write them. You are only allowed to trade the setups you defined before the session."},
+  {title:"Set your max loss for the session",desc:"If you hit it, the session ends. No exceptions. No recovery trades."},
+  {title:"Observe the opening 15 minutes without touching a button",desc:"9:30–9:45 is observation only. Mark the opening range. Watch where the volume is."},
+];
+
+const KILL_SWITCHES=[
+  {label:"Sleep under 6 hours",desc:"Session terminated. Study mode only. No execution regardless of how good the setup looks."},
+  {label:"Emotional state rated 4 or 5",desc:"Session terminated. The market will be there tomorrow. Your edge requires clarity."},
+  {label:"Two consecutive losses in one session",desc:"Session terminated. Close the platform. 24-hour minimum before next session."},
+  {label:"One hard-rule violation",desc:"Session terminated. Log the violation, identify the cause, write what changes before next session."},
+  {label:"Major economic release in next 30 minutes",desc:"No new entries until after the release and 10-minute stabilization window."},
+  {label:"You are watching P&L instead of price action",desc:"Exit the trade cleanly. You have left the trade. The session ends here."},
+];
+
+// ── STORAGE ───────────────────────────────────────────────
+function gs(k,def){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):def}catch{return def}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+function today(){return new Date().toISOString().split("T")[0]}
+
+let trades=gs("tj_trades",[]);
+let gates=gs("tj_gates",{});
+let studyDone=gs("tj_study",{});
+let protocolDone=gs("tj_protocol",{});
+
+document.getElementById("hdr-date").textContent=new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}).toUpperCase();
+
+// ── TABS ─────────────────────────────────────────────────
+function switchTab(btn){
+  document.querySelectorAll(".tnb").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+  const t=btn.dataset.tab;
+  if(t==="dashboard")renderDashboard();
+  if(t==="log")renderLog();
+  if(t==="rules")renderRules();
+  if(t==="phases")renderPhases();
+  if(t==="study")renderStudy();
+  if(t==="premarket")renderPremarket();
+}
+
+// ── DASHBOARD ────────────────────────────────────────────
+function renderDashboard(){
+  const total=trades.length;
+  const wins=trades.filter(t=>t.pnl>0).length;
+  const losses=trades.filter(t=>t.pnl<0).length;
+  const winRate=total>0?Math.round(wins/total*100):0;
+  const totalPnl=trades.reduce((a,t)=>a+(parseFloat(t.pnl)||0),0);
+  const violations=trades.filter(t=>parseInt(t.viol)>0).length;
+  const gatesMet=Object.values(gates).filter(Boolean).length;
+
+  document.getElementById("main-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">Sim trades</div><div class="stat-v ${total>=100?"g":""}">${total}</div><div class="stat-s">of 100 gate</div></div>
+    <div class="stat"><div class="stat-l">Win rate</div><div class="stat-v ${winRate>=50?"g":"c"}">${winRate}%</div><div class="stat-s">${wins}W / ${losses}L</div></div>
+    <div class="stat"><div class="stat-l">Total P&L</div><div class="stat-v ${totalPnl>=0?"g":"c"}">${totalPnl>=0?"+":""}${totalPnl.toFixed(2)}</div><div class="stat-s">points</div></div>
+    <div class="stat"><div class="stat-l">Violations</div><div class="stat-v ${violations===0?"g":"c"}">${violations}</div><div class="stat-s">rule breaks</div></div>
+  `;
+
+  const pct=Math.round(gatesMet/7*100);
+  document.getElementById("gate-overall").innerHTML=`
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-bottom:5px;letter-spacing:0.06em"><span>${gatesMet} of 7 gates met</span><span>${pct}%</span></div>
+    <div style="height:3px;background:var(--s3);overflow:hidden"><div style="height:100%;background:${pct>=100?"var(--gb)":"var(--amber)"};width:${pct}%;transition:width 0.5s"></div></div>
+  `;
+
+  document.getElementById("gate-list").innerHTML=EVAL_GATES.map(g=>`
+    <div class="gate-item ${gates[g.id]?"met":""}" onclick="toggleGate('${g.id}')">
+      <div class="gate-check">${gates[g.id]?"&#10003;":""}</div>
+      <div class="gate-lbl">${g.label}<div style="font-family:'Crimson Pro',serif;font-style:italic;font-size:12px;color:var(--t3);margin-top:2px">${g.detail}</div></div>
+      <div class="gate-req">${g.req}</div>
+    </div>
+  `).join("");
+
+  // Equity curve
+  const canvas=document.getElementById("equity-canvas");
+  const ctx=canvas.getContext("2d");
+  canvas.width=canvas.offsetWidth*2;canvas.height=160;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(trades.length>1){
+    let running=0;const points=[0,...trades.map(t=>{running+=parseFloat(t.pnl)||0;return running;})];
+    const min=Math.min(...points),max=Math.max(...points);
+    const range=max-min||1;
+    const w=canvas.width,h=canvas.height;
+    ctx.beginPath();
+    points.forEach((p,i)=>{
+      const x=i/(points.length-1)*w;
+      const y=h-((p-min)/range*(h-20)+10);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle=totalPnl>=0?"#22b07d":"#c0553a";ctx.lineWidth=1.5;ctx.stroke();
+    ctx.lineTo(w,h);ctx.lineTo(0,h);
+    ctx.fillStyle=totalPnl>=0?"rgba(26,140,99,0.08)":"rgba(192,85,58,0.08)";ctx.fill();
+    ctx.beginPath();ctx.moveTo(0,h-((0-min)/range*(h-20)+10));ctx.lineTo(w,h-((0-min)/range*(h-20)+10));
+    ctx.strokeStyle="rgba(255,255,255,0.06)";ctx.lineWidth=1;ctx.stroke();
+  } else {
+    ctx.fillStyle="rgba(255,255,255,0.04)";ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="#3d3a36";ctx.font="14px 'JetBrains Mono'";ctx.textAlign="center";
+    ctx.fillText("Log trades to see equity curve",canvas.width/2,canvas.height/2);
+  }
+
+  const esT=trades.filter(t=>t.inst==="ES");const nqT=trades.filter(t=>t.inst==="NQ");
+  const esW=esT.filter(t=>t.pnl>0).length;const nqW=nqT.filter(t=>t.pnl>0).length;
+  document.getElementById("inst-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">ES trades</div><div class="stat-v">${esT.length}</div><div class="stat-s">${esT.length?Math.round(esW/esT.length*100):0}% win rate</div></div>
+    <div class="stat"><div class="stat-l">ES P&L</div><div class="stat-v ${esT.reduce((a,t)=>a+t.pnl,0)>=0?"g":"c"}">${esT.reduce((a,t)=>a+(parseFloat(t.pnl)||0),0).toFixed(1)}</div><div class="stat-s">points</div></div>
+    <div class="stat"><div class="stat-l">NQ trades</div><div class="stat-v">${nqT.length}</div><div class="stat-s">${nqT.length?Math.round(nqW/nqT.length*100):0}% win rate</div></div>
+    <div class="stat"><div class="stat-l">NQ P&L</div><div class="stat-v ${nqT.reduce((a,t)=>a+t.pnl,0)>=0?"g":"c"}">${nqT.reduce((a,t)=>a+(parseFloat(t.pnl)||0),0).toFixed(1)}</div><div class="stat-s">points</div></div>
+  `;
+
+  const weekAgo=Date.now()-7*24*60*60*1000;
+  const weekTrades=trades.filter(t=>t.ts>weekAgo);
+  const weekPnl=weekTrades.reduce((a,t)=>a+(parseFloat(t.pnl)||0),0);
+  const weekViols=weekTrades.filter(t=>parseInt(t.viol)>0).length;
+  document.getElementById("week-summary").innerHTML=`
+    <div class="stats" style="margin-bottom:0">
+      <div class="stat"><div class="stat-l">Week trades</div><div class="stat-v">${weekTrades.length}</div><div class="stat-s">last 7 days</div></div>
+      <div class="stat"><div class="stat-l">Week P&L</div><div class="stat-v ${weekPnl>=0?"g":"c"}">${weekPnl>=0?"+":""}${weekPnl.toFixed(1)}</div><div class="stat-s">points</div></div>
+      <div class="stat"><div class="stat-l">Week violations</div><div class="stat-v ${weekViols===0?"g":"c"}">${weekViols}</div><div class="stat-s">this week</div></div>
+      <div class="stat"><div class="stat-l">Study complete</div><div class="stat-v ${Object.values(studyDone).filter(Boolean).length>=24?"g":"a"}">${Object.values(studyDone).filter(Boolean).length}/24</div><div class="stat-s">items</div></div>
+    </div>
+  `;
+}
+
+function toggleGate(id){gates[id]=!gates[id];ss("tj_gates",gates);renderDashboard();}
+
+// ── LOG ──────────────────────────────────────────────────
+function renderLog(){
+  const instFilter=document.getElementById("filter-inst")?.value||"all";
+  const outcomeFilter=document.getElementById("filter-outcome")?.value||"all";
+  let items=[...trades].reverse();
+  if(instFilter!=="all")items=items.filter(t=>t.inst===instFilter);
+  if(outcomeFilter==="win")items=items.filter(t=>t.pnl>0);
+  else if(outcomeFilter==="loss")items=items.filter(t=>t.pnl<0);
+  else if(outcomeFilter==="violation")items=items.filter(t=>parseInt(t.viol)>0);
+
+  const total=items.length;
+  const wins=items.filter(t=>t.pnl>0).length;
+  const pnl=items.reduce((a,t)=>a+(parseFloat(t.pnl)||0),0);
+  const viols=items.filter(t=>parseInt(t.viol)>0).length;
+  document.getElementById("log-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">Showing</div><div class="stat-v">${total}</div><div class="stat-s">trades</div></div>
+    <div class="stat"><div class="stat-l">Win rate</div><div class="stat-v ${total&&wins/total>=0.5?"g":"c"}">${total?Math.round(wins/total*100):0}%</div><div class="stat-s">${wins} wins</div></div>
+    <div class="stat"><div class="stat-l">P&L</div><div class="stat-v ${pnl>=0?"g":"c"}">${pnl>=0?"+":""}${pnl.toFixed(1)}</div><div class="stat-s">points</div></div>
+    <div class="stat"><div class="stat-l">Violations</div><div class="stat-v ${viols===0?"g":"c"}">${viols}</div><div class="stat-s">in selection</div></div>
+  `;
+
+  const list=document.getElementById("trade-list");
+  if(!items.length){list.innerHTML='<div class="empty">No trades logged yet. Go to "Log a trade" to start building your data set.</div>';return;}
+  const violLabels={none:"None",revenge:"Revenge trade",fomo:"FOMO entry",overhold:"Overholding winner",no_stop:"No stop set",sized_up:"Sized up after win",early_exit:"Early exit — fear",outside_setup:"Outside setup",tired:"Traded tired"};
+  const setupLabels={trend_continuation:"Trend continuation",pullback:"Pullback to level",breakout:"Breakout",reversal:"Reversal",vwap_reclaim:"VWAP reclaim",open_drive:"Opening drive",other:"Other"};
+  list.innerHTML=items.map(t=>{
+    const outcome=t.pnl>0?"win":t.pnl<0?"loss":"flat";
+    const hasViol=parseInt(t.viol)>0;
+    return`<div class="trade-card ${hasViol?"violation":outcome}" id="tc-${t.id}">
+      <div class="trade-header" onclick="toggleTrade(${t.id})">
+        <div class="trade-date">${t.date}</div>
+        <div class="trade-inst">${t.inst}</div>
+        <div class="trade-dir dir-${t.dir}">${t.dir}</div>
+        <div class="trade-setup">${setupLabels[t.setup]||t.setup}</div>
+        ${hasViol?`<div class="trade-viol">Violation</div>`:""}
+        <div class="trade-pnl pnl-${outcome}">${t.pnl>0?"+":""}${parseFloat(t.pnl).toFixed(2)}</div>
+      </div>
+      <div class="trade-body">
+        <div class="trade-meta">
+          <div><div class="tm-label">Session</div><div class="tm-val">${t.session||"—"}</div></div>
+          <div><div class="tm-label">Entry</div><div class="tm-val">${t.entry||"—"}</div></div>
+          <div><div class="tm-label">Exit</div><div class="tm-val">${t.exit||"—"}</div></div>
+          <div><div class="tm-label">Stop set?</div><div class="tm-val" style="color:${t.stop==="yes"?"var(--gb)":"var(--coral)"}">${t.stop==="yes"?"Yes":"No"}</div></div>
+          <div><div class="tm-label">Emotion (1–5)</div><div class="tm-val" style="color:${t.emotion<=2?"var(--gb)":t.emotion>=4?"var(--coral)":"var(--amber)"}">${t.emotion||"—"}</div></div>
+          <div><div class="tm-label">Sleep</div><div class="tm-val" style="color:${t.sleep==="good"?"var(--gb)":t.sleep==="poor"?"var(--coral)":"var(--amber)"}">${t.sleep||"—"}</div></div>
+          ${hasViol?`<div class="tm-label" style="color:var(--purple)">Violation: ${violLabels[t.violtype]||t.violtype}</div>`:""}
+        </div>
+        ${t.thesis?`<div class="trade-journal-text"><span style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:4px">Thesis</span>${t.thesis}</div>`:""}
+        ${t.debrief?`<div class="trade-journal-text"><span style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:4px">Post-trade debrief</span>${t.debrief}</div>`:""}
+        <div style="margin-top:10px"><button class="btn danger" onclick="removeTrade(${t.id})">Remove</button></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function toggleTrade(id){document.getElementById("tc-"+id).classList.toggle("open")}
+function removeTrade(id){if(!confirm("Remove this trade?"))return;trades=trades.filter(t=>t.id!==id);ss("tj_trades",trades);renderLog();}
+
+// ── ADD TRADE ────────────────────────────────────────────
+function addTrade(){
+  const pnl=parseFloat(document.getElementById("t-pnl").value);
+  if(isNaN(pnl)){alert("P&L is required.");return;}
+  trades.push({
+    id:Date.now(),
+    date:document.getElementById("t-date").value||today(),
+    session:document.getElementById("t-session").value,
+    inst:document.getElementById("t-inst").value,
+    dir:document.getElementById("t-dir").value,
+    setup:document.getElementById("t-setup").value,
+    pnl,
+    entry:document.getElementById("t-entry").value.trim(),
+    exit:document.getElementById("t-exit").value.trim(),
+    stop:document.getElementById("t-stop").value,
+    viol:document.getElementById("t-viol").value,
+    violtype:document.getElementById("t-violtype").value,
+    thesis:document.getElementById("t-thesis").value.trim(),
+    debrief:document.getElementById("t-debrief").value.trim(),
+    emotion:parseInt(document.getElementById("t-emotion").value),
+    sleep:document.getElementById("t-sleep").value,
+    ts:Date.now(),
+  });
+  ss("tj_trades",trades);
+  ["t-entry","t-exit","t-thesis","t-debrief","t-pnl"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("t-viol").value="0";
+  document.getElementById("t-violtype").value="none";
+  document.getElementById("t-emotion").value="1";
+  document.getElementById("t-sleep").value="good";
+  document.querySelector('.tnb[data-tab="log"]').click();
+}
+
+// ── RULES ────────────────────────────────────────────────
+function renderRules(){
+  document.getElementById("rules-list").innerHTML=RULES.map((r,i)=>`
+    <div class="rule-card ${r.type}" id="rc-${i}">
+      <div class="rule-header" onclick="toggleRule(${i})">
+        <span class="rule-type type-${r.type}">${r.type}</span>
+        <div class="rule-title">${r.title}</div>
+      </div>
+      <div class="rule-body">
+        <div class="rule-text">${r.body.replace(/\n\n/g,"</p><p style='margin-top:10px'>").replace(/\n/g,"<br>")}</div>
+        <div class="rule-yohann" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b1);color:var(--amber)">&#9658; Yohann-specific: ${r.yohann}</div>
+      </div>
+    </div>
+  `).join("");
+}
+function toggleRule(i){document.getElementById("rc-"+i).classList.toggle("open")}
+
+// ── PHASES ───────────────────────────────────────────────
+function renderPhases(){
+  document.getElementById("phase-list").innerHTML=PHASES.map(p=>`
+    <div class="phase-card ${p.status}">
+      <div class="phase-num">${p.num}</div>
+      <div class="phase-name ${p.status==="current"?"green":""}">${p.name}${p.status==="current"?' — <span style="font-size:12px;color:var(--gb);font-family:\'JetBrains Mono\',monospace;letter-spacing:0.1em">YOU ARE HERE</span>':''}</div>
+      <div class="phase-desc">${p.desc}</div>
+      <div class="phase-tasks">${p.tasks.map(t=>`<div class="phase-task">${t}</div>`).join("")}</div>
+    </div>
+  `).join("");
+}
+
+// ── STUDY ────────────────────────────────────────────────
+function renderStudy(){
+  ["phase1","phase2","phase3","phase4"].forEach(phase=>{
+    document.getElementById("study-"+phase).innerHTML=STUDY_ITEMS[phase].map(item=>`
+      <div class="study-item ${studyDone[item.id]?"done":""}" onclick="toggleStudy('${item.id}')">
+        <div class="study-check">${studyDone[item.id]?"&#10003;":""}</div>
+        <div><div class="study-lbl">${item.label}</div><div class="study-sub">${item.sub}</div></div>
+      </div>
+    `).join("");
+  });
+}
+function toggleStudy(id){studyDone[id]=!studyDone[id];ss("tj_study",studyDone);renderStudy();}
+
+// ── PREMARKET ────────────────────────────────────────────
+function renderPremarket(){
+  const todayKey=today();
+  document.getElementById("protocol-list").innerHTML=PROTOCOL_STEPS.map((s,i)=>{
+    const key="proto_"+todayKey+"_"+i;
+    const done=protocolDone[key];
+    return`<div class="protocol-item" style="cursor:pointer;${done?"opacity:0.6":""}" onclick="toggleProto('${key}')">
+      <div class="proto-num" style="color:${done?"var(--gb)":"var(--t3)"}">${String(i+1).padStart(2,"0")}</div>
+      <div class="proto-content">
+        <div class="proto-title" style="color:${done?"var(--gb)":"var(--t1)"}">${s.title}${done?' &#10003;':''}</div>
+        <div class="proto-desc">${s.desc}</div>
+      </div>
+    </div>`;
+  }).join("");
+  document.getElementById("kill-switches").innerHTML=KILL_SWITCHES.map(k=>`
+    <div style="background:var(--s1);border-left:2px solid var(--cbdr);padding:12px 16px 12px 18px;margin-bottom:2px">
+      <div style="font-size:11px;color:var(--coral);margin-bottom:3px">${k.label}</div>
+      <div style="font-family:'Crimson Pro',serif;font-size:14px;color:var(--t3);line-height:1.5">${k.desc}</div>
+    </div>
+  `).join("");
+}
+function toggleProto(key){protocolDone[key]=!protocolDone[key];ss("tj_protocol",protocolDone);renderPremarket();}
+
+// ── EXPORT / IMPORT ──────────────────────────────────────
+function exportData(){
+  const blob=new Blob([JSON.stringify({trades,gates,studyDone,exported:new Date().toISOString()},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="trading_journal_"+today()+".json";a.click();
+}
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.trades){ss("tj_trades",trades=d.trades);}
+      if(d.gates){ss("tj_gates",gates=d.gates);}
+      if(d.studyDone){ss("tj_study",studyDone=d.studyDone);}
+      renderDashboard();alert("Imported.");
+    }catch{alert("Invalid file.");}
+  };
+  reader.readAsText(file);
+}
+
+// ── INIT ─────────────────────────────────────────────────
+setTimeout(()=>{document.getElementById("loader").classList.add("hidden");},1800);
+document.getElementById("t-date").value=today();
+renderDashboard();
+</script>
+</body>
+</html>

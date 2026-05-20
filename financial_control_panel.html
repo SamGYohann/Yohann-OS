@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capital Control Panel — Yohann OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--s1:#0f0f0f;--s2:#161616;--s3:#1e1e1e;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);
+  --t1:#e8e4dc;--t2:#7a7670;--t3:#3d3a36;
+  --green:#1a8c63;--gb:#22b07d;--gdim:rgba(26,140,99,0.12);--gbdr:rgba(26,140,99,0.35);
+  --amber:#c49a3c;--adim:rgba(196,154,60,0.1);--abdr:rgba(196,154,60,0.3);
+  --coral:#c0553a;--cdim:rgba(192,85,58,0.1);--cbdr:rgba(192,85,58,0.3);
+  --purple:#6e65c4;--pdim:rgba(110,101,196,0.1);--pbdr:rgba(110,101,196,0.3);
+  --blue:#3a7bc4;--bdim:rgba(58,123,196,0.1);--bbdr:rgba(58,123,196,0.3);
+  --gold:#c49a3c;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35}
+
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;transition:opacity 0.8s ease,visibility 0.8s}
+#loader.hidden{opacity:0;visibility:hidden}
+.l-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,88px);letter-spacing:0.15em;animation:lpulse 1.5s ease-in-out infinite alternate;color:var(--amber)}
+.l-sub{font-size:10px;color:var(--t3);letter-spacing:0.3em;text-transform:uppercase;margin-top:8px}
+.l-bar-wrap{width:160px;height:1px;background:var(--b2);margin-top:28px;overflow:hidden}
+.l-bar{height:100%;background:var(--amber);width:0%;animation:lbar 1.8s ease forwards}
+@keyframes lpulse{from{opacity:0.4}to{opacity:1}}
+@keyframes lbar{0%{width:0%}60%{width:70%}100%{width:100%}}
+
+.app{max-width:900px;margin:0 auto;padding:0 28px 100px;opacity:0;animation:fadein 0.6s ease 2s forwards}
+@keyframes fadein{to{opacity:1}}
+
+/* HEADER */
+.header{padding:44px 0 24px;border-bottom:1px solid var(--b1);margin-bottom:32px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.h-wordmark{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);letter-spacing:0.12em;line-height:1;color:var(--amber)}
+.h-sub{font-family:'Crimson Pro',serif;font-style:italic;font-size:15px;color:var(--t2);margin-top:6px}
+.h-date{font-size:10px;color:var(--t3);letter-spacing:0.12em;text-transform:uppercase;text-align:right}
+
+/* NAV */
+.tab-nav{display:flex;gap:2px;margin-bottom:32px;border-bottom:1px solid var(--b1);overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tnb{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:11px 16px;border:none;background:transparent;color:var(--t3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+.tnb:hover{color:var(--t2)}
+.tnb.active{color:var(--amber);border-bottom-color:var(--amber)}
+.tab{display:none}.tab.active{display:block}
+
+/* SLBL */
+.slbl{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.slbl::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:24px}
+.stat{background:var(--s1);padding:14px 16px}
+.stat-l{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.stat-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.05em;color:var(--t1);line-height:1}
+.stat-v.g{color:var(--gb)}.stat-v.a{color:var(--amber)}.stat-v.c{color:var(--coral)}.stat-v.p{color:var(--purple)}
+.stat-s{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* BIG NUMBER */
+.big-num-wrap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:24px}
+.big-num-cell{background:var(--s1);padding:20px}
+.bn-label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.bn-val{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,52px);letter-spacing:0.05em;line-height:1}
+.bn-sub{font-size:10px;color:var(--t3);margin-top:4px}
+.bn-edit{font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--b1);padding:3px 8px;cursor:pointer;background:transparent;font-family:'JetBrains Mono',monospace;margin-top:8px;display:inline-block;transition:all 0.15s}
+.bn-edit:hover{border-color:var(--abdr);color:var(--amber)}
+
+/* MILESTONE BAR */
+.milestone-wrap{margin-bottom:28px}
+.milestone-item{display:flex;align-items:center;gap:0;background:var(--b1);margin-bottom:2px}
+.ms-label{background:var(--s1);padding:14px 16px;min-width:190px;border-right:1px solid var(--b1)}
+.ms-name{font-size:12px;color:var(--t1)}
+.ms-desc{font-size:10px;color:var(--t3);margin-top:2px;font-family:'Crimson Pro',serif;font-style:italic}
+.ms-bar-wrap{flex:1;background:var(--s1);padding:14px 16px;border-right:1px solid var(--b1)}
+.ms-track{height:4px;background:var(--s3);overflow:hidden}
+.ms-fill{height:100%;transition:width 0.6s ease;position:relative}
+.ms-fill::after{content:'';position:absolute;right:0;top:0;width:3px;height:100%;background:rgba(255,255,255,0.4)}
+.ms-sub{font-size:9px;color:var(--t3);margin-top:5px;letter-spacing:0.04em}
+.ms-val{background:var(--s1);padding:14px 16px;min-width:110px;text-align:right}
+.ms-pct{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;line-height:1}
+.ms-eta{font-size:9px;color:var(--t3);margin-top:2px;letter-spacing:0.04em}
+.ms-done{color:var(--gb)}
+.ms-item.locked{opacity:0.4}
+
+/* TIMELINE */
+.timeline-row{display:flex;flex-direction:column;gap:2px;margin-bottom:24px}
+.tl-item{display:flex;gap:0;background:var(--b1)}
+.tl-year{background:var(--s1);padding:14px 16px;min-width:90px;border-right:1px solid var(--b1);text-align:center}
+.tl-year-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--amber);line-height:1}
+.tl-year-lbl{font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;margin-top:2px}
+.tl-content{background:var(--s1);padding:14px 16px;flex:1}
+.tl-title{font-size:12px;color:var(--t1);margin-bottom:4px}
+.tl-items{display:flex;flex-direction:column;gap:3px}
+.tl-point{font-size:11px;color:var(--t2);display:flex;gap:8px;font-family:'Crimson Pro',serif}
+.tl-point::before{content:'—';color:var(--t3);flex-shrink:0}
+.tl-item.current .tl-year{background:var(--adim);border-right-color:var(--abdr)}
+.tl-item.current .tl-year-val{color:var(--amber)}
+.tl-item.current .tl-content{background:var(--adim)}
+
+/* SPENDING */
+.spend-card{background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;position:relative;overflow:hidden}
+.spend-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.spend-card.essential::before{background:var(--gb)}
+.spend-card.controlled::before{background:var(--amber)}
+.spend-card.leak::before{background:var(--coral)}
+.spend-header{display:flex;align-items:center;gap:12px;padding:12px 16px 12px 20px;cursor:pointer}
+.spend-cat{font-size:12px;color:var(--t1);flex:1}
+.spend-type-tag{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border:1px solid;flex-shrink:0}
+.tag-essential{border-color:var(--gbdr);color:var(--gb)}
+.tag-controlled{border-color:var(--abdr);color:var(--amber)}
+.tag-leak{border-color:var(--cbdr);color:var(--coral)}
+.spend-amount{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:80px;text-align:right;flex-shrink:0}
+.spend-body{display:none;padding:0 20px 14px 20px;border-top:1px solid var(--b1)}
+.spend-card.open .spend-body{display:block}
+.spend-rule{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6;margin-top:10px}
+
+/* EXPENSE LOG */
+.exp-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:14px;align-items:end}
+.exp-item{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;transition:background 0.15s}
+.exp-item:hover{background:var(--s2)}
+.exp-date{font-size:10px;color:var(--t3);min-width:80px;flex-shrink:0}
+.exp-cat{font-size:11px;color:var(--amber);min-width:100px;flex-shrink:0}
+.exp-desc{font-size:12px;color:var(--t2);flex:1}
+.exp-amount{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--coral);min-width:70px;text-align:right;flex-shrink:0}
+.exp-remove{font-size:10px;color:var(--t3);cursor:pointer;padding:4px;transition:color 0.15s}
+.exp-remove:hover{color:var(--coral)}
+
+/* SAVINGS RATE */
+.rate-display{display:flex;align-items:center;gap:24px;padding:20px;background:var(--s1);border:1px solid var(--b1);margin-bottom:24px}
+.rate-big{font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:0.05em;line-height:1}
+.rate-info{flex:1}
+.rate-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.rate-context{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6}
+
+/* JESKO */
+.jesko-full{background:var(--s1);border:1px solid var(--abdr);padding:28px;margin-bottom:24px;position:relative;overflow:hidden}
+.jesko-full::before{content:'KOENIGSEGG';position:absolute;right:-20px;top:50%;transform:translateY(-50%);font-family:'Bebas Neue',sans-serif;font-size:80px;color:rgba(196,154,60,0.04);letter-spacing:0.1em;pointer-events:none;white-space:nowrap}
+.jesko-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.jesko-name{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:0.1em;color:var(--amber);line-height:1}
+.jesko-model{font-size:10px;color:var(--t3);letter-spacing:0.2em;text-transform:uppercase;margin-top:4px}
+.jesko-price{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--t2);letter-spacing:0.05em;text-align:right}
+.jesko-price-label{font-size:9px;color:var(--t3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px}
+.jesko-track{height:3px;background:var(--s3);margin-bottom:8px;overflow:hidden}
+.jesko-fill{height:100%;background:var(--amber);transition:width 0.6s ease}
+.jesko-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:20px;padding-top:20px;border-top:1px solid var(--b1)}
+.jm-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.jm-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--t1);letter-spacing:0.05em;line-height:1}
+.jm-sub{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* PROP FUND */
+.prop-panel{background:var(--s1);border:1px solid var(--b1);padding:20px;margin-bottom:24px}
+.prop-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.prop-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.08em;color:var(--t1)}
+.prop-status{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border:1px solid;margin-top:4px}
+.prop-locked{border-color:var(--b1);color:var(--t3)}
+.prop-ready{border-color:var(--gbdr);color:var(--gb)}
+.prop-rule{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6;margin-bottom:14px;padding-left:14px;border-left:2px solid var(--cbdr)}
+.prop-row{display:flex;align-items:center;gap:0;background:var(--b1);margin-bottom:2px}
+.pr-firm{background:var(--s1);padding:12px 16px;min-width:160px;border-right:1px solid var(--b1)}
+.pr-firm-name{font-size:12px;color:var(--t1)}
+.pr-firm-sub{font-size:10px;color:var(--t3);margin-top:1px;font-family:'Crimson Pro',serif;font-style:italic}
+.pr-cost{background:var(--s1);padding:12px 16px;flex:1;border-right:1px solid var(--b1);font-size:11px;color:var(--t2)}
+.pr-rec{background:var(--s1);padding:12px 16px;min-width:100px;text-align:center}
+.pr-badge{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border:1px solid;display:inline-block}
+
+/* INCOME SCENARIO */
+.scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-bottom:24px}
+.sc-card{background:var(--s1);border:1px solid var(--b1);padding:16px;transition:all 0.15s}
+.sc-card:hover{background:var(--s2)}
+.sc-card.highlight{border-color:var(--abdr);background:var(--adim)}
+.sc-title{font-size:10px;color:var(--amber);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px}
+.sc-salary{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--t1);letter-spacing:0.05em;line-height:1;margin-bottom:8px}
+.sc-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.sc-label{color:var(--t3)}
+.sc-val{color:var(--t2)}
+.sc-milestone{margin-top:10px;padding-top:10px;border-top:1px solid var(--b1);font-size:10px;color:var(--t3)}
+
+/* FORM ELEMENTS */
+input[type="text"],input[type="number"],input[type="date"],select{background:var(--s2);border:1px solid var(--b1);padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t1);transition:border-color 0.15s;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--b2)}
+input::placeholder{color:var(--t3)}
+select option{background:var(--s2);color:var(--t1)}
+.flbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+
+.btn{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:10px 18px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--amber);color:var(--amber)}
+.btn.danger:hover{border-color:var(--cbdr);color:var(--coral)}
+
+.alert-box{padding:14px 18px;border-left:3px solid var(--coral);background:var(--cdim);margin-bottom:16px}
+.alert-title{font-size:10px;color:var(--coral);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px}
+.alert-text{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6}
+.rule{border:none;border-top:1px solid var(--b1);margin:24px 0}
+.empty{font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t3);padding:20px 0}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="l-name">Capital</div>
+  <div class="l-sub">Financial Control Panel — Yohann OS</div>
+  <div class="l-bar-wrap"><div class="l-bar"></div></div>
+</div>
+
+<div class="app">
+
+<header class="header">
+  <div>
+    <div class="h-wordmark">Capital Control Panel</div>
+    <div class="h-sub">The salary funds the build. The build funds the view. Every dollar tracked is a decision made consciously.</div>
+  </div>
+  <div class="h-date" id="hdr-date"></div>
+</header>
+
+<div class="tab-nav">
+  <button class="tnb active" data-tab="overview" onclick="switchTab(this)">Overview</button>
+  <button class="tnb" data-tab="milestones" onclick="switchTab(this)">Milestones</button>
+  <button class="tnb" data-tab="spending" onclick="switchTab(this)">Spending</button>
+  <button class="tnb" data-tab="prop" onclick="switchTab(this)">Prop Fund</button>
+  <button class="tnb" data-tab="scenarios" onclick="switchTab(this)">Income scenarios</button>
+  <button class="tnb" data-tab="timeline" onclick="switchTab(this)">10-year map</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="tab-overview" class="tab active">
+  <div id="alert-zone"></div>
+  <div class="big-num-wrap" id="big-nums"></div>
+  <div class="stats" id="overview-stats"></div>
+  <div class="slbl">Savings rate</div>
+  <div class="rate-display" id="rate-display"></div>
+  <div class="slbl">Update financials</div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px">
+    <div><div class="flbl">Current savings ($)</div><input type="number" id="u-savings" placeholder="698"></div>
+    <div><div class="flbl">Monthly income ($)</div><input type="number" id="u-income" placeholder="500"></div>
+    <div><div class="flbl">Monthly expenses ($)</div><input type="number" id="u-expenses" placeholder="300"></div>
+  </div>
+  <button class="btn" onclick="updateFinancials()">Update</button>
+  <div class="rule"></div>
+  <div class="jesko-full" id="jesko-panel"></div>
+</div>
+
+<!-- MILESTONES -->
+<div id="tab-milestones" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">Each milestone is a prerequisite for the next. You do not skip rungs. The emergency buffer must be funded before the prop fund exists. The prop fund must be built before you attempt an evaluation. The sequence is not negotiable.</p>
+  <div class="milestone-wrap" id="milestone-list"></div>
+</div>
+
+<!-- SPENDING -->
+<div id="tab-spending" class="tab">
+  <div class="alert-box">
+    <div class="alert-title">Your known gap — spending discipline</div>
+    <div class="alert-text">You identified this yourself: expenses vary and spending discipline is a weak point. This section exists to convert that awareness into a system. Awareness without tracking is just guilt. Tracking without a rule is just data. The rule: every purchase logged within 24 hours. Every week reviewed on Friday.</div>
+  </div>
+  <div class="stats" id="spend-stats"></div>
+  <div class="slbl">Spending framework — your categories</div>
+  <div id="spend-categories"></div>
+  <div class="rule"></div>
+  <div class="slbl">Log an expense</div>
+  <div class="exp-form">
+    <div><div class="flbl">Date</div><input type="date" id="e-date"></div>
+    <div><div class="flbl">Category</div>
+      <select id="e-cat">
+        <option value="Food/Groceries">Food / Groceries</option>
+        <option value="Transport">Transport</option>
+        <option value="Subscriptions">Subscriptions</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Entertainment">Entertainment</option>
+        <option value="Tech/Tools">Tech / Tools</option>
+        <option value="Eating out">Eating out</option>
+        <option value="Miscellaneous">Miscellaneous</option>
+        <option value="Investment">Investment / Savings transfer</option>
+      </select>
+    </div>
+    <div><div class="flbl">Amount ($)</div><input type="number" id="e-amount" placeholder="0.00" step="0.01"></div>
+    <div><div class="flbl">Description</div><input type="text" id="e-desc" placeholder="What was it?"></div>
+  </div>
+  <div style="margin-bottom:20px"><button class="btn" onclick="addExpense()">+ Log expense</button></div>
+  <div class="slbl">Expense log — this month</div>
+  <div id="expense-log"></div>
+  <div class="rule"></div>
+  <button class="btn" onclick="exportData()">&#8595; Export data</button>
+  &nbsp;<label class="btn" style="cursor:pointer">&#8593; Import<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+</div>
+
+<!-- PROP FUND -->
+<div id="tab-prop" class="tab">
+  <div class="prop-panel" id="prop-panel"></div>
+  <div class="slbl">The sequencing rule</div>
+  <div style="background:var(--s1);border-left:2px solid var(--cbdr);padding:16px 20px;margin-bottom:2px">
+    <div style="font-size:9px;color:var(--coral);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Non-negotiable order</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.7">Emergency buffer ($6,000) must be fully funded before a single dollar enters the prop fund. No exceptions. If this feels slow — it is supposed to feel slow. The speed of the sequence is proportional to the quality of the foundation.</div>
+  </div>
+  <div style="background:var(--s1);border-left:2px solid var(--abdr);padding:16px 20px;margin-top:2px;margin-bottom:24px">
+    <div style="font-size:9px;color:var(--amber);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">The war budget doctrine</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.7">Budget for multiple failed evaluations. A Topstep 50K pass on the first attempt is not the plan — it is the best case. The plan is $500–$1,100 for the first evaluation cycle, including resets. Plan as if failure is normal until your sim data proves otherwise. Budget from the prop fund only — never from emergency savings, never from tuition money.</div>
+  </div>
+  <div class="slbl">Firm comparison</div>
+  <div id="firm-comparison"></div>
+  <div class="rule"></div>
+  <div class="slbl">Update prop fund balance</div>
+  <div style="display:flex;gap:8px;max-width:400px">
+    <input type="number" id="prop-input" placeholder="Current prop fund ($)">
+    <button class="btn" onclick="updateProp()">Update</button>
+  </div>
+</div>
+
+<!-- SCENARIOS -->
+<div id="tab-scenarios" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">Your first job should do one thing: fund the build. These scenarios show what the capital engine looks like under different salary outcomes. Model conservatively. The GPA recovery story means first-year comp should be planned at the low end, not the median.</p>
+  <div class="slbl">Post-graduation income scenarios</div>
+  <div class="scenario-grid" id="scenario-grid"></div>
+  <div class="rule"></div>
+  <div class="slbl">Current phase — student engine</div>
+  <div class="stats" id="student-stats"></div>
+  <div style="background:var(--s1);border-left:2px solid var(--abdr);padding:16px 20px;margin-top:2px">
+    <div style="font-size:9px;color:var(--amber);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">The living cheap doctrine — years 1–3 post graduation</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.7">If you keep rent artificially low and avoid lifestyle inflation in the first 24–36 months post-grad, you buy time, prop attempts, and emotional stability. The people who fail at this stage are the ones who upgrade their lifestyle the moment the first paycheck hits. The view requires patience at the foundation level.</div>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<div id="tab-timeline" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">This is the machine. One output at a time, in sequence. The view at the end is a consequence — not a shortcut, not a fantasy. A mathematical result of running the system long enough without quitting.</p>
+  <div class="timeline-row" id="timeline"></div>
+</div>
+
+</div>
+
+<script>
+// ── DEFAULTS ─────────────────────────────────────────────
+const DEFAULTS={savings:698,income:500,expenses:300,prop:0};
+
+const MILESTONES=[
+  {id:"m1",name:"Emergency buffer",target:6000,desc:"Foundation. Non-negotiable. Nothing else gets funded until this is complete.",color:"var(--gb)",priority:1},
+  {id:"m2",name:"Prop / training fund",target:2000,desc:"Challenge fund only. Topstep 50K first attempt cycle. Funded only after emergency buffer.",color:"var(--amber)",priority:2},
+  {id:"m3",name:"Recruiting reserve",target:2000,desc:"Laptop, interview travel, professional clothing. Career infrastructure.",color:"var(--blue)",priority:3},
+  {id:"m4",name:"First $10K milestone",target:10000,desc:"Full foundation complete. Real optionality begins.",color:"var(--purple)",priority:4},
+  {id:"m5",name:"Long-term investments",target:15000,desc:"Index funds. The compounding layer. Untouchable.",color:"var(--amber)",priority:5},
+  {id:"m6",name:"$50K milestone",target:50000,desc:"Real operator capital. Multiple prop accounts possible. Career exit becoming visible.",color:"var(--amber)",priority:6},
+  {id:"m7",name:"$100K milestone",target:100000,desc:"$30K emergency/opportunity. $30K investments. $40K deployable business/trading capital.",color:"var(--gold)",priority:7},
+];
+
+const SPEND_CATEGORIES=[
+  {type:"essential",cat:"Rent / Housing",budget:0,rule:"This is your largest variable. Keep it as low as humanly possible in years 1–3. Every dollar saved here is a dollar toward the prop fund and emergency buffer."},
+  {type:"essential",cat:"Food / Groceries",budget:150,rule:"$150/month is realistic and disciplined. Cook. The $14 lunch every day is $280/month — nearly your entire food budget."},
+  {type:"essential",cat:"Transport",budget:80,rule:"Gas, insurance, basic maintenance. The car is infrastructure, not a status signal. Keep it running, not upgraded."},
+  {type:"controlled",cat:"Subscriptions",budget:30,rule:"Audit every subscription quarterly. Cancel anything unused in the last 30 days. The default is off, not on."},
+  {type:"controlled",cat:"Eating out",budget:40,rule:"This is your highest-probability spending leak. The rule: eating out is planned, not impulsive. Unplanned eating out is logged as a leak."},
+  {type:"controlled",cat:"Clothing",budget:30,rule:"One purchase per month maximum during the build phase. Not zero — but intentional and planned."},
+  {type:"leak",cat:"Entertainment / Impulse",budget:20,rule:"This catches everything unplanned. If you find yourself logging here more than twice a week, the spending discipline system is not working. Adjust the upstream behavior."},
+  {type:"leak",cat:"Tech / Tools",budget:0,rule:"Only when it directly improves career or trading output. 'I might need this' is not a reason. 'This makes the system better' is."},
+];
+
+const FIRMS=[
+  {name:"Topstep 50K",sub:"Primary — first evaluation",cost:"$49 combine/reset + $149 activation",profit:"$3,000 target",loss:"$1,000 daily limit",rec:"primary",recColor:"var(--gb)"},
+  {name:"Bulenox 50K",sub:"Secondary",cost:"$125/mo promo, $78 reset, $148 activation",profit:"$3,000 target",loss:"$2,500 drawdown",rec:"secondary",recColor:"var(--amber)"},
+  {name:"Apex 50K",sub:"Later — rules change often",cost:"Pricing varies by promo",profit:"$2,000 drawdown",loss:"4-contract cap",rec:"later",recColor:"var(--t3)"},
+];
+
+const SCENARIOS=[
+  {title:"Conservative",salary:52000,savings_rate:0.22,monthly_save:950,label:"Plan for this"},
+  {title:"Realistic",salary:62000,savings_rate:0.28,monthly_save:1450,label:"Target",highlight:true},
+  {title:"Strong",salary:72000,savings_rate:0.32,monthly_save:1920,label:"Best case"},
+];
+
+const TIMELINE=[
+  {year:"2026",phase:"Build phase",current:true,points:["Community college transfers clear — BUSN 212, SPCH 221, BUSN 323","FIRE 311 unlocked — the first real finance gate","Emergency fund contributions start — $200/month minimum","Study checklist Phase 1 & 2 complete — market structure foundation built","Sim trading journal started — pure observation mode"]},
+  {year:"2027",phase:"Degree completion",current:false,points:["FIRE chain: 311 → 312 → 317 → 321 → 461","GPA recovery — 3.4+ term average required every semester","First analytical role secured — FP&A, Strategy, or BA","Emergency buffer fully funded — $6,000","Prop fund contributions begin — $100–$200/month"]},
+  {year:"2028",phase:"First year employed",current:false,points:["$55K–$72K salary — model conservatively at $52K","Aggressive savings rate — 22–32% of net","Sim gate requirements approaching — 100 trades, 3 profitable months","$10K milestone target — full foundation","Topstep first evaluation cycle if sim gates met"]},
+  {year:"2029",phase:"Capital acceleration",current:false,points:["Multiple Topstep evaluation cycles budgeted","First funded account payouts possible","$50K milestone target","12-month payout consistency check — no job exit before this","Salary raises compound — performance track established"]},
+  {year:"2031",phase:"Operator phase",current:false,points:["Multi-account funded consistency","$100K capital target","Trading income supplementing salary materially","Location freedom entering the picture","The view starting to become concrete infrastructure"]},
+  {year:"2033+",phase:"The view",current:false,points:["Transition from trader to allocator","Operator-level autonomy — no employer dependency","The four monitors. The city at 2AM. The view from the top.","A mathematical result of running the system long enough without quitting.","The Jesko is no longer a fantasy. It is a timeline."]},
+];
+
+// ── STORAGE ───────────────────────────────────────────────
+function gs(k,def){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):def}catch{return def}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+function today(){return new Date().toISOString().split("T")[0]}
+function thisMonth(){return today().slice(0,7)}
+
+let fin=gs("fin_data",{savings:698,income:500,expenses:300,prop:0});
+let expenses=gs("fin_expenses",[]);
+
+document.getElementById("hdr-date").textContent=new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}).toUpperCase();
+
+// ── TABS ─────────────────────────────────────────────────
+function switchTab(btn){
+  document.querySelectorAll(".tnb").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+  const t=btn.dataset.tab;
+  if(t==="overview")renderOverview();
+  if(t==="milestones")renderMilestones();
+  if(t==="spending")renderSpending();
+  if(t==="prop")renderProp();
+  if(t==="scenarios")renderScenarios();
+  if(t==="timeline")renderTimeline();
+}
+
+// ── OVERVIEW ─────────────────────────────────────────────
+function renderOverview(){
+  const {savings,income,expenses:exp,prop}=fin;
+  const netMonthly=income-exp;
+  const savingsRate=income>0?Math.round(netMonthly/income*100):0;
+  const monthsTo10K=netMonthly>0?Math.ceil((10000-savings)/netMonthly):999;
+  const emergencyGap=Math.max(0,6000-savings);
+  const monthsToEmergency=netMonthly>0?Math.ceil(emergencyGap/netMonthly):999;
+
+  // Alert zone
+  let alerts="";
+  if(savingsRate<20&&income>0)alerts+=`<div class="alert-box" style="margin-bottom:16px"><div class="alert-title">Savings rate below 20%</div><div class="alert-text">Your current net monthly savings is $${netMonthly}. A savings rate below 20% means the milestones compound slowly and the prop fund stays locked. The spending log is the diagnostic tool. Use it.</div></div>`;
+  if(exp>income*0.7&&income>0)alerts+=`<div class="alert-box" style="margin-bottom:16px"><div class="alert-title">Expenses above 70% of income</div><div class="alert-text">Your expenses are consuming over 70% of your income. Every dollar above 60% expense ratio is a dollar that does not compound. Find the leak, cut it, log it.</div></div>`;
+  document.getElementById("alert-zone").innerHTML=alerts;
+
+  document.getElementById("big-nums").innerHTML=`
+    <div class="big-num-cell">
+      <div class="bn-label">Current savings</div>
+      <div class="bn-val" style="color:${savings>=6000?"var(--gb)":"var(--amber)"}">$${savings.toLocaleString()}</div>
+      <div class="bn-sub">of $6,000 emergency buffer</div>
+      <button class="bn-edit" onclick="focusUpdate()">Update</button>
+    </div>
+    <div class="big-num-cell">
+      <div class="bn-label">Monthly income</div>
+      <div class="bn-val" style="color:var(--t1)">$${income.toLocaleString()}</div>
+      <div class="bn-sub">current phase</div>
+    </div>
+    <div class="big-num-cell">
+      <div class="bn-label">Net monthly savings</div>
+      <div class="bn-val" style="color:${netMonthly>=200?"var(--gb)":netMonthly>=0?"var(--amber)":"var(--coral)"}">$${netMonthly.toLocaleString()}</div>
+      <div class="bn-sub">income minus expenses</div>
+    </div>
+  `;
+
+  document.getElementById("overview-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">Savings rate</div><div class="stat-v ${savingsRate>=30?"g":savingsRate>=20?"a":"c"}">${savingsRate}%</div><div class="stat-s">target 30%+</div></div>
+    <div class="stat"><div class="stat-l">Emergency fund</div><div class="stat-v ${savings>=6000?"g":"a"}">${Math.min(100,Math.round(savings/6000*100))}%</div><div class="stat-s">$${Math.min(savings,6000).toLocaleString()} / $6K</div></div>
+    <div class="stat"><div class="stat-l">Months to $10K</div><div class="stat-v ${monthsTo10K<=24?"g":monthsTo10K<=48?"a":"c"}">${monthsTo10K>=999?"—":monthsTo10K}</div><div class="stat-s">${netMonthly>0?"at current rate":"increase savings"}</div></div>
+    <div class="stat"><div class="stat-l">Prop fund</div><div class="stat-v ${prop>=2000?"g":""}">${prop>=2000?"Ready":"$"+prop.toLocaleString()}</div><div class="stat-s">target $2,000</div></div>
+  `;
+
+  const rateColor=savingsRate>=30?"var(--gb)":savingsRate>=20?"var(--amber)":"var(--coral)";
+  const rateContext=savingsRate>=30?"This is the aggressive savings rate that funds the build on an accelerated timeline. Protect it."
+    :savingsRate>=20?"This is the minimum viable savings rate for the plan to work on a reasonable timeline. Push toward 30%."
+    :savingsRate>=0?"Below 20% means the milestones compound slowly. Find the spending leak and cut it."
+    :"Your expenses exceed your income. This is the only problem that matters right now.";
+  document.getElementById("rate-display").innerHTML=`
+    <div class="rate-big" style="color:${rateColor}">${savingsRate}%</div>
+    <div class="rate-info">
+      <div class="rate-label">Monthly savings rate</div>
+      <div class="rate-context">${rateContext}</div>
+    </div>
+  `;
+
+  // Jesko panel
+  const JESKO_PRICE=3400000;
+  const jeskoPct=savings/JESKO_PRICE*100;
+  const jeskoPctDisp=jeskoPct<0.01?"< 0.01":jeskoPct.toFixed(3);
+  const yearsAtCurrent=netMonthly>0?Math.round((JESKO_PRICE-savings)/netMonthly/12):999;
+  const yearsPostGrad=Math.round((JESKO_PRICE)/1500/12);
+  document.getElementById("jesko-panel").innerHTML=`
+    <div class="jesko-top">
+      <div>
+        <div class="jesko-name">Jesko Absolut</div>
+        <div class="jesko-model">Koenigsegg — No-ceiling acquisition target</div>
+      </div>
+      <div class="jesko-right" style="text-align:right">
+        <div class="jesko-price-label">List price</div>
+        <div class="jesko-price">$3,400,000</div>
+      </div>
+    </div>
+    <div class="jesko-track"><div class="jesko-fill" style="width:${Math.min(100,jeskoPct)}%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t3);margin-top:4px"><span>$${savings.toLocaleString()} saved</span><span>${jeskoPctDisp}% of target</span></div>
+    <div class="jesko-meta">
+      <div><div class="jm-label">At current savings rate</div><div class="jm-val">${yearsAtCurrent>=999?"—":yearsAtCurrent+"y"}</div><div class="jm-sub">$${netMonthly}/mo net</div></div>
+      <div><div class="jm-label">At $1,500/mo post-grad</div><div class="jm-val">${yearsPostGrad}y</div><div class="jm-sub">conservative salary</div></div>
+      <div><div class="jm-label">At $2,000/mo post-grad</div><div class="jm-val">${Math.round(JESKO_PRICE/2000/12)}y</div><div class="jm-sub">with trading income</div></div>
+      <div><div class="jm-label">Remaining</div><div class="jm-val">$${(JESKO_PRICE-savings).toLocaleString()}</div><div class="jm-sub">to target</div></div>
+    </div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--b1);font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t3);line-height:1.6">The Jesko is not the first milestone. It is the last one. It exists on this panel to anchor the long time horizon — the reminder that the system is not built for the next 12 months. It is built for the next 20 years. Every financial decision you make today either shortens or lengthens that timeline.</div>
+  `;
+}
+
+function focusUpdate(){document.getElementById("u-savings").focus();}
+
+function updateFinancials(){
+  const s=parseFloat(document.getElementById("u-savings").value);
+  const i=parseFloat(document.getElementById("u-income").value);
+  const e=parseFloat(document.getElementById("u-expenses").value);
+  if(!isNaN(s))fin.savings=s;
+  if(!isNaN(i))fin.income=i;
+  if(!isNaN(e))fin.expenses=e;
+  ss("fin_data",fin);
+  renderOverview();
+}
+
+// ── MILESTONES ───────────────────────────────────────────
+function renderMilestones(){
+  const {savings,income,expenses:exp,prop}=fin;
+  const netMonthly=income-exp;
+  const capForMilestone=(id)=>{
+    if(id==="m1")return savings;
+    if(id==="m2")return prop;
+    if(id==="m3")return Math.max(0,savings-6000);
+    if(id==="m4")return savings+prop;
+    return savings+prop;
+  };
+  document.getElementById("milestone-list").innerHTML=MILESTONES.map((m,i)=>{
+    const current=capForMilestone(m.id);
+    const pct=Math.min(100,Math.round(current/m.target*100));
+    const remaining=Math.max(0,m.target-current);
+    const months=netMonthly>0?Math.ceil(remaining/netMonthly):null;
+    const done=pct>=100;
+    const locked=i>0&&capForMilestone(MILESTONES[i-1].id)<MILESTONES[i-1].target*0.9&&i>1;
+    return`<div class="milestone-item${locked?" ms-item locked":""}">
+      <div class="ms-label">
+        <div class="ms-name" style="color:${done?"var(--gb)":m.color}">${done?"✓ ":""} ${m.name}</div>
+        <div class="ms-desc">${m.desc}</div>
+      </div>
+      <div class="ms-bar-wrap">
+        <div class="ms-track"><div class="ms-fill" style="width:${pct}%;background:${done?"var(--gb)":m.color}"></div></div>
+        <div class="ms-sub">$${Math.min(current,m.target).toLocaleString()} of $${m.target.toLocaleString()} — ${remaining>0?"$"+remaining.toLocaleString()+" remaining":""}</div>
+      </div>
+      <div class="ms-val">
+        <div class="ms-pct ${done?"ms-done":""}" style="color:${done?"var(--gb)":m.color}">${done?"Done":pct+"%"}</div>
+        <div class="ms-eta">${done?"":months?"~"+months+"mo":""}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── SPENDING ─────────────────────────────────────────────
+function renderSpending(){
+  const monthExp=expenses.filter(e=>e.date&&e.date.startsWith(thisMonth()));
+  const monthTotal=monthExp.reduce((a,e)=>a+(parseFloat(e.amount)||0),0);
+  const {income,expenses:budgetExp}=fin;
+  const remaining=Math.max(0,budgetExp-monthTotal);
+  const over=Math.max(0,monthTotal-budgetExp);
+
+  document.getElementById("spend-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">Spent this month</div><div class="stat-v ${monthTotal>budgetExp?"c":"g"}">$${monthTotal.toFixed(0)}</div><div class="stat-s">of $${budgetExp} budget</div></div>
+    <div class="stat"><div class="stat-l">${over>0?"Over budget":"Remaining"}</div><div class="stat-v ${over>0?"c":"g'}"}">$${over>0?over.toFixed(0):remaining.toFixed(0)}</div><div class="stat-s">${over>0?"overspent":"left this month"}</div></div>
+    <div class="stat"><div class="stat-l">Transactions</div><div class="stat-v">${monthExp.length}</div><div class="stat-s">this month</div></div>
+    <div class="stat"><div class="stat-l">Largest item</div><div class="stat-v a">${monthExp.length?("$"+Math.max(...monthExp.map(e=>e.amount||0)).toFixed(0)):"—"}</div><div class="stat-s">single expense</div></div>
+  `;
+
+  document.getElementById("spend-categories").innerHTML=SPEND_CATEGORIES.map((c,i)=>`
+    <div class="spend-card ${c.type}" id="sc-${i}">
+      <div class="spend-header" onclick="toggleSpend(${i})">
+        <div class="spend-cat">${c.cat}</div>
+        <span class="spend-type-tag tag-${c.type}">${c.type}</span>
+        <div class="spend-amount" style="color:${c.type==="essential"?"var(--t2)":c.type==="controlled"?"var(--amber)":"var(--coral)"}">
+          ${c.budget>0?"$"+c.budget:c.type==="leak"?"⚠":"—"}
+        </div>
+      </div>
+      <div class="spend-body">
+        <div class="spend-rule">${c.rule}</div>
+      </div>
+    </div>
+  `).join("");
+
+  const log=document.getElementById("expense-log");
+  if(!monthExp.length){log.innerHTML='<div class="empty">No expenses logged this month. Add the first one above.</div>';return;}
+  const sorted=[...monthExp].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  log.innerHTML=sorted.map(e=>`
+    <div class="exp-item">
+      <div class="exp-date">${e.date}</div>
+      <div class="exp-cat">${e.cat}</div>
+      <div class="exp-desc">${e.desc||"—"}</div>
+      <div class="exp-amount">-$${parseFloat(e.amount).toFixed(2)}</div>
+      <div class="exp-remove" onclick="removeExpense(${e.id})">✕</div>
+    </div>
+  `).join("");
+}
+
+function toggleSpend(i){document.getElementById("sc-"+i).classList.toggle("open")}
+
+function addExpense(){
+  const amount=parseFloat(document.getElementById("e-amount").value);
+  if(!amount||amount<=0){alert("Amount required.");return;}
+  expenses.push({
+    id:Date.now(),
+    date:document.getElementById("e-date").value||today(),
+    cat:document.getElementById("e-cat").value,
+    amount,
+    desc:document.getElementById("e-desc").value.trim(),
+    ts:Date.now(),
+  });
+  ss("fin_expenses",expenses);
+  document.getElementById("e-amount").value="";
+  document.getElementById("e-desc").value="";
+  renderSpending();
+}
+
+function removeExpense(id){expenses=expenses.filter(e=>e.id!==id);ss("fin_expenses",expenses);renderSpending();}
+
+// ── PROP ─────────────────────────────────────────────────
+function renderProp(){
+  const {savings,prop}=fin;
+  const emergencyFunded=savings>=6000;
+  const propReady=emergencyFunded&&prop>=2000;
+  document.getElementById("prop-panel").innerHTML=`
+    <div class="prop-header">
+      <div>
+        <div class="prop-title">Prop Challenge Fund</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px">Target: $2,000 — Topstep 50K Standard Path first</div>
+      </div>
+      <div class="prop-status ${propReady?"prop-ready":"prop-locked"}">${propReady?"Ready to attempt":"Locked — prerequisites not met"}</div>
+    </div>
+    <div class="prop-rule">${!emergencyFunded?"Emergency buffer ($6,000) not yet funded. The prop fund does not exist until this is complete. This is the sequencing. Do not compress it.":prop<2000?"Emergency buffer funded. Now building the prop fund. Target: $2,000 minimum before first attempt.":"Both prerequisites met. Prop fund at $"+prop.toLocaleString()+". First evaluation is authorized when sim gates are met."}</div>
+    <div style="margin-bottom:8px;font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase">Emergency buffer: ${Math.min(100,Math.round(savings/6000*100))}% — Prop fund: ${Math.min(100,Math.round(prop/2000*100))}%</div>
+    <div style="height:3px;background:var(--s3);margin-bottom:4px;overflow:hidden"><div style="height:100%;background:${emergencyFunded?"var(--gb)":"var(--amber)"};width:${Math.min(100,Math.round(savings/6000*100))}%;transition:width 0.5s"></div></div>
+    <div style="height:3px;background:var(--s3);overflow:hidden"><div style="height:100%;background:${propReady?"var(--gb)":"var(--amber)"};width:${Math.min(100,Math.round(prop/2000*100))}%;transition:width 0.5s"></div></div>
+  `;
+
+  document.getElementById("firm-comparison").innerHTML=FIRMS.map(f=>`
+    <div class="prop-row">
+      <div class="pr-firm"><div class="pr-firm-name">${f.name}</div><div class="pr-firm-sub">${f.sub}</div></div>
+      <div class="pr-cost">${f.cost}<br><span style="color:var(--t3)">Profit target: ${f.profit} | Loss limit: ${f.loss}</span></div>
+      <div class="pr-rec"><div class="pr-badge" style="border-color:${f.recColor};color:${f.recColor}">${f.rec}</div></div>
+    </div>
+  `).join("");
+}
+
+function updateProp(){
+  const v=parseFloat(document.getElementById("prop-input").value)||0;
+  fin.prop=v;ss("fin_data",fin);renderProp();
+}
+
+// ── SCENARIOS ────────────────────────────────────────────
+function renderScenarios(){
+  document.getElementById("scenario-grid").innerHTML=SCENARIOS.map(s=>`
+    <div class="sc-card ${s.highlight?"highlight":""}">
+      <div class="sc-title">${s.title}${s.highlight?" — plan for this":""}</div>
+      <div class="sc-salary">$${(s.salary/1000).toFixed(0)}K</div>
+      <div class="sc-row"><span class="sc-label">Monthly net save</span><span class="sc-val">$${s.monthly_save.toLocaleString()}</span></div>
+      <div class="sc-row"><span class="sc-label">Savings rate</span><span class="sc-val">${Math.round(s.savings_rate*100)}%</span></div>
+      <div class="sc-row"><span class="sc-label">Months to $10K</span><span class="sc-val">${Math.ceil((10000-698)/s.monthly_save)}mo</span></div>
+      <div class="sc-row"><span class="sc-label">Months to $50K</span><span class="sc-val">${Math.ceil(50000/s.monthly_save)}mo</span></div>
+      <div class="sc-milestone">$100K in ${Math.ceil(100000/s.monthly_save/12)} years at this rate</div>
+    </div>
+  `).join("");
+
+  const {savings,income,expenses:exp}=fin;
+  const net=income-exp;
+  const sr=income>0?Math.round(net/income*100):0;
+  document.getElementById("student-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">Current income</div><div class="stat-v">$${income.toLocaleString()}</div><div class="stat-s">per month</div></div>
+    <div class="stat"><div class="stat-l">Net savings</div><div class="stat-v ${net>=100?"g":"c"}">$${net.toLocaleString()}</div><div class="stat-s">per month</div></div>
+    <div class="stat"><div class="stat-l">Savings rate</div><div class="stat-v ${sr>=30?"g":sr>=20?"a":"c"}">${sr}%</div><div class="stat-s">current</div></div>
+    <div class="stat"><div class="stat-l">Months to grad</div><div class="stat-v a">~18</div><div class="stat-s">Fall 2027 target</div></div>
+  `;
+}
+
+// ── TIMELINE ─────────────────────────────────────────────
+function renderTimeline(){
+  document.getElementById("timeline").innerHTML=TIMELINE.map(t=>`
+    <div class="tl-item ${t.current?"current":""}">
+      <div class="tl-year">
+        <div class="tl-year-val">${t.year}</div>
+        <div class="tl-year-lbl">${t.current?"Now":""}</div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-title">${t.phase}${t.current?' — <span style="font-size:10px;color:var(--amber);font-family:\'JetBrains Mono\',monospace;letter-spacing:0.1em">YOU ARE HERE</span>':''}</div>
+        <div class="tl-items">${t.points.map(p=>`<div class="tl-point">${p}</div>`).join("")}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ── EXPORT / IMPORT ──────────────────────────────────────
+function exportData(){
+  const blob=new Blob([JSON.stringify({fin,expenses,exported:new Date().toISOString()},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="capital_panel_"+today()+".json";a.click();
+}
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.fin){ss("fin_data",fin=d.fin);}
+      if(d.expenses){ss("fin_expenses",expenses=d.expenses);}
+      renderOverview();alert("Imported.");
+    }catch{alert("Invalid file.");}
+  };
+  reader.readAsText(file);
+}
+
+// ── INIT ─────────────────────────────────────────────────
+setTimeout(()=>{document.getElementById("loader").classList.add("hidden");},1800);
+document.getElementById("e-date").value=today();
+renderOverview();
+</script>
+</body>
+</html>

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly War Room — Yohann OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--s1:#0f0f0f;--s2:#161616;--s3:#1e1e1e;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);
+  --t1:#e8e4dc;--t2:#7a7670;--t3:#3d3a36;
+  --green:#1a8c63;--gb:#22b07d;--gdim:rgba(26,140,99,0.12);--gbdr:rgba(26,140,99,0.35);
+  --amber:#c49a3c;--adim:rgba(196,154,60,0.1);--abdr:rgba(196,154,60,0.3);
+  --coral:#c0553a;--cdim:rgba(192,85,58,0.1);--cbdr:rgba(192,85,58,0.3);
+  --purple:#6e65c4;--pdim:rgba(110,101,196,0.1);--pbdr:rgba(110,101,196,0.3);
+  --blue:#3a7bc4;--bdim:rgba(58,123,196,0.1);--bbdr:rgba(58,123,196,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35}
+
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;transition:opacity 0.8s ease,visibility 0.8s}
+#loader.hidden{opacity:0;visibility:hidden}
+.l-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,80px);letter-spacing:0.15em;animation:lpulse 1.5s ease-in-out infinite alternate;color:var(--coral)}
+.l-sub{font-size:10px;color:var(--t3);letter-spacing:0.3em;text-transform:uppercase;margin-top:8px}
+.l-bar-wrap{width:160px;height:1px;background:var(--b2);margin-top:28px;overflow:hidden}
+.l-bar{height:100%;background:var(--coral);width:0%;animation:lbar 1.8s ease forwards}
+@keyframes lpulse{from{opacity:0.4}to{opacity:1}}
+@keyframes lbar{0%{width:0%}60%{width:70%}100%{width:100%}}
+
+.app{max-width:920px;margin:0 auto;padding:0 28px 100px;opacity:0;animation:fadein 0.6s ease 2s forwards}
+@keyframes fadein{to{opacity:1}}
+
+/* HEADER */
+.header{padding:44px 0 24px;border-bottom:1px solid var(--b1);margin-bottom:32px}
+.header-top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:16px}
+.h-wordmark{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);letter-spacing:0.12em;line-height:1;color:var(--coral)}
+.h-sub{font-family:'Crimson Pro',serif;font-style:italic;font-size:15px;color:var(--t2);margin-top:6px}
+.h-week{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.1em;color:var(--t2);text-align:right;flex-shrink:0}
+.h-weeknum{font-size:10px;color:var(--t3);letter-spacing:0.15em;text-transform:uppercase;text-align:right}
+
+/* NORTH STAR */
+.north-star{border-left:3px solid var(--cbdr);padding:14px 20px;background:var(--cdim);margin-bottom:32px;display:flex;align-items:flex-start;gap:14px}
+.ns-icon{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--coral);flex-shrink:0;line-height:1;margin-top:2px}
+.ns-content{flex:1}
+.ns-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--coral);margin-bottom:5px}
+.ns-text{font-family:'Crimson Pro',serif;font-style:italic;font-size:17px;color:var(--t1);line-height:1.5;cursor:text;outline:none;min-height:28px}
+.ns-text:empty::before{content:attr(data-placeholder);color:var(--t3)}
+
+/* NAV */
+.tab-nav{display:flex;gap:2px;margin-bottom:32px;border-bottom:1px solid var(--b1);overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tnb{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:11px 16px;border:none;background:transparent;color:var(--t3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+.tnb:hover{color:var(--t2)}
+.tnb.active{color:var(--coral);border-bottom-color:var(--coral)}
+.tab{display:none}.tab.active{display:block}
+
+/* SLBL */
+.slbl{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.slbl::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+/* STATS */
+.stats{display:grid;gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:24px}
+.stats-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.stats-5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.stat{background:var(--s1);padding:14px 16px}
+.stat-l{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.stat-v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.05em;color:var(--t1);line-height:1}
+.stat-v.g{color:var(--gb)}.stat-v.a{color:var(--amber)}.stat-v.c{color:var(--coral)}.stat-v.p{color:var(--purple)}
+.stat-s{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* TIER BLOCKS */
+.tier-wrap{margin-bottom:28px}
+.tier-header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.tier-badge{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.15em;padding:4px 12px;border:1px solid}
+.tier-1{border-color:var(--cbdr);color:var(--coral)}
+.tier-2{border-color:var(--abdr);color:var(--amber)}
+.tier-label{font-size:10px;color:var(--t3);letter-spacing:0.1em}
+
+/* METRIC CARD */
+.metric-card{background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;position:relative;overflow:hidden;transition:background 0.15s}
+.metric-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.mc-body{border-color:var(--gbdr)}.mc-body::before{background:var(--gb)}
+.mc-capital{border-color:var(--abdr)}.mc-capital::before{background:var(--amber)}
+.mc-career{border-color:var(--cbdr)}.mc-career::before{background:var(--coral)}
+.mc-school{border-color:var(--pbdr)}.mc-school::before{background:var(--purple)}
+.mc-trading{border-color:var(--bbdr)}.mc-trading::before{background:var(--blue)}
+.metric-main{display:flex;align-items:center;gap:14px;padding:14px 16px 14px 20px}
+.metric-icon{font-size:18px;flex-shrink:0}
+.metric-info{flex:1;min-width:0}
+.metric-name{font-size:13px;color:var(--t1)}
+.metric-target{font-size:10px;color:var(--t3);margin-top:1px}
+.metric-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.mc-counter{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.05em;min-width:50px;text-align:center;line-height:1}
+.mc-btn{width:28px;height:28px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.mc-btn:hover{border-color:var(--b3);color:var(--t1)}
+.mc-of{font-size:10px;color:var(--t3);min-width:40px;text-align:center}
+.metric-bar-wrap{height:2px;background:var(--s3);margin:0 20px 12px 20px;overflow:hidden}
+.metric-bar-fill{height:100%;transition:width 0.4s ease}
+.metric-detail{display:none;padding:0 20px 14px 20px;border-top:1px solid var(--b1)}
+.metric-card.open .metric-detail{display:block}
+.metric-detail-text{font-family:'Crimson Pro',serif;font-size:14px;color:var(--t2);line-height:1.6}
+.metric-toggle{cursor:pointer;padding:4px 8px;font-size:10px;color:var(--t3);background:transparent;border:none;font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;transition:color 0.15s}
+.metric-toggle:hover{color:var(--t2)}
+
+/* WEEK SELECTOR */
+.week-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.wnav-btn{width:30px;height:30px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:'JetBrains Mono',monospace}
+.wnav-btn:hover:not(:disabled){border-color:var(--coral);color:var(--coral)}
+.wnav-btn:disabled{opacity:0.2;cursor:default}
+.week-label{flex:1;font-family:'Crimson Pro',serif;font-size:18px;color:var(--t1);text-align:center}
+.this-week-tag{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--coral);border:1px solid var(--cbdr);padding:3px 10px}
+
+/* DAILY BREAKDOWN */
+.day-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;margin-bottom:24px}
+.day-cell{background:var(--s1);border:1px solid var(--b1);padding:12px 8px;text-align:center;cursor:pointer;transition:all 0.15s;position:relative}
+.day-cell:hover{background:var(--s2)}
+.day-cell.today{border-color:var(--coral)}
+.day-cell.has-data{background:var(--s2)}
+.day-name{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.day-date{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--t1);line-height:1;margin-bottom:4px}
+.day-score{font-size:10px;margin-top:4px}
+.day-dots{display:flex;justify-content:center;gap:3px;margin-top:6px;flex-wrap:wrap}
+.day-dot{width:5px;height:5px;border-radius:50%}
+
+/* FOCUS BLOCK */
+.focus-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-bottom:24px}
+.focus-cell{background:var(--s1);border:1px solid var(--b1);padding:14px 10px}
+.focus-day{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--coral);margin-bottom:8px}
+.focus-items{display:flex;flex-direction:column;gap:4px}
+.focus-item{font-size:11px;color:var(--t2);line-height:1.4;display:flex;gap:6px;font-family:'Crimson Pro',serif}
+.focus-item::before{content:'—';color:var(--t3);flex-shrink:0}
+
+/* FRIDAY DEBRIEF */
+.debrief-section{margin-bottom:20px}
+.deb-q{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.deb-q span{font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);text-transform:none;letter-spacing:0;display:block;margin-top:3px}
+textarea{width:100%;background:var(--s1);border:1px solid var(--b1);padding:12px 16px;font-family:'Crimson Pro',serif;font-size:15px;color:var(--t1);line-height:1.7;resize:vertical;min-height:80px;transition:border-color 0.15s}
+textarea:focus{outline:none;border-color:var(--b2)}
+textarea:read-only{opacity:0.5;cursor:default}
+textarea::placeholder{color:var(--t3);font-style:italic}
+
+/* SCORECARD */
+.scorecard-row{display:flex;align-items:center;gap:0;background:var(--b1);margin-bottom:2px}
+.sc-label{background:var(--s1);padding:12px 16px;min-width:200px;border-right:1px solid var(--b1);font-size:12px;color:var(--t2)}
+.sc-bar-wrap{flex:1;background:var(--s1);padding:12px 16px;border-right:1px solid var(--b1)}
+.sc-track{height:3px;background:var(--s3);overflow:hidden}
+.sc-fill{height:100%;transition:width 0.5s ease}
+.sc-val{background:var(--s1);padding:12px 16px;min-width:90px;text-align:right}
+.sc-num{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.05em;line-height:1}
+.sc-sub{font-size:9px;color:var(--t3);margin-top:1px}
+
+/* HISTORY */
+.history-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:24px}
+.hist-lbl-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+.hist-lbl{font-size:9px;color:var(--t3);text-align:center;letter-spacing:0.08em}
+.hist-cell{aspect-ratio:1;border-radius:3px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--t3);cursor:pointer;border:1px solid transparent;transition:all 0.1s}
+.hist-cell:hover{border-color:var(--b2)}
+.hist-cell.w100{background:var(--coral);color:#000}
+.hist-cell.w80{background:rgba(192,85,58,0.5);color:var(--coral)}
+.hist-cell.w50{background:rgba(192,85,58,0.25);color:var(--coral)}
+.hist-cell.wlow{background:var(--s3);color:var(--t3)}
+.hist-cell.current-week{border-color:var(--t2)}
+
+/* PROTOCOL */
+.protocol-item{display:flex;gap:14px;align-items:flex-start;padding:13px 16px;background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;cursor:pointer;transition:background 0.15s}
+.protocol-item:hover{background:var(--s2)}
+.proto-check{width:18px;height:18px;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;transition:all 0.15s}
+.protocol-item.done .proto-check{background:var(--green);border-color:var(--green);color:#000}
+.proto-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--t3);line-height:1;flex-shrink:0;min-width:26px}
+.proto-content{flex:1}
+.proto-title{font-size:12px;color:var(--t1);margin-bottom:2px}
+.protocol-item.done .proto-title{color:var(--t2)}
+.proto-desc{font-family:'Crimson Pro',serif;font-size:13px;color:var(--t3);line-height:1.5}
+
+/* MANTRA */
+.mantra-wrap{border:1px solid var(--b1);background:var(--s1);padding:24px;margin-bottom:24px}
+.mantra-item{display:flex;gap:16px;padding:10px 0;border-bottom:1px solid var(--b1)}
+.mantra-item:last-child{border-bottom:none}
+.mantra-n{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--t3);min-width:24px;line-height:1.3;flex-shrink:0}
+.mantra-text{font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);line-height:1.5}
+
+/* BUTTONS */
+.btn{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:10px 18px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--coral);color:var(--coral)}
+.btn.saved{border-color:var(--gbdr);color:var(--gb)}
+.btn.hidden{display:none}
+input[type="text"],select{background:var(--s2);border:1px solid var(--b1);padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t1);transition:border-color 0.15s;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--b2)}
+input::placeholder{color:var(--t3)}
+.flbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.rule{border:none;border-top:1px solid var(--b1);margin:24px 0}
+.empty{font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t3);padding:16px 0}
+</style>
+</head>
+<body>
+<div id="loader">
+  <div class="l-name">War Room</div>
+  <div class="l-sub">Weekly Operating System — Yohann OS</div>
+  <div class="l-bar-wrap"><div class="l-bar"></div></div>
+</div>
+
+<div class="app">
+
+<header class="header">
+  <div class="header-top">
+    <div>
+      <div class="h-wordmark">Weekly War Room</div>
+      <div class="h-sub">Sunday night planning. Friday debrief. The week is not managed — it is operated.</div>
+    </div>
+    <div>
+      <div class="h-weeknum" id="week-num"></div>
+      <div class="h-week" id="week-range"></div>
+    </div>
+  </div>
+  <div class="north-star">
+    <div class="ns-icon">&#9650;</div>
+    <div class="ns-content">
+      <div class="ns-label">North star — what is this week for?</div>
+      <div class="ns-text" id="north-star-text" contenteditable="true" data-placeholder="Write your north star for this week..."></div>
+    </div>
+  </div>
+</header>
+
+<div class="tab-nav">
+  <button class="tnb active" data-tab="command" onclick="switchTab(this)">Command</button>
+  <button class="tnb" data-tab="metrics" onclick="switchTab(this)">Metrics</button>
+  <button class="tnb" data-tab="focus" onclick="switchTab(this)">Focus map</button>
+  <button class="tnb" data-tab="debrief" onclick="switchTab(this)">Friday debrief</button>
+  <button class="tnb" data-tab="history" onclick="switchTab(this)">History</button>
+  <button class="tnb" data-tab="sunday" onclick="switchTab(this)">Sunday protocol</button>
+  <button class="tnb" data-tab="mantras" onclick="switchTab(this)">Operating mantras</button>
+</div>
+
+<!-- COMMAND CENTER -->
+<div id="tab-command" class="tab active">
+  <div class="stats stats-5" id="command-stats"></div>
+  <div class="slbl">Tier 1 — body, capital, career</div>
+  <div id="tier1-metrics"></div>
+  <div class="slbl" style="margin-top:20px">Tier 2 — school & trading study</div>
+  <div id="tier2-metrics"></div>
+  <div class="rule"></div>
+  <div class="slbl">This week at a glance</div>
+  <div class="day-grid" id="day-grid"></div>
+  <div class="slbl">Week scorecard</div>
+  <div id="scorecard"></div>
+</div>
+
+<!-- METRICS DETAIL -->
+<div id="tab-metrics" class="tab">
+  <div class="week-nav">
+    <button class="wnav-btn" id="metrics-prev" onclick="shiftMetricsWeek(-1)">&#8249;</button>
+    <div class="week-label" id="metrics-week-label"></div>
+    <span class="this-week-tag" id="metrics-this-tag" style="display:none">This week</span>
+    <button class="wnav-btn" id="metrics-next" onclick="shiftMetricsWeek(1)">&#8250;</button>
+  </div>
+  <div id="metrics-past-notice" class="empty" style="display:none;padding:8px 0;font-size:11px">Viewing past week — read only</div>
+  <div class="slbl">All metrics — detailed view</div>
+  <div id="metrics-detail"></div>
+  <div class="rule"></div>
+  <button class="btn" onclick="exportData()">&#8595; Export all data</button>
+  &nbsp;<label class="btn" style="cursor:pointer">&#8593; Import<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+</div>
+
+<!-- FOCUS MAP -->
+<div id="tab-focus" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">The focus map is pre-wired to your cognitive rotation and pillar priorities. Monday through Friday, each day has a primary emphasis. The Tier 1 pillars show up every day because they are non-negotiable. The Tier 2 work fits around them.</p>
+  <div class="slbl">Weekly focus architecture</div>
+  <div class="focus-grid" id="focus-grid"></div>
+  <div class="rule"></div>
+  <div class="slbl">Daily non-negotiables — Tier 1</div>
+  <div id="daily-nonneg"></div>
+</div>
+
+<!-- FRIDAY DEBRIEF -->
+<div id="tab-debrief" class="tab">
+  <div class="week-nav">
+    <button class="wnav-btn" onclick="shiftDebriefWeek(-1)">&#8249;</button>
+    <div class="week-label" id="deb-week-label"></div>
+    <span class="this-week-tag" id="deb-this-tag" style="display:none">This week</span>
+    <button class="wnav-btn" id="deb-next-btn" onclick="shiftDebriefWeek(1)">&#8250;</button>
+  </div>
+  <div id="deb-past-notice" class="empty" style="display:none;padding:8px 0;font-size:11px">Viewing past debrief — read only</div>
+  <div style="display:flex;flex-direction:column;gap:18px" id="debrief-form"></div>
+  <div style="margin-top:16px"><button class="btn" id="deb-save-btn" onclick="saveDebrief()">Save debrief</button></div>
+</div>
+
+<!-- HISTORY -->
+<div id="tab-history" class="tab">
+  <div class="stats stats-4" id="history-stats"></div>
+  <div class="slbl">12-week history — click any week to view</div>
+  <div class="hist-lbl-row">
+    <span class="hist-lbl">Mon</span><span class="hist-lbl">Tue</span><span class="hist-lbl">Wed</span>
+    <span class="hist-lbl">Thu</span><span class="hist-lbl">Fri</span><span class="hist-lbl">Sat</span><span class="hist-lbl">Sun</span>
+  </div>
+  <div class="history-grid" id="history-grid"></div>
+  <div class="slbl">Week-by-week log</div>
+  <div id="week-log"></div>
+</div>
+
+<!-- SUNDAY PROTOCOL -->
+<div id="tab-sunday" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">Every Sunday night, 30 minutes. Non-negotiable. This is where the week is built, not reacted to. The protocol resets every week — check off each step as you complete it.</p>
+  <div class="slbl">Sunday night protocol — <span id="sunday-date" style="color:var(--t2);text-transform:none;font-family:'Crimson Pro',serif;font-style:italic;letter-spacing:0"></span></div>
+  <div id="sunday-protocol"></div>
+  <div class="rule"></div>
+  <div class="slbl">After the protocol — set this week's north star</div>
+  <div style="background:var(--s1);border-left:2px solid var(--cbdr);padding:14px 18px">
+    <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6">Go back to the top of the page and write your north star for this week. One sentence. What is this week for? Not what are you doing — what does this week <em>mean</em> in the context of where you are going?</div>
+  </div>
+</div>
+
+<!-- MANTRAS -->
+<div id="tab-mantras" class="tab">
+  <p style="font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t2);margin-bottom:24px;line-height:1.6">These are not motivational quotes. They are operating principles — the structural rules that govern how you move through the week. Read them at the start of the Sunday protocol. They are not inspiration. They are architecture.</p>
+  <div class="mantra-wrap" id="mantra-list"></div>
+</div>
+
+</div>
+
+<script>
+// ── CONSTANTS ─────────────────────────────────────────────
+
+const METRICS=[
+  // TIER 1
+  {id:"training",tier:1,pillar:"body",cls:"mc-body",icon:"🏋",name:"Training sessions",target:5,unit:"sessions",weekly:true,
+   detail:"4–5 sessions minimum. Lift 3x, conditioning 1–2x. Non-negotiable because a degraded body is a degraded system. Every missed session compounds into lower output across all other pillars. The Baki protocol runs regardless of how you feel."},
+  {id:"savings",tier:1,pillar:"capital",cls:"mc-capital",icon:"💰",name:"Savings deposit made",target:1,unit:"deposit",weekly:true,
+   detail:"Every week that income comes in, a portion goes to savings immediately — before anything else. This is not 'what's left at the end of the week.' It is the first transfer. Even $50 counts. The habit is the infrastructure."},
+  {id:"apps",tier:1,pillar:"career",cls:"mc-career",icon:"📋",name:"Job applications sent",target:5,unit:"apps",weekly:true,
+   detail:"5 per week = 20 per month. These are tailored applications, not spray-and-pray. Each one should reflect research on the company, role alignment, and a cover letter that actually speaks to the job. Quality over quantity — but quantity still matters."},
+  {id:"outreach",tier:1,pillar:"career",cls:"mc-career",icon:"📞",name:"Cold outreaches sent",target:3,unit:"outreaches",weekly:true,
+   detail:"3 per week = 12 per month. LinkedIn messages, alumni emails, hiring manager contacts. Short, specific, not needy. Use the templates in the Career Pipeline app. The pipeline is a BD funnel — treat it like one."},
+  // TIER 2
+  {id:"fire311",tier:2,pillar:"school",cls:"mc-school",icon:"🔥",name:"FIRE 311 study sessions",target:3,unit:"sessions",weekly:true,
+   detail:"3 dedicated study sessions per week minimum. Not reading — active study. Problems, practice exams, office hours when needed. This is the gate course. There is no acceptable grade below a C, and the target is a B or higher."},
+  {id:"coursework",tier:2,pillar:"school",cls:"mc-school",icon:"📚",name:"Coursework hours logged",target:10,unit:"hours",weekly:true,
+   detail:"10 hours minimum across all courses. Engrained or not, the hours have to be there. FIRE 311 gets priority, then INFO 360, then the rest. Track the hours — what gets measured gets protected."},
+  {id:"sim",tier:2,pillar:"trading",cls:"mc-trading",icon:"📈",name:"Trading study sessions",target:3,unit:"sessions",weekly:true,
+   detail:"3 study sessions per week while in Phase 1. No sim trading yet — observation, chart reading, market structure study, and working through the study checklist in the Trading Journal. One session = 30 minutes minimum of active study, not passive watching."},
+  {id:"reading",tier:2,pillar:"trading",cls:"mc-trading",icon:"📖",name:"Market Wizards / Grimes",target:2,unit:"chapters",weekly:true,
+   detail:"One Market Wizards interview per week. One chapter of Adam Grimes per week minimum. These are your Phase 1 trading books. Log what you extract from each — the pattern recognition does not happen from passive reading."},
+];
+
+const WEEKLY_FOCUS=[
+  {day:"Mon",items:["Cog: Systems thinking (Meadows)","FIRE 311 study — priority","Training — lift","BD outreach x1","Career research block"]},
+  {day:"Tue",items:["Cog: Mental Models (Farnam St)","Coursework block — priority","Trading study session","Application x1-2","Cold outreach x1"]},
+  {day:"Wed",items:["Cog: Root cause (Dobelli)","FIRE 311 study — office hours if needed","Training — lift","BD outreach x1","Market structure review"]},
+  {day:"Thu",items:["Cog: Game theory (Dixit)","Coursework block","Application x1-2","Cold outreach x1","Trading: chart study 30min"]},
+  {day:"Fri",items:["Cog: Munger synthesis","Weekly War Room debrief (20 min)","Training — conditioning","Loss log review","Savings check — did the deposit happen?"]},
+];
+
+const DAILY_NONNEG=[
+  {pillar:"Body",color:"var(--gb)",items:["Training logged OR active recovery noted","8,000+ steps or equivalent movement","7.5h+ sleep protected"]},
+  {pillar:"Capital",color:"var(--amber)",items:["No impulse spend — every purchase logged","Weekly savings deposit (Friday trigger)","No prop money from emergency funds"]},
+  {pillar:"Career",color:"var(--coral)",items:["One application or outreach minimum M–F","Pipeline updated same day as any action","Follow-up dates checked"]},
+];
+
+const SUNDAY_PROTOCOL=[
+  {title:"Review last week's scorecard",desc:"Open the Friday debrief. What was the final score? Where did Tier 1 slip? What pattern showed up across the week?"},
+  {title:"Set the north star for this week",desc:"One sentence. What does this week mean in the context of the larger build? Not tasks — meaning. Write it at the top of the page."},
+  {title:"Check FIRE 311 status",desc:"Where are you in the material? What's the next graded assessment? How many study sessions do you need this week to be prepared?"},
+  {title:"Load the career pipeline",desc:"How many active applications? Who needs a follow-up? What outreaches are scheduled this week? Set the 5 application targets."},
+  {title:"Check the capital panel",desc:"What is the savings balance? Did last week's deposit happen? What is the prop fund at? What does this week's spending need to look like?"},
+  {title:"Set training schedule",desc:"Which 4–5 days are training days this week? Write them. Pre-committed sessions are completed at a higher rate than decided in the moment."},
+  {title:"Review the loss log",desc:"Any losses from last week that haven't been fully processed? Root cause chain complete? Input change documented?"},
+  {title:"Close the loop on last week",desc:"Any open items, promises to yourself, or incomplete debrief entries? Close them before the new week starts. A clean slate is a prerequisite for a focused week."},
+];
+
+const DEBRIEF_QUESTIONS=[
+  {id:"d1",label:"01 — Body",q:"Did the body get what it needed this week? Training, sleep, supplements, food quality."},
+  {id:"d2",label:"02 — Capital",q:"Did money move in the right direction? Savings deposit made? Spending discipline held or slipped?"},
+  {id:"d3",label:"03 — Career",q:"Did the pipeline move? Applications sent, outreaches made, follow-ups executed?"},
+  {id:"d4",label:"04 — School",q:"FIRE 311 — where does the understanding level sit? What gaps need to be closed before the next assessment?"},
+  {id:"d5",label:"05 — Extraction",q:"What is the single most important thing this week taught you? Not what happened — what it means."},
+  {id:"d6",label:"06 — Interference",q:"Where did personal stakes compete with clarity this week? In which domain, in what form?"},
+  {id:"d7",label:"07 — Next week",q:"What is the one structural change next week needs? Not a resolution — a system-level adjustment."},
+];
+
+const MANTRAS=[
+  "Tier 1 does not negotiate. Body, capital, and career pipeline run regardless of how the week feels.",
+  "The upward trajectory is the argument. One bad week doesn't break it. A pattern of bad weeks does. Track the pattern.",
+  "School is engrained. That is a strength. Do not let it become a reason to deprioritize Tier 1.",
+  "The week is not managed. It is operated. There is a difference between reacting to what comes and executing what was planned.",
+  "Loss is data. Every week that doesn't hit its targets is a data point, not a failure. Extract the root cause. Change the input.",
+  "The Friday debrief is not optional. It is the mechanism by which the week becomes learning instead of just time passing.",
+  "Personal stakes introduce interference. When the week is hard, that is not a reason to skip the protocol. It is a reason to follow it more precisely.",
+  "The view is a consequence. Every week that runs the system properly moves the timeline forward. Every week that doesn't moves it backward. There is no neutral.",
+  "FIRE 311 is the gate. Nothing in the academic sequence moves without it. It is not one course among five. It is the bottleneck. Treat it accordingly.",
+  "The pipeline is a BD funnel. You are running a business development operation on your own career. Track it, work it, follow up on it.",
+];
+
+// ── STORAGE ───────────────────────────────────────────────
+function gs(k,def){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):def}catch{return def}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+
+function getMonday(d){
+  const dt=new Date(d);
+  const day=dt.getDay();
+  const diff=dt.getDate()-(day===0?6:day-1);
+  dt.setDate(diff);dt.setHours(0,0,0,0);return dt;
+}
+function weekKey(d){return getMonday(d).toISOString().split("T")[0]}
+function todayKey(){return new Date().toISOString().split("T")[0]}
+function thisWeekKey(){return weekKey(new Date())}
+function fmtWeekRange(wk){
+  const mon=new Date(wk);
+  const sun=new Date(mon);sun.setDate(sun.getDate()+6);
+  const opts={month:"short",day:"numeric"};
+  return mon.toLocaleDateString("en-US",opts)+" — "+sun.toLocaleDateString("en-US",{...opts,year:"numeric"});
+}
+function fmtWeekNum(wk){
+  const mon=new Date(wk);
+  const start=new Date(mon.getFullYear(),0,1);
+  const weekN=Math.ceil((((mon-start)/86400000)+start.getDay()+1)/7);
+  return "Week "+weekN+", "+mon.getFullYear();
+}
+
+let viewWeek=thisWeekKey();
+let metricsViewWeek=thisWeekKey();
+let debriefViewWeek=thisWeekKey();
+let sundayDone=gs("wwr_sunday_"+thisWeekKey(),{});
+let weeklyData=gs("wwr_all",{});
+let debriefs=gs("wwr_debriefs",{});
+let northStars=gs("wwr_northstars",{});
+
+function getWeekData(wk){return weeklyData[wk]||{}}
+function setWeekData(wk,data){weeklyData[wk]=data;ss("wwr_all",weeklyData);}
+function getMetric(wk,id){return getWeekData(wk)[id]||0}
+function setMetric(wk,id,val){const d=getWeekData(wk);d[id]=val;setWeekData(wk,d);}
+function weekScore(wk){
+  const d=getWeekData(wk);
+  let total=0,earned=0;
+  METRICS.forEach(m=>{total+=m.target;earned+=Math.min(m.target,d[m.id]||0);});
+  return total>0?Math.round(earned/total*100):0;
+}
+
+// ── HEADER ────────────────────────────────────────────────
+function updateHeader(){
+  const wk=thisWeekKey();
+  document.getElementById("week-num").textContent=fmtWeekNum(wk).toUpperCase();
+  document.getElementById("week-range").textContent=fmtWeekRange(wk);
+  // North star
+  const ns=northStars[wk]||"";
+  const el=document.getElementById("north-star-text");
+  if(el&&!el.dataset.loaded){el.textContent=ns;el.dataset.loaded="1";}
+}
+updateHeader();
+
+document.getElementById("north-star-text").addEventListener("blur",function(){
+  northStars[thisWeekKey()]=this.textContent.trim();
+  ss("wwr_northstars",northStars);
+});
+
+// ── TABS ─────────────────────────────────────────────────
+function switchTab(btn){
+  document.querySelectorAll(".tnb").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+  const t=btn.dataset.tab;
+  if(t==="command")renderCommand();
+  if(t==="metrics"){metricsViewWeek=thisWeekKey();renderMetricsDetail();}
+  if(t==="focus")renderFocus();
+  if(t==="debrief"){debriefViewWeek=thisWeekKey();renderDebrief();}
+  if(t==="history")renderHistory();
+  if(t==="sunday")renderSunday();
+  if(t==="mantras")renderMantras();
+}
+
+// ── COMMAND ───────────────────────────────────────────────
+function renderCommand(){
+  const wk=thisWeekKey();
+  const score=weekScore(wk);
+  const t1metrics=METRICS.filter(m=>m.tier===1);
+  const t2metrics=METRICS.filter(m=>m.tier===2);
+  const t1score=calcTierScore(wk,1);
+  const t2score=calcTierScore(wk,2);
+  const debriefDone=!!(debriefs[wk]&&debriefs[wk].d5);
+
+  document.getElementById("command-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">Week score</div><div class="stat-v ${score>=80?"g":score>=60?"a":"c"}">${score}%</div><div class="stat-s">${fmtWeekRange(wk).split("—")[0].trim()}</div></div>
+    <div class="stat"><div class="stat-l">Tier 1</div><div class="stat-v ${t1score>=80?"g":t1score>=60?"a":"c"}">${t1score}%</div><div class="stat-s">body, capital, career</div></div>
+    <div class="stat"><div class="stat-l">Tier 2</div><div class="stat-v ${t2score>=80?"g":t2score>=60?"a":"c"}">${t2score}%</div><div class="stat-s">school, trading</div></div>
+    <div class="stat"><div class="stat-l">Debrief</div><div class="stat-v ${debriefDone?"g":"c"}">${debriefDone?"Done":"Pending"}</div><div class="stat-s">Friday reflection</div></div>
+    <div class="stat"><div class="stat-l">Streak</div><div class="stat-v ${calcWeekStreak()>0?"g":""}">${calcWeekStreak()}</div><div class="stat-s">weeks 80%+</div></div>
+  `;
+
+  renderTierBlock("tier1-metrics",t1metrics,wk,false);
+  renderTierBlock("tier2-metrics",t2metrics,wk,false);
+  renderDayGrid(wk);
+  renderScorecard(wk);
+}
+
+function calcTierScore(wk,tier){
+  const metrics=METRICS.filter(m=>m.tier===tier);
+  let total=0,earned=0;
+  metrics.forEach(m=>{total+=m.target;earned+=Math.min(m.target,getMetric(wk,m.id));});
+  return total>0?Math.round(earned/total*100):0;
+}
+
+function calcWeekStreak(){
+  let s=0;
+  const d=new Date();
+  for(let i=0;i<52;i++){
+    const wk=weekKey(d);
+    if(weekScore(wk)>=80){s++;d.setDate(d.getDate()-7);}
+    else if(i===0){d.setDate(d.getDate()-7);}
+    else break;
+  }
+  return s;
+}
+
+function renderTierBlock(containerId,metrics,wk,readonly){
+  const container=document.getElementById(containerId);
+  container.innerHTML=metrics.map(m=>{
+    const val=getMetric(wk,m.id);
+    const pct=Math.min(100,Math.round(val/m.target*100));
+    const color=pct>=100?"var(--gb)":pct>=60?"var(--amber)":"var(--coral)";
+    return`<div class="metric-card ${m.cls}" id="mc-${m.id}">
+      <div class="metric-main">
+        <div class="metric-icon">${m.icon}</div>
+        <div class="metric-info">
+          <div class="metric-name">${m.name}</div>
+          <div class="metric-target">Target: ${m.target} ${m.unit}/week</div>
+        </div>
+        <div class="metric-controls">
+          ${readonly?`<div class="mc-counter" style="color:${color}">${val}</div><div class="mc-of">of ${m.target}</div>`:
+          `<button class="mc-btn" onclick="adjustMetric('${wk}','${m.id}',-1)">&#8722;</button>
+          <div class="mc-counter" style="color:${color}">${val}</div>
+          <div class="mc-of">of ${m.target}</div>
+          <button class="mc-btn" onclick="adjustMetric('${wk}','${m.id}',1)">&#43;</button>`}
+        </div>
+        <button class="metric-toggle" onclick="toggleDetail('${m.id}')">details</button>
+      </div>
+      <div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="metric-detail" id="md-${m.id}"><div class="metric-detail-text">${m.detail}</div></div>
+    </div>`;
+  }).join("");
+}
+
+function adjustMetric(wk,id,delta){
+  const m=METRICS.find(m=>m.id===id);
+  const cur=getMetric(wk,id);
+  const newVal=Math.max(0,Math.min(m.target*3,cur+delta));
+  setMetric(wk,id,newVal);
+  renderCommand();
+}
+
+function toggleDetail(id){
+  document.getElementById("mc-"+id)?.classList.toggle("open");
+}
+
+function renderDayGrid(wk){
+  const mon=new Date(wk);
+  const today=todayKey();
+  const days=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const pillarColors={body:"var(--gb)",capital:"var(--amber)",career:"var(--coral)",school:"var(--purple)",trading:"var(--blue)"};
+  document.getElementById("day-grid").innerHTML=days.map((d,i)=>{
+    const date=new Date(mon);date.setDate(mon.getDate()+i);
+    const dk=date.toISOString().split("T")[0];
+    const isToday=dk===today;
+    const isPast=dk<today;
+    return`<div class="day-cell ${isToday?"today":""}" title="${dk}">
+      <div class="day-name">${d}</div>
+      <div class="day-date" style="color:${isToday?"var(--coral)":"var(--t1)"}">${date.getDate()}</div>
+      <div class="day-score" style="color:${isToday?"var(--coral)":"var(--t3)"}">${isToday?"today":isPast?"past":"ahead"}</div>
+      <div class="day-dots">
+        ${Object.entries(pillarColors).map(([p,c])=>`<div class="day-dot" style="background:${c};opacity:0.6"></div>`).join("")}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderScorecard(wk){
+  const rows=[
+    {label:"Training sessions",id:"training",target:5,color:"var(--gb)"},
+    {label:"Savings deposit",id:"savings",target:1,color:"var(--amber)"},
+    {label:"Applications sent",id:"apps",target:5,color:"var(--coral)"},
+    {label:"Cold outreaches",id:"outreach",target:3,color:"var(--coral)"},
+    {label:"FIRE 311 sessions",id:"fire311",target:3,color:"var(--purple)"},
+    {label:"Coursework hours",id:"coursework",target:10,color:"var(--purple)"},
+    {label:"Trading study",id:"sim",target:3,color:"var(--blue)"},
+  ];
+  document.getElementById("scorecard").innerHTML=rows.map(r=>{
+    const val=getMetric(wk,r.id);
+    const pct=Math.min(100,Math.round(val/r.target*100));
+    return`<div class="scorecard-row">
+      <div class="sc-label">${r.label}</div>
+      <div class="sc-bar-wrap"><div class="sc-track"><div class="sc-fill" style="width:${pct}%;background:${r.color}"></div></div></div>
+      <div class="sc-val"><div class="sc-num" style="color:${pct>=100?"var(--gb)":pct>=60?"var(--amber)":"var(--coral)"}">${val}/${r.target}</div><div class="sc-sub">${pct}%</div></div>
+    </div>`;
+  }).join("");
+}
+
+// ── METRICS DETAIL ────────────────────────────────────────
+function shiftMetricsWeek(d){
+  const dt=new Date(metricsViewWeek);dt.setDate(dt.getDate()+d*7);
+  const nk=weekKey(dt);
+  if(nk>thisWeekKey())return;
+  metricsViewWeek=nk;renderMetricsDetail();
+}
+
+function renderMetricsDetail(){
+  const isThis=metricsViewWeek===thisWeekKey();
+  document.getElementById("metrics-week-label").textContent=fmtWeekRange(metricsViewWeek);
+  document.getElementById("metrics-this-tag").style.display=isThis?"inline-block":"none";
+  document.getElementById("metrics-next").disabled=isThis;
+  document.getElementById("metrics-past-notice").style.display=isThis?"none":"block";
+  const t1=METRICS.filter(m=>m.tier===1);
+  const t2=METRICS.filter(m=>m.tier===2);
+  const container=document.getElementById("metrics-detail");
+  container.innerHTML=`
+    <div class="slbl">Tier 1 — body, capital, career</div>
+    <div id="md-tier1"></div>
+    <div class="slbl" style="margin-top:20px">Tier 2 — school, trading</div>
+    <div id="md-tier2"></div>
+  `;
+  renderTierBlock("md-tier1",t1,metricsViewWeek,!isThis);
+  renderTierBlock("md-tier2",t2,metricsViewWeek,!isThis);
+}
+
+// ── FOCUS ─────────────────────────────────────────────────
+function renderFocus(){
+  document.getElementById("focus-grid").innerHTML=WEEKLY_FOCUS.map(d=>`
+    <div class="focus-cell">
+      <div class="focus-day">${d.day}</div>
+      <div class="focus-items">${d.items.map(i=>`<div class="focus-item">${i}</div>`).join("")}</div>
+    </div>
+  `).join("");
+
+  document.getElementById("daily-nonneg").innerHTML=DAILY_NONNEG.map(d=>`
+    <div style="background:var(--s1);border-left:3px solid ${d.color};padding:14px 16px 14px 18px;margin-bottom:2px">
+      <div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:${d.color};margin-bottom:8px">${d.pillar}</div>
+      ${d.items.map(it=>`<div style="font-family:'Crimson Pro',serif;font-size:14px;color:var(--t2);line-height:1.5;display:flex;gap:8px;margin-bottom:4px"><span style="color:var(--t3);flex-shrink:0">—</span>${it}</div>`).join("")}
+    </div>
+  `).join("");
+}
+
+// ── DEBRIEF ───────────────────────────────────────────────
+function shiftDebriefWeek(d){
+  const dt=new Date(debriefViewWeek);dt.setDate(dt.getDate()+d*7);
+  const nk=weekKey(dt);
+  if(nk>thisWeekKey())return;
+  debriefViewWeek=nk;renderDebrief();
+}
+
+function renderDebrief(){
+  const isThis=debriefViewWeek===thisWeekKey();
+  document.getElementById("deb-week-label").textContent=fmtWeekRange(debriefViewWeek);
+  document.getElementById("deb-this-tag").style.display=isThis?"inline-block":"none";
+  document.getElementById("deb-next-btn").disabled=isThis;
+  document.getElementById("deb-past-notice").style.display=isThis?"none":"block";
+  const entry=debriefs[debriefViewWeek]||{};
+  const btn=document.getElementById("deb-save-btn");
+  btn.className="btn"+(isThis?"":" hidden");
+  btn.textContent="Save debrief";
+
+  document.getElementById("debrief-form").innerHTML=DEBRIEF_QUESTIONS.map(q=>`
+    <div class="debrief-section">
+      <div class="deb-q">${q.label}<span>${q.q}</span></div>
+      <textarea id="${q.id}" placeholder="Write honestly. This is the mechanism by which the week becomes learning." ${isThis?"":"readonly"}>${entry[q.id]||""}</textarea>
+    </div>
+  `).join("");
+}
+
+function saveDebrief(){
+  const entry={};
+  DEBRIEF_QUESTIONS.forEach(q=>{entry[q.id]=document.getElementById(q.id)?.value||"";});
+  entry.saved=Date.now();
+  debriefs[debriefViewWeek]=entry;
+  ss("wwr_debriefs",debriefs);
+  const btn=document.getElementById("deb-save-btn");
+  btn.textContent="Saved ✓";btn.classList.add("saved");
+  setTimeout(()=>{btn.textContent="Save debrief";btn.classList.remove("saved");},2000);
+}
+
+// ── HISTORY ───────────────────────────────────────────────
+function renderHistory(){
+  const totalWeeks=Object.keys(weeklyData).length;
+  const scores=Object.values(weeklyData).map((_,i)=>weekScore(Object.keys(weeklyData)[i]));
+  const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0;
+  const weeks80=Object.keys(weeklyData).filter(wk=>weekScore(wk)>=80).length;
+  const streak=calcWeekStreak();
+
+  document.getElementById("history-stats").innerHTML=`
+    <div class="stat"><div class="stat-l">Weeks tracked</div><div class="stat-v">${totalWeeks}</div><div class="stat-s">total</div></div>
+    <div class="stat"><div class="stat-l">Avg score</div><div class="stat-v ${avg>=80?"g":avg>=60?"a":"c"}">${avg}%</div><div class="stat-s">all time</div></div>
+    <div class="stat"><div class="stat-l">Weeks 80%+</div><div class="stat-v ${weeks80>0?"g":""}">${weeks80}</div><div class="stat-s">strong weeks</div></div>
+    <div class="stat"><div class="stat-l">Current streak</div><div class="stat-v ${streak>0?"g":""}">${streak}</div><div class="stat-s">weeks 80%+</div></div>
+  `;
+
+  // 12-week grid
+  const grid=document.getElementById("history-grid");
+  grid.innerHTML="";
+  const today=new Date();
+  for(let i=83;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    const wk=weekKey(d);
+    const score=weekScore(wk);
+    const isCurrentWk=wk===thisWeekKey();
+    const cls=score>=80?"w100":score>=60?"w80":score>=30?"w50":score>0?"wlow":"";
+    const cell=document.createElement("div");
+    cell.className="hist-cell"+(cls?" "+cls:"")+(isCurrentWk?" current-week":"");
+    cell.title=fmtWeekRange(wk)+" — "+score+"%";
+    cell.textContent=d.getDate();
+    cell.onclick=()=>{metricsViewWeek=wk;document.querySelector('.tnb[data-tab="metrics"]').click();};
+    grid.appendChild(cell);
+  }
+
+  // Week log
+  const allWeeks=Object.keys(weeklyData).sort().reverse().slice(0,12);
+  if(!allWeeks.length){document.getElementById("week-log").innerHTML='<div class="empty">No weeks tracked yet. Start logging this week.</div>';return;}
+  document.getElementById("week-log").innerHTML=allWeeks.map(wk=>{
+    const score=weekScore(wk);
+    const hasDeb=!!(debriefs[wk]&&debriefs[wk].d5);
+    return`<div style="display:flex;align-items:center;gap:0;background:var(--b1);margin-bottom:2px;cursor:pointer" onclick="jumpToWeek('${wk}')">
+      <div style="background:var(--s1);padding:12px 16px;min-width:220px;border-right:1px solid var(--b1)">
+        <div style="font-size:12px;color:var(--t1)">${fmtWeekRange(wk)}</div>
+        <div style="font-size:9px;color:var(--t3);margin-top:2px">${fmtWeekNum(wk)}</div>
+      </div>
+      <div style="flex:1;background:var(--s1);padding:12px 16px;border-right:1px solid var(--b1)">
+        <div style="height:3px;background:var(--s3);overflow:hidden"><div style="width:${score}%;height:100%;background:${score>=80?"var(--gb)":score>=60?"var(--amber)":"var(--coral)"}"></div></div>
+      </div>
+      <div style="background:var(--s1);padding:12px 16px;min-width:70px;text-align:center;border-right:1px solid var(--b1)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${score>=80?"var(--gb)":score>=60?"var(--amber)":"var(--coral)"}">${score}%</div>
+      </div>
+      <div style="background:var(--s1);padding:12px 16px;min-width:80px;text-align:center">
+        <div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:${hasDeb?"var(--gb)":"var(--t3)"}">${hasDeb?"Debriefed":"No debrief"}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function jumpToWeek(wk){metricsViewWeek=wk;document.querySelector('.tnb[data-tab="metrics"]').click();}
+
+// ── SUNDAY PROTOCOL ───────────────────────────────────────
+function renderSunday(){
+  const wk=thisWeekKey();
+  const sun=new Date(wk);sun.setDate(sun.getDate()+6);
+  document.getElementById("sunday-date").textContent="Week of "+fmtWeekRange(wk);
+  sundayDone=gs("wwr_sunday_"+wk,{});
+
+  document.getElementById("sunday-protocol").innerHTML=SUNDAY_PROTOCOL.map((s,i)=>{
+    const done=sundayDone["s"+i];
+    return`<div class="protocol-item ${done?"done":""}" onclick="toggleSunday(${i})">
+      <div class="proto-check">${done?"&#10003;":""}</div>
+      <div class="proto-num">${String(i+1).padStart(2,"0")}</div>
+      <div class="proto-content">
+        <div class="proto-title">${s.title}</div>
+        <div class="proto-desc">${s.desc}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function toggleSunday(i){
+  const wk=thisWeekKey();
+  sundayDone["s"+i]=!sundayDone["s"+i];
+  ss("wwr_sunday_"+wk,sundayDone);renderSunday();
+}
+
+// ── MANTRAS ───────────────────────────────────────────────
+function renderMantras(){
+  document.getElementById("mantra-list").innerHTML=MANTRAS.map((m,i)=>`
+    <div class="mantra-item">
+      <div class="mantra-n">${String(i+1).padStart(2,"0")}</div>
+      <div class="mantra-text">${m}</div>
+    </div>
+  `).join("");
+}
+
+// ── EXPORT / IMPORT ───────────────────────────────────────
+function exportData(){
+  const blob=new Blob([JSON.stringify({weeklyData,debriefs,northStars,exported:new Date().toISOString()},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="war_room_"+todayKey()+".json";a.click();
+}
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.weeklyData){ss("wwr_all",weeklyData=d.weeklyData);}
+      if(d.debriefs){ss("wwr_debriefs",debriefs=d.debriefs);}
+      if(d.northStars){ss("wwr_northstars",northStars=d.northStars);}
+      renderCommand();alert("Imported.");
+    }catch{alert("Invalid file.");}
+  };
+  reader.readAsText(file);
+}
+
+// ── INIT ─────────────────────────────────────────────────
+setTimeout(()=>{document.getElementById("loader").classList.add("hidden");},1800);
+renderCommand();
+</script>
+</body>
+</html>
