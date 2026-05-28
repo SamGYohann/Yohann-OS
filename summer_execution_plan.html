@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summer Execution Plan — Yohann OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--s1:#0f0f0f;--s2:#161616;--s3:#1e1e1e;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);--b3:rgba(255,255,255,0.2);
+  --t1:#e8e4dc;--t2:#7a7670;--t3:#3d3a36;
+  --green:#1a8c63;--gb:#22b07d;--gdim:rgba(26,140,99,0.12);--gbdr:rgba(26,140,99,0.35);
+  --amber:#c49a3c;--adim:rgba(196,154,60,0.1);--abdr:rgba(196,154,60,0.3);
+  --coral:#c0553a;--cdim:rgba(192,85,58,0.1);--cbdr:rgba(192,85,58,0.3);
+  --purple:#6e65c4;--pdim:rgba(110,101,196,0.1);--pbdr:rgba(110,101,196,0.3);
+  --blue:#3a7bc4;--bdim:rgba(58,123,196,0.1);--bbdr:rgba(58,123,196,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35}
+
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;transition:opacity 0.8s ease,visibility 0.8s}
+#loader.hidden{opacity:0;visibility:hidden}
+.l-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,88px);letter-spacing:0.15em;animation:lpulse 1.5s ease-in-out infinite alternate;text-align:center;line-height:0.95}
+.l-sub{font-size:10px;color:var(--t3);letter-spacing:0.3em;text-transform:uppercase;margin-top:12px}
+.l-bar-wrap{width:160px;height:1px;background:var(--b2);margin-top:28px;overflow:hidden}
+.l-bar{height:100%;background:var(--gb);width:0%;animation:lbar 1.8s ease forwards}
+@keyframes lpulse{from{opacity:0.4}to{opacity:1}}
+@keyframes lbar{0%{width:0%}60%{width:70%}100%{width:100%}}
+
+.app{max-width:960px;margin:0 auto;padding:0 28px 100px;opacity:0;animation:fadein 0.6s ease 2s forwards}
+@keyframes fadein{to{opacity:1}}
+
+.header{padding:44px 0 24px;border-bottom:1px solid var(--b1);margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.h-wordmark{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5.5vw,58px);letter-spacing:0.1em;line-height:1}
+.h-sub{font-family:'Crimson Pro',serif;font-style:italic;font-size:15px;color:var(--t2);margin-top:6px}
+.h-right{text-align:right;flex-shrink:0}
+.h-date{font-size:10px;color:var(--t3);letter-spacing:0.12em;text-transform:uppercase}
+
+/* THE GAP HERO */
+.gap-hero{display:grid;grid-template-columns:1fr auto 1fr;gap:0;background:var(--b1);border:1px solid var(--b1);margin-bottom:24px;align-items:stretch}
+.gap-side{background:var(--s1);padding:28px 26px}
+.gap-side.now{border-left:3px solid var(--coral)}
+.gap-side.target{border-left:3px solid var(--gb)}
+.gap-arrow{background:var(--s1);display:flex;align-items:center;justify-content:center;padding:0 18px;font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--t3)}
+.gap-label{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;margin-bottom:10px}
+.gap-label.c{color:var(--coral)}
+.gap-label.g{color:var(--gb)}
+.gap-name{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.06em;color:var(--t1);margin-bottom:12px}
+.gap-desc{font-family:'Crimson Pro',serif;font-size:14px;color:var(--t2);line-height:1.6}
+
+.mission-bar{background:var(--s1);border:1px solid var(--b1);border-left:3px solid var(--amber);padding:20px 24px;margin-bottom:28px}
+.mission-bar-label{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--amber);margin-bottom:10px}
+.mission-bar-text{font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);line-height:1.6}
+
+/* PROGRESS DASHBOARD */
+.dash{display:grid;grid-template-columns:auto 1fr;gap:24px;background:var(--s1);border:1px solid var(--b1);padding:24px;margin-bottom:28px;align-items:center}
+.ring-wrap{position:relative;width:140px;height:140px;flex-shrink:0}
+.ring-pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-num{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1;color:var(--gb)}
+.ring-lbl{font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t3);margin-top:2px}
+.dash-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--b1);border:1px solid var(--b1)}
+.dash-stat{background:var(--s1);padding:14px 16px}
+.dash-stat-l{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.dash-stat-v{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--t1);line-height:1}
+.dash-stat-v.g{color:var(--gb)}.dash-stat-v.a{color:var(--amber)}
+
+.slbl{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t3);margin:24px 0 14px;display:flex;align-items:center;gap:12px}
+.slbl::after{content:'';flex:1;height:1px;background:var(--b1)}
+.intro-prose{font-family:'Crimson Pro',serif;font-style:italic;font-size:15px;color:var(--t2);margin-bottom:20px;line-height:1.6}
+
+/* DELIVERABLES */
+.deliverable{background:var(--s1);border:1px solid var(--b1);margin-bottom:14px;position:relative;overflow:hidden}
+.deliverable::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--amber)}
+.deliverable.complete::before{background:var(--gb)}
+.del-header{padding:20px 24px 14px;cursor:pointer;display:flex;align-items:flex-start;gap:16px}
+.del-num{font-family:'Bebas Neue',sans-serif;font-size:38px;line-height:0.9;color:var(--t3);flex-shrink:0;width:46px}
+.del-headtext{flex:1}
+.del-name{font-size:15px;color:var(--t1);margin-bottom:4px}
+.del-weeks{font-size:10px;color:var(--amber);letter-spacing:0.08em;text-transform:uppercase}
+.del-prog{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gb);flex-shrink:0;padding:4px 12px;border:1px solid var(--gbdr)}
+.del-body{padding:0 24px 20px 24px;border-top:1px solid var(--b1)}
+.del-what{font-family:'Crimson Pro',serif;font-size:15px;color:var(--t2);line-height:1.6;margin:14px 0}
+.del-why{font-size:11px;color:var(--t3);padding:12px 14px;background:var(--s2);border-left:2px solid var(--gbdr);margin-bottom:16px;line-height:1.5}
+.del-why-label{color:var(--gb);letter-spacing:0.1em;text-transform:uppercase;font-size:9px;margin-bottom:4px}
+.del-format{font-size:11px;color:var(--t2);margin-bottom:16px;line-height:1.5}
+.del-format-label{color:var(--amber);letter-spacing:0.1em;text-transform:uppercase;font-size:9px;margin-bottom:4px}
+.task{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--b1);cursor:pointer;transition:opacity 0.15s}
+.task:last-child{border-bottom:none}
+.task.done{opacity:0.45}
+.task.done .task-text{text-decoration:line-through;color:var(--t3)}
+.task-check{width:16px;height:16px;border:1px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--gb);margin-top:2px;transition:all 0.15s}
+.task.done .task-check{border-color:var(--gbdr);background:var(--gdim)}
+.task-text{font-size:12px;color:var(--t1);line-height:1.5}
+
+/* WEEKS */
+.week-block{background:var(--s1);border:1px solid var(--b1);margin-bottom:2px;overflow:hidden}
+.week-head{padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:16px;transition:background 0.15s}
+.week-head:hover{background:var(--s2)}
+.week-num{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.1em;color:var(--amber);flex-shrink:0;min-width:64px}
+.week-focus{font-size:12px;color:var(--t1);flex:1}
+.week-phase{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);padding:2px 8px;border:1px solid var(--b1);flex-shrink:0}
+.week-detail{display:none;padding:0 18px 16px 18px;border-top:1px solid var(--b1)}
+.week-block.open .week-detail{display:block}
+.week-list{list-style:none;margin-top:12px}
+.week-list li{font-family:'Crimson Pro',serif;font-size:14px;color:var(--t2);line-height:1.6;padding:4px 0 4px 20px;position:relative}
+.week-list li::before{content:'';position:absolute;left:0;top:13px;width:8px;height:1px;background:var(--t3)}
+
+/* SKILLS */
+.skill-card{background:var(--s1);border:1px solid var(--b1);padding:20px 22px;margin-bottom:2px;position:relative;overflow:hidden}
+.skill-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.skill-card.s1::before{background:var(--coral)}
+.skill-card.s2::before{background:var(--blue)}
+.skill-card.s3::before{background:var(--purple)}
+.skill-card.s4::before{background:var(--amber)}
+.skill-rank{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.skill-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;color:var(--t1);margin-bottom:10px}
+.skill-target{font-family:'Crimson Pro',serif;font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:10px}
+.skill-target strong{color:var(--t1);font-weight:400}
+.skill-note{font-size:11px;color:var(--t3);font-style:italic;font-family:'Crimson Pro',serif}
+
+/* RESOURCES */
+.res-card{background:var(--s1);border:1px solid var(--b1);padding:16px 18px;margin-bottom:2px;display:flex;gap:16px;align-items:flex-start}
+.res-domain{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border:1px solid;flex-shrink:0;min-width:110px;text-align:center;margin-top:2px}
+.res-domain.prob{border-color:var(--cbdr);color:var(--coral)}
+.res-domain.py{border-color:var(--bbdr);color:var(--blue)}
+.res-domain.la{border-color:var(--pbdr);color:var(--purple)}
+.res-domain.micro{border-color:var(--abdr);color:var(--amber)}
+.res-content{flex:1}
+.res-title{font-size:13px;color:var(--t1);margin-bottom:3px}
+.res-meta{font-size:10px;color:var(--gb);margin-bottom:4px;letter-spacing:0.04em}
+.res-why{font-size:11px;color:var(--t3);font-family:'Crimson Pro',serif;font-style:italic;line-height:1.5}
+
+/* RHYTHM */
+.rhythm-day{background:var(--s1);border:1px solid var(--b1);padding:16px 20px;margin-bottom:2px;display:flex;gap:20px;align-items:flex-start}
+.rhythm-when{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.08em;color:var(--amber);flex-shrink:0;min-width:130px}
+.rhythm-what{flex:1}
+.rhythm-block{font-family:'Crimson Pro',serif;font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:6px}
+.rhythm-block strong{color:var(--t1);font-weight:400}
+.rhythm-block:last-child{margin-bottom:0}
+
+/* TRADING JOURNAL */
+.journal-form{background:var(--s1);border:1px solid var(--b1);padding:18px;margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-full{grid-column:1/-1}
+.flbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+input[type="text"],input[type="number"],input[type="date"],select,textarea{width:100%;background:var(--s2);border:1px solid var(--b1);padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t1);transition:border-color 0.15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--b2)}
+input::placeholder,textarea::placeholder{color:var(--t3)}
+select{cursor:pointer}select option{background:var(--s2);color:var(--t1)}
+textarea{min-height:54px;resize:vertical;line-height:1.5}
+.jentry{background:var(--s1);border:1px solid var(--b1);padding:16px 18px;margin-bottom:2px;position:relative;overflow:hidden}
+.jentry::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.jentry.win::before{background:var(--gb)}
+.jentry.loss::before{background:var(--coral)}
+.jentry.flat::before{background:var(--t3)}
+.jentry-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.jentry-inst{font-size:13px;color:var(--t1);font-weight:400}
+.jentry-result{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.04em;margin-left:auto}
+.jentry-result.win{color:var(--gb)}.jentry-result.loss{color:var(--coral)}.jentry-result.flat{color:var(--t2)}
+.jentry-date{font-size:10px;color:var(--t3)}
+.jentry-row{font-size:11px;color:var(--t2);margin-top:6px;line-height:1.5}
+.jentry-label{color:var(--t3);letter-spacing:0.08em;text-transform:uppercase;font-size:9px}
+
+.btn{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:10px 18px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--gb);color:var(--gb)}
+.btn.danger:hover{border-color:var(--cbdr);color:var(--coral)}
+
+/* NAV */
+.tab-nav{display:flex;gap:2px;margin-bottom:32px;border-bottom:1px solid var(--b1);overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tnb{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:11px 16px;border:none;background:transparent;color:var(--t3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+.tnb:hover{color:var(--t2)}
+.tnb.active{color:var(--gb);border-bottom-color:var(--gb)}
+.tab{display:none}.tab.active{display:block}
+
+.rule{border:none;border-top:1px solid var(--b1);margin:24px 0}
+.empty{font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--t3);padding:20px 0}
+.endquote{font-family:'Crimson Pro',serif;font-style:italic;font-size:16px;color:var(--t1);line-height:1.7;text-align:center;padding:32px 40px;border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);margin:28px 0}
+
+@media (max-width:700px){
+  .gap-hero{grid-template-columns:1fr}
+  .gap-arrow{padding:14px 0;transform:rotate(90deg)}
+  .dash{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .dash-stats{width:100%}
+  .rhythm-day{flex-direction:column;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="l-name">The Summer<br>Campaign</div>
+  <div class="l-sub">Twelve weeks · Sam → Yohann</div>
+  <div class="l-bar-wrap"><div class="l-bar"></div></div>
+</div>
+
+<div class="app">
+
+<header class="header">
+  <div>
+    <div class="h-wordmark">Summer Execution</div>
+    <div class="h-sub">Twelve weeks to become the candidate that does not exist in the pool. The first battle of the campaign.</div>
+  </div>
+  <div class="h-right">
+    <div class="h-date" id="hdr-date"></div>
+  </div>
+</header>
+
+<div class="tab-nav">
+  <button class="tnb active" data-tab="overview" onclick="switchTab(this)">The gap</button>
+  <button class="tnb" data-tab="deliverables" onclick="switchTab(this)">Deliverables</button>
+  <button class="tnb" data-tab="schedule" onclick="switchTab(this)">12 weeks</button>
+  <button class="tnb" data-tab="skills" onclick="switchTab(this)">Skills</button>
+  <button class="tnb" data-tab="resources" onclick="switchTab(this)">Resources</button>
+  <button class="tnb" data-tab="rhythm" onclick="switchTab(this)">Daily rhythm</button>
+  <button class="tnb" data-tab="journal" onclick="switchTab(this)">Trade journal</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="tab-overview" class="tab active">
+  <div class="gap-hero">
+    <div class="gap-side now">
+      <div class="gap-label c">Who shows up by default</div>
+      <div class="gap-name">Sam</div>
+      <div class="gap-desc">The non-target candidate with a finance degree and a recovering GPA. Thinks probabilistically by instinct but hasn't formalized it. Has the framework but not the proof. Competes in a pool of people who look exactly the same on paper. Indistinguishable until he proves otherwise.</div>
+    </div>
+    <div class="gap-arrow">&rarr;</div>
+    <div class="gap-side target">
+      <div class="gap-label g">Who shows up by design</div>
+      <div class="gap-name">Yohann</div>
+      <div class="gap-desc">The operator with demonstrable quant-adjacent work product, a documented trading framework, real Python output on live market data, and the ability to discuss order flow and bid-ask dynamics fluently in an interview. A categorically different candidate. The only one in the pool who proved anything.</div>
+    </div>
+  </div>
+
+  <div class="mission-bar">
+    <div class="mission-bar-label">The summer mission</div>
+    <div class="mission-bar-text">By September: five shipped deliverables, three months of documented real trades, four skill domains formalized, and a profile that does not exist in the DC/MD recruiting pool. Not Taylor Mason — Taylor is the ten-year outcome. This summer builds the foundation that makes the ten-year outcome possible, and makes me the standout candidate this August.</div>
+  </div>
+
+  <div class="slbl">Progress</div>
+  <div class="dash">
+    <div class="ring-wrap">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle cx="70" cy="70" r="62" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+        <circle id="ring-fill" cx="70" cy="70" r="62" fill="none" stroke="#22b07d" stroke-width="6" stroke-linecap="round" stroke-dasharray="389.6" stroke-dashoffset="389.6" transform="rotate(-90 70 70)" style="transition:stroke-dashoffset 0.8s ease"/>
+      </svg>
+      <div class="ring-pct">
+        <div class="ring-num" id="ring-num">0%</div>
+        <div class="ring-lbl">Complete</div>
+      </div>
+    </div>
+    <div class="dash-stats">
+      <div class="dash-stat"><div class="dash-stat-l">Tasks done</div><div class="dash-stat-v g" id="ds-tasks">0 / 0</div></div>
+      <div class="dash-stat"><div class="dash-stat-l">Deliverables shipped</div><div class="dash-stat-v a" id="ds-delivs">0 / 5</div></div>
+      <div class="dash-stat"><div class="dash-stat-l">Trades logged</div><div class="dash-stat-v" id="ds-trades">0</div></div>
+      <div class="dash-stat"><div class="dash-stat-l">Documented win rate</div><div class="dash-stat-v" id="ds-winrate">—</div></div>
+    </div>
+  </div>
+
+  <div class="endquote">"By September you are the non-target, sub-3.0 GPA candidate who walked into an interview with a distressed teardown, a Python backtest on GitHub, a documented systematic trading framework, and the ability to discuss order flow fluently. That candidate does not exist in your pool. You will be the only one. That is the edge. The rest is execution."</div>
+</div>
+
+<!-- DELIVERABLES -->
+<div id="tab-deliverables" class="tab">
+  <p class="intro-prose">Five artifacts. Each one is concrete — something you can send, show, or discuss in an interview. The discipline of shipping them on schedule is itself the signal. Check tasks as you complete them.</p>
+  <div id="deliverables-list"></div>
+</div>
+
+<!-- SCHEDULE -->
+<div id="tab-schedule" class="tab">
+  <p class="intro-prose">Twelve weeks. Each week has a focus. Tap to expand. The schedule is a default, not a cage — but if you're going to break it, break it for more work, not less.</p>
+  <div id="schedule-list"></div>
+</div>
+
+<!-- SKILLS -->
+<div id="tab-skills" class="tab">
+  <p class="intro-prose">Four domains, ranked by priority. Probability is the foundation everything else sits on. The target levels are deliberately bounded — you are not getting a PhD this summer, you are reaching functional fluency in the things that actually matter on a desk.</p>
+  <div id="skills-list"></div>
+</div>
+
+<!-- RESOURCES -->
+<div id="tab-resources" class="tab">
+  <p class="intro-prose">Nothing generic. Each resource maps to a specific skill domain and a specific deliverable. Most are free. The constraint is never access — it's consistency.</p>
+  <div id="resources-list"></div>
+</div>
+
+<!-- RHYTHM -->
+<div id="tab-rhythm" class="tab">
+  <p class="intro-prose">Two hours minimum, every weekday, outside any job or internship work. The rhythm is the engine. Skill is the residue of consistent reps, not occasional intensity.</p>
+  <div id="rhythm-list"></div>
+  <div class="slbl">The non-negotiables</div>
+  <div style="background:var(--s1);border:1px solid var(--b1);border-left:3px solid var(--coral);padding:18px 22px">
+    <ul class="week-list">
+      <li>No Python session that only reads documentation — every session produces output</li>
+      <li>No skipped trade log — every position has a thesis before entry and an assessment after exit</li>
+      <li>No "I'll double up tomorrow" — the rhythm compounds only if it's daily</li>
+      <li>No deliverable started in the final week of its window — front-load, always</li>
+    </ul>
+  </div>
+</div>
+
+<!-- JOURNAL -->
+<div id="tab-journal" class="tab">
+  <p class="intro-prose">Real money. Small size. Every trade logged with the probabilistic reasoning behind it — not "the chart looked good." What did you think the probability was, what did the market imply, where was the edge. By September this is three months of documented evidence. It is worth more than anything else on this list in the right conversation.</p>
+  <div class="journal-form">
+    <div class="form-grid">
+      <div><div class="flbl">Instrument *</div><input type="text" id="j-inst" placeholder="ES, SPY, EUR/USD..."></div>
+      <div><div class="flbl">Direction</div><select id="j-dir"><option value="long">Long</option><option value="short">Short</option></select></div>
+      <div><div class="flbl">Your est. probability (%)</div><input type="number" id="j-myprob" placeholder="58" min="0" max="100"></div>
+      <div><div class="flbl">Market-implied prob (%)</div><input type="number" id="j-mktprob" placeholder="50" min="0" max="100"></div>
+      <div><div class="flbl">Result</div><select id="j-result"><option value="win">Win</option><option value="loss">Loss</option><option value="flat">Flat / Scratch</option></select></div>
+      <div><div class="flbl">Date</div><input type="date" id="j-date"></div>
+      <div class="form-full"><div class="flbl">Thesis before entry — where was the edge?</div><textarea id="j-thesis" placeholder="What you believed and why, in probabilistic terms..."></textarea></div>
+      <div class="form-full"><div class="flbl">Post-exit assessment — what did the outcome teach?</div><textarea id="j-assess" placeholder="Was the process right regardless of result? What did the opponent (market) do well?"></textarea></div>
+    </div>
+    <button class="btn" onclick="addTrade()" style="margin-top:8px">+ Log trade</button>
+  </div>
+  <div id="journal-list"></div>
+</div>
+
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────
+
+const DELIVERABLES=[
+  {
+    id:"d1",num:"01",name:"Systematic Trading Framework Document",weeks:"Weeks 1–3",
+    what:"Take the existing betting operation system — edge identification, Kelly sizing, kill switches, CLV tracking — and reframe it entirely in market language. Line movement becomes price discovery. CLV becomes alpha decay. Sportsbook becomes market maker. The logic is identical; the language is what translates.",
+    why:"This is the document that opens the prop desk conversation. A documented systematic framework with real logic is more compelling to the right reader than any GPA or school name.",
+    format:"10–15 page PDF. Framework description, decision logic, position sizing math, sample trades with documented rationale, performance tracking methodology. Written as if presenting to a prop firm.",
+    tasks:[
+      "Extract the decision logic from the betting OS HTML files into prose",
+      "Translate every betting term into its market equivalent (glossary)",
+      "Write the edge-identification section — how a position qualifies",
+      "Write the position-sizing section — Kelly logic with the math shown",
+      "Write the kill-switch / risk section — when and why you exit",
+      "Document 3–5 sample trades with full probabilistic rationale",
+      "Write the performance-tracking methodology section",
+      "Final pass — format as PDF, read it as if you're the prop firm",
+    ]
+  },
+  {
+    id:"d2",num:"02",name:"Python Market Analysis Tool",weeks:"Weeks 4–7",
+    what:"A Python project that fetches real price data (yfinance), calculates a momentum or mean-reversion signal on a chosen instrument, backtests it against history with clean metrics (Sharpe, max drawdown, win rate), and visualizes the output. It does not need to be profitable — it needs to demonstrate hypothesis → test → result using code.",
+    why:"The Python credential translated into finance language. Everyone else who says 'I know Python' means they finished a course. You have output on real market data.",
+    format:"GitHub repository — clean code, README explaining the thesis and methodology, one-page write-up of findings and implications.",
+    tasks:[
+      "Set up the environment — Python, pandas, yfinance, matplotlib",
+      "Fetch and clean historical price data for a chosen instrument",
+      "Build one signal — momentum crossover or mean-reversion z-score",
+      "Write the backtest loop — entries, exits, position tracking",
+      "Calculate performance metrics — Sharpe, max drawdown, win rate",
+      "Visualize — equity curve, signal overlay, drawdown chart",
+      "Write the README — thesis, methodology, how to run it",
+      "Write the one-page findings doc — what it shows, what it doesn't",
+      "Push clean to GitHub with a professional repo structure",
+    ]
+  },
+  {
+    id:"d3",num:"03",name:"Distressed Company Teardown",weeks:"Weeks 3–6",
+    what:"Full Chapter 11 analysis of a recent bankruptcy (Bed Bath & Beyond, Rite Aid, Yellow Corp, Envision Health). Map capital structure by creditor class, estimate recovery rates per class, build a 13-week cash flow model from last public filings, write an intervention thesis — what you'd have done, when, why.",
+    why:"The primary calling card for finance outreach. Signals you did serious analytical work nobody asked for, in the exact language of the field.",
+    format:"PDF executive summary + Excel workbook. The PDF should let a senior advisory person understand your full thinking in ten minutes.",
+    tasks:[
+      "Pick the target company and pull last public filings (10-K, 10-Q)",
+      "Map the capital structure by creditor class",
+      "Estimate recovery rates per class with stated assumptions",
+      "Build the 13-week cash flow model in Excel",
+      "Write the intervention thesis — what, when, why",
+      "Write the executive summary (1–2 pages, board-ready)",
+      "Final formatting — PDF + clean Excel workbook",
+    ]
+  },
+  {
+    id:"d4",num:"04",name:"Quantitative Financial Model",weeks:"Weeks 7–10",
+    what:"Apply the regression architecture from the xG project to a financial prediction problem. Pick one: earnings-surprise prediction, credit-default probability, or sector-rotation signals. Build it in Python, document the methodology, interpret honestly including where the model fails.",
+    why:"Closes the gap between 'can code' and 'understands what the code is measuring.' Translates your demonstrated skill directly into market language — what the xG project should have been.",
+    format:"Python notebook on GitHub + two-page write-up: methodology, results, limitations.",
+    tasks:[
+      "Choose the prediction problem and source the data",
+      "Clean and engineer the feature set",
+      "Build the regression / classification model",
+      "Evaluate — out-of-sample testing, honest accuracy metrics",
+      "Identify and document where the model breaks",
+      "Write the two-page methodology + results + limitations doc",
+      "Push the notebook clean to GitHub",
+    ]
+  },
+  {
+    id:"d5",num:"05",name:"Market Microstructure Essay",weeks:"Weeks 9–12",
+    what:"A 5–8 page document proving you understand how prices actually form. Bid-ask spread as information, not just cost. Order flow and what it signals. Market makers and why liquidity provision is a business. What all of it means for position sizing and execution.",
+    why:"Almost no undergraduate can discuss microstructure in an interview. It's a proxy for genuine market understanding versus textbook fluency. One good answer about order flow is worth more than a 3.8 GPA to the right interviewer.",
+    format:"PDF. Clean writing. Doubles as a writing sample for applications and a framework for your own decisions.",
+    tasks:[
+      "Read Harris — Trading and Exchanges, chapters 1–15",
+      "Take notes in your own words on each core concept",
+      "Outline the essay — spread, order flow, market makers, execution",
+      "Write the bid-ask-as-information section",
+      "Write the order-flow + market-maker section",
+      "Write the position-sizing + execution implications section",
+      "Final edit — tighten to 5–8 pages, format as PDF",
+    ]
+  },
+];
+
+const SCHEDULE=[
+  {week:"Week 1",phase:"Foundation",focus:"Framework translation begins + probability intuition",items:["Start Deliverable 1 — extract betting OS logic into prose","Begin Naked Statistics (Wheelan)","Set the daily rhythm — two hours, every weekday","Open the trading account, fund it small, place first logged trade"]},
+  {week:"Week 2",phase:"Foundation",focus:"Framework drafting + probability formalization",items:["Deliverable 1 — write edge-identification and sizing sections","Finish Naked Statistics, start Think Bayes (Downey)","Watch 3Blue1Brown Linear Algebra videos 1–6","Trade journal — minimum 3 logged positions this week"]},
+  {week:"Week 3",phase:"Foundation → Analysis",focus:"Ship Deliverable 1 + open the distressed teardown",items:["Finish and ship Deliverable 1 (PDF)","Start Deliverable 3 — pick company, pull filings, map cap structure","Continue Think Bayes — conditional probability, Bayesian updating","Watch 3Blue1Brown videos 7–11"]},
+  {week:"Week 4",phase:"Build",focus:"Python environment + teardown modeling",items:["Start Deliverable 2 — environment, fetch + clean price data","Deliverable 3 — build the 13-week cash flow model","Finish 3Blue1Brown Linear Algebra series","Trade journal — review week 1–3, refine the framework"]},
+  {week:"Week 5",phase:"Build",focus:"Signal building + teardown thesis",items:["Deliverable 2 — build the signal and backtest loop","Deliverable 3 — write the intervention thesis","Start Trading and Exchanges (Harris), 30 min/session","Trade journal — focus on process quality over outcome"]},
+  {week:"Week 6",phase:"Build → Ship",focus:"Ship the teardown + Python metrics",items:["Finish and ship Deliverable 3 (PDF + Excel)","Deliverable 2 — performance metrics + visualization","Continue Harris — chapters on order flow","Trade journal — first monthly review: win rate, process notes"]},
+  {week:"Week 7",phase:"Build",focus:"Ship Python tool + open the quant model",items:["Finish and ship Deliverable 2 (GitHub)","Start Deliverable 4 — choose problem, source data","Continue Harris — market makers and liquidity","Trade journal — refine sizing based on documented results"]},
+  {week:"Week 8",phase:"Build",focus:"Quant model construction",items:["Deliverable 4 — feature engineering, build the model","Continue Harris reading","Begin integrating microstructure concepts into the framework doc","Trade journal — minimum 12 cumulative trades by now"]},
+  {week:"Week 9",phase:"Build → Synthesis",focus:"Ship quant model + open microstructure essay",items:["Finish and ship Deliverable 4 (GitHub notebook)","Start Deliverable 5 — outline from Harris notes","Finish Harris chapters 1–15","Trade journal — second monthly review"]},
+  {week:"Week 10",phase:"Synthesis",focus:"Microstructure essay drafting",items:["Deliverable 5 — write spread + order flow sections","Review all four shipped deliverables — polish, fix, consolidate","Begin assembling the portfolio one-pager (links to all work)","Trade journal — refine the probabilistic language in entries"]},
+  {week:"Week 11",phase:"Synthesis",focus:"Essay completion + portfolio assembly",items:["Deliverable 5 — write execution/sizing implications section","Assemble the master portfolio doc — all five deliverables linked","Draft interview talking points for each deliverable","Trade journal — prep the 3-month performance summary"]},
+  {week:"Week 12",phase:"Deployment",focus:"Ship the essay + go to market",items:["Finish and ship Deliverable 5 (PDF)","Portfolio complete — all five artifacts ready to send","Update the Career Pipeline portfolio tab with everything shipped","Begin outreach using the work as the lead — the edge is now real"]},
+];
+
+const SKILLS=[
+  {rank:"Priority 1 — the foundation",cls:"s1",name:"Probability & Statistics",target:"Calculate expected value, understand conditional probability intuitively, explain a distribution versus a point estimate, apply Bayesian updating to a real decision. <strong>You are not learning this for an exam — you are learning it to think differently about every position you ever take.</strong>",note:"You already think this way from the betting system. This is formalization, not new construction."},
+  {rank:"Priority 2 — the testing layer",cls:"s2",name:"Python for Finance",target:"Fetch live market data, clean it, run basic statistical tests, backtest a simple strategy, visualize the output. <strong>Not a software engineer — someone who can test a hypothesis against data before committing capital.</strong>",note:"You have exposure from the xG project. The goal is functional, market-applied fluency."},
+  {rank:"Priority 3 — just enough",cls:"s3",name:"Linear Algebra",target:"Understand vectors and matrices as descriptions of portfolio relationships. Covariance, correlation, basic factor decomposition. <strong>This unlocks Kelly criterion in multi-asset form and portfolio construction logic.</strong> Nothing beyond that is needed.",note:"3Blue1Brown's 16-video series builds the entire intuition. Don't skip it, don't overdo it."},
+  {rank:"Priority 4 — the interview edge",cls:"s4",name:"Market Microstructure",target:"Explain how a price forms from order flow. Bid-ask spread as information, not just cost. What liquidity means in practice and why it matters to sizing. <strong>The differentiator almost no undergraduate candidate has.</strong>",note:"One fluent answer about order flow in an interview outweighs a high GPA to the right person."},
+];
+
+const RESOURCES=[
+  {domain:"prob",dlabel:"Probability",title:"Naked Statistics — Charles Wheelan",meta:"~2 weeks · book · paid",why:"Solidifies intuition fast. Reads quickly, no heavy math. The on-ramp."},
+  {domain:"prob",dlabel:"Probability",title:"Think Bayes — Allen Downey",meta:"free · greenteapress.com · Python-integrated",why:"Bayesian reasoning applied to decision-making under uncertainty. Directly maps to how you size and qualify positions."},
+  {domain:"py",dlabel:"Python",title:"Python for Finance — Yves Hilpisch",meta:"book · application-first",why:"Assumes basic Python, teaches market application. The exercises are directly relevant to Deliverables 2 and 4."},
+  {domain:"py",dlabel:"Python",title:"yfinance + pandas documentation",meta:"free · official docs",why:"yfinance for free market data, pandas for cleaning and analysis. The working toolkit for every Python deliverable."},
+  {domain:"la",dlabel:"Linear Algebra",title:"Essence of Linear Algebra — 3Blue1Brown",meta:"free · YouTube · 16 videos",why:"The best mathematical intuition content that exists. Watch all of it before week 4. Builds the foundation for portfolio math."},
+  {domain:"micro",dlabel:"Microstructure",title:"Trading and Exchanges — Larry Harris",meta:"book · chapters 1–15 · dense",why:"The definitive text on how markets actually work mechanically. 30 min/session. The source for Deliverable 5 and the interview edge."},
+];
+
+const RHYTHM=[
+  {when:"Mon–Fri · Hour 1",blocks:["<strong>Python.</strong> Every session produces output — a chart, a function, a backtest result. Never a session that only reads documentation. Build something that ran and produced a result, every single time."]},
+  {when:"Mon–Fri · Hour 2",blocks:["<strong>Skill rotation.</strong> Weeks 1–4: probability + linear algebra. Weeks 5–8: market microstructure reading. Weeks 9–12: writing and integration.","Take notes like you're building a reference document, not cramming for an exam."]},
+  {when:"Saturday",blocks:["<strong>Apply.</strong> Take the week's learning and make one concrete update to how you think about a position or a decision. Every concept learned gets a direct translation into the trading framework."]},
+  {when:"Sunday",blocks:["<strong>Review.</strong> What did you build. What do you actually understand versus what did you only read. Update the trade journal. Set the coming week's focus.","This is the loop that turns activity into progress."]},
+];
+
+// ── STORAGE ───────────────────────────────────────────────
+function gs(k,def){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):def}catch{return def}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+function today(){return new Date().toISOString().split("T")[0]}
+
+let taskState=gs("sep_tasks",{});
+let trades=gs("sep_trades",[]);
+
+document.getElementById("hdr-date").textContent=new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}).toUpperCase();
+
+function switchTab(btn){
+  document.querySelectorAll(".tnb").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+  const t=btn.dataset.tab;
+  if(t==="deliverables")renderDeliverables();
+  if(t==="schedule")renderSchedule();
+  if(t==="skills")renderSkills();
+  if(t==="resources")renderResources();
+  if(t==="rhythm")renderRhythm();
+  if(t==="journal")renderJournal();
+  if(t==="overview")renderDashboard();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+function renderDashboard(){
+  let totalTasks=0,doneTasks=0,shippedDelivs=0;
+  DELIVERABLES.forEach(d=>{
+    let dDone=0;
+    d.tasks.forEach((_,i)=>{totalTasks++;if(taskState[d.id+"-"+i]){doneTasks++;dDone++;}});
+    if(dDone===d.tasks.length)shippedDelivs++;
+  });
+  const pct=totalTasks>0?Math.round(doneTasks/totalTasks*100):0;
+  const circ=389.6;
+  document.getElementById("ring-fill").style.strokeDashoffset=circ-(circ*pct/100);
+  document.getElementById("ring-num").textContent=pct+"%";
+  document.getElementById("ds-tasks").textContent=doneTasks+" / "+totalTasks;
+  document.getElementById("ds-delivs").textContent=shippedDelivs+" / 5";
+  document.getElementById("ds-trades").textContent=trades.length;
+  const wins=trades.filter(t=>t.result==="win").length;
+  const decided=trades.filter(t=>t.result!=="flat").length;
+  document.getElementById("ds-winrate").textContent=decided>0?Math.round(wins/decided*100)+"%":"—";
+}
+
+// ── DELIVERABLES ──────────────────────────────────────────
+function toggleTask(did,idx){
+  const key=did+"-"+idx;
+  taskState[key]=!taskState[key];
+  ss("sep_tasks",taskState);
+  renderDeliverables();
+}
+function toggleDel(id){document.getElementById("delbody-"+id).parentElement.classList.toggle("open-del");
+  const body=document.getElementById("delbody-"+id);
+  body.style.display=body.style.display==="none"?"block":"none";
+}
+function renderDeliverables(){
+  document.getElementById("deliverables-list").innerHTML=DELIVERABLES.map(d=>{
+    const done=d.tasks.filter((_,i)=>taskState[d.id+"-"+i]).length;
+    const complete=done===d.tasks.length;
+    return`
+    <div class="deliverable ${complete?'complete':''}">
+      <div class="del-header" onclick="toggleDel('${d.id}')">
+        <div class="del-num">${d.num}</div>
+        <div class="del-headtext">
+          <div class="del-name">${d.name}</div>
+          <div class="del-weeks">${d.weeks}</div>
+        </div>
+        <div class="del-prog">${done}/${d.tasks.length}</div>
+      </div>
+      <div class="del-body" id="delbody-${d.id}" style="display:block">
+        <div class="del-what">${d.what}</div>
+        <div class="del-why"><div class="del-why-label">Why it matters</div>${d.why}</div>
+        <div class="del-format"><div class="del-format-label">Format</div>${d.format}</div>
+        <div class="del-tasklabel" style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Tasks</div>
+        ${d.tasks.map((t,i)=>`
+          <div class="task ${taskState[d.id+'-'+i]?'done':''}" onclick="toggleTask('${d.id}',${i})">
+            <div class="task-check">${taskState[d.id+'-'+i]?'&#10003;':''}</div>
+            <div class="task-text">${t}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── SCHEDULE ──────────────────────────────────────────────
+function toggleWeek(el){el.parentElement.classList.toggle("open");}
+function renderSchedule(){
+  document.getElementById("schedule-list").innerHTML=SCHEDULE.map(w=>`
+    <div class="week-block">
+      <div class="week-head" onclick="toggleWeek(this)">
+        <div class="week-num">${w.week}</div>
+        <div class="week-focus">${w.focus}</div>
+        <div class="week-phase">${w.phase}</div>
+      </div>
+      <div class="week-detail">
+        <ul class="week-list">${w.items.map(i=>`<li>${i}</li>`).join("")}</ul>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ── SKILLS ────────────────────────────────────────────────
+function renderSkills(){
+  document.getElementById("skills-list").innerHTML=SKILLS.map(s=>`
+    <div class="skill-card ${s.cls}">
+      <div class="skill-rank">${s.rank}</div>
+      <div class="skill-name">${s.name}</div>
+      <div class="skill-target">${s.target}</div>
+      <div class="skill-note">${s.note}</div>
+    </div>
+  `).join("");
+}
+
+// ── RESOURCES ─────────────────────────────────────────────
+function renderResources(){
+  document.getElementById("resources-list").innerHTML=RESOURCES.map(r=>`
+    <div class="res-card">
+      <div class="res-domain ${r.domain}">${r.dlabel}</div>
+      <div class="res-content">
+        <div class="res-title">${r.title}</div>
+        <div class="res-meta">${r.meta}</div>
+        <div class="res-why">${r.why}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ── RHYTHM ────────────────────────────────────────────────
+function renderRhythm(){
+  document.getElementById("rhythm-list").innerHTML=RHYTHM.map(r=>`
+    <div class="rhythm-day">
+      <div class="rhythm-when">${r.when}</div>
+      <div class="rhythm-what">${r.blocks.map(b=>`<div class="rhythm-block">${b}</div>`).join("")}</div>
+    </div>
+  `).join("");
+}
+
+// ── JOURNAL ───────────────────────────────────────────────
+function addTrade(){
+  const inst=document.getElementById("j-inst").value.trim();
+  if(!inst){alert("Instrument is required.");return;}
+  trades.push({
+    id:Date.now(),inst,
+    dir:document.getElementById("j-dir").value,
+    myprob:document.getElementById("j-myprob").value,
+    mktprob:document.getElementById("j-mktprob").value,
+    result:document.getElementById("j-result").value,
+    date:document.getElementById("j-date").value||today(),
+    thesis:document.getElementById("j-thesis").value.trim(),
+    assess:document.getElementById("j-assess").value.trim(),
+  });
+  ss("sep_trades",trades);
+  ["j-inst","j-myprob","j-mktprob","j-thesis","j-assess"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("j-date").value=today();
+  renderJournal();
+}
+function removeTrade(id){if(!confirm("Remove this trade?"))return;trades=trades.filter(t=>t.id!==id);ss("sep_trades",trades);renderJournal();}
+function renderJournal(){
+  const list=document.getElementById("journal-list");
+  if(!trades.length){list.innerHTML='<div class="empty">No trades logged yet. The record starts with the first entry.</div>';return;}
+  const resultLabel={win:"Win",loss:"Loss",flat:"Flat"};
+  list.innerHTML=[...trades].sort((a,b)=>b.id-a.id).map(t=>{
+    const edge=(t.myprob&&t.mktprob)?(parseFloat(t.myprob)-parseFloat(t.mktprob)).toFixed(0):null;
+    return`
+    <div class="jentry ${t.result}">
+      <div class="jentry-head">
+        <div class="jentry-inst">${t.inst} <span style="color:var(--t3);font-size:10px">· ${t.dir==="long"?"Long":"Short"}</span></div>
+        <div class="jentry-date">${t.date}</div>
+        <div class="jentry-result ${t.result}">${resultLabel[t.result]}</div>
+      </div>
+      ${(t.myprob&&t.mktprob)?`<div class="jentry-row"><span class="jentry-label">Edge — </span>You ${t.myprob}% vs market ${t.mktprob}% = ${edge>0?'+':''}${edge} pts</div>`:''}
+      ${t.thesis?`<div class="jentry-row"><span class="jentry-label">Thesis — </span>${t.thesis}</div>`:''}
+      ${t.assess?`<div class="jentry-row"><span class="jentry-label">Assessment — </span>${t.assess}</div>`:''}
+      <div style="margin-top:8px"><button class="btn danger" style="padding:4px 10px;font-size:9px" onclick="removeTrade(${t.id})">Remove</button></div>
+    </div>`;
+  }).join("");
+}
+
+// ── INIT ─────────────────────────────────────────────────
+setTimeout(()=>{document.getElementById("loader").classList.add("hidden");},1800);
+document.getElementById("j-date").value=today();
+renderDashboard();
+</script>
+</body>
+</html>
