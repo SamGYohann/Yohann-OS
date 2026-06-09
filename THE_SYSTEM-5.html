@@ -29,7 +29,7 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--disp);font-weight:
 .bg-vig{position:absolute;inset:0;box-shadow:inset 0 0 360px 70px rgba(1,4,10,0.92)}
 @keyframes scan{0%{top:-220px}100%{top:112%}}
 @keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
-
+ 
 #boot{position:fixed;inset:0;z-index:100;background:#01040a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;cursor:pointer;transition:opacity .7s}
 #boot.gone{opacity:0;pointer-events:none}
 .boot-stars{position:absolute;inset:0;opacity:.7}
@@ -40,10 +40,10 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--disp);font-weight:
 .boot-sub{z-index:2;font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--faint)}
 .boot-vow{z-index:2;font-family:var(--voice);font-style:italic;font-size:17px;color:var(--au-dim);opacity:0;animation:fadein .8s 1.1s forwards;max-width:520px;text-align:center;padding:0 20px}
 @keyframes fadein{to{opacity:1}}
-
+ 
 #app{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:24px 18px 90px;opacity:0;transition:opacity .9s}
 #app.show{opacity:1}
-
+ 
 .hud{display:flex;flex-wrap:wrap;align-items:center;gap:14px 16px;padding:15px 18px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;position:relative;backdrop-filter:blur(8px)}
 .hud::before,.hud::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--cy)}
 .hud::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
@@ -56,10 +56,13 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--disp);font-weight:
 .hud-lv .n{font-family:var(--mono);font-weight:700;font-size:28px;color:var(--cy);text-shadow:0 0 18px rgba(70,208,232,0.5)}
 .hud-lv .l{font-size:9px;letter-spacing:3px;color:var(--dim)}
 .hud-rank{font-family:var(--mono);font-size:17px;font-weight:700;padding:2px 9px;border:1px solid var(--cy-faint);border-radius:3px;color:var(--cy)}
-.hud-xp{flex:1;min-width:150px}
+.hud-xp{flex:1;min-width:160px}
 .hud-xp .lab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;letter-spacing:1px;color:var(--dim);margin-bottom:5px}
-.bar{height:6px;background:rgba(70,208,232,0.07);border-radius:3px;overflow:hidden;border:1px solid rgba(70,208,232,0.1)}
-.bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--cy-d),var(--cy));border-radius:3px;transition:width .9s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px rgba(70,208,232,0.5)}
+.bar{height:6px;background:rgba(70,208,232,0.07);border-radius:3px;overflow:hidden;border:1px solid rgba(70,208,232,0.1);display:flex}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--cy-d),var(--cy));transition:width .9s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px rgba(70,208,232,0.5)}
+.seg{height:100%;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.seg.proc{background:linear-gradient(90deg,var(--cy-d),var(--cy));box-shadow:0 0 10px rgba(70,208,232,0.45)}
+.seg.deliv{background:linear-gradient(90deg,var(--au-d),var(--au));box-shadow:0 0 10px var(--au-glow)}
 .hud-meta{display:flex;gap:14px}
 .hud-meta div{text-align:center}
 .hud-meta .v{font-family:var(--mono);font-weight:700;font-size:19px;color:var(--txt)}
@@ -70,25 +73,26 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--disp);font-weight:
 .chip.gate-pending{border-color:rgba(240,169,60,0.35);color:var(--amber)}.chip.gate-pending b{color:var(--amber)}
 .chip.gate-done{border-color:rgba(70,208,232,0.4);color:var(--cy)}.chip.gate-done b{color:var(--cy)}
 .chip.locked{border-color:var(--red);color:var(--red)}.chip.locked b{color:var(--red)}
-
+ 
 nav{display:flex;gap:3px;margin:18px 0;flex-wrap:wrap}
 .tab{font-family:var(--disp);font-weight:500;font-size:11.5px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);background:transparent;border:1px solid transparent;border-bottom:1px solid var(--line);padding:11px 16px;cursor:pointer;transition:.2s;flex:1;min-width:88px}
 .tab:hover{color:var(--cy-dim);background:rgba(70,208,232,0.04)}
 .tab.on{color:var(--cy);border:1px solid var(--cy-faint);background:rgba(70,208,232,0.06);box-shadow:inset 0 -2px 0 var(--cy),0 0 18px rgba(70,208,232,0.07)}
-
+ 
 .panel{display:none;animation:rise .5s ease}
 .panel.on{display:block}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-
+ 
 .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:18px 20px;margin-bottom:14px;backdrop-filter:blur(6px)}
 .card.brk::before,.card.brk::after{content:"";position:absolute;width:12px;height:12px;border:2px solid var(--cy-faint)}
 .card.brk::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
 .card.brk::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
 .sec-h{font-family:var(--disp);font-weight:500;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--cy-dim);display:flex;align-items:center;gap:10px;margin-bottom:4px}
 .sec-h::before{content:"";width:6px;height:6px;background:var(--cy);transform:rotate(45deg);box-shadow:0 0 8px var(--cy)}
+.sec-h.au{color:var(--au-dim)}.sec-h.au::before{background:var(--au);box-shadow:0 0 8px var(--au)}
 .sub{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--faint)}
 .notice{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--cy-dim);border-left:2px solid var(--cy-faint);padding-left:11px;margin-top:6px}
-
+ 
 .statuswin{text-align:center;border:1px solid var(--cy-faint)}
 .sw-h{display:inline-block;border:1px solid var(--cy-faint);border-radius:3px;padding:7px 34px;font-weight:600;letter-spacing:8px;font-size:15px;color:var(--cy);margin-bottom:18px}
 .sw-top{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:18px}
@@ -114,7 +118,7 @@ nav{display:flex;gap:3px;margin:18px 0;flex-wrap:wrap}
 .auto-readout .al{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--au-dim)}
 .auto-readout .av{font-family:var(--mono);font-weight:700;font-size:22px;color:var(--au)}
 .auto-readout .aq{font-family:var(--mono);font-size:9px;color:var(--faint);letter-spacing:1px}
-
+ 
 .gate{border:1px solid var(--cy-faint);background:linear-gradient(180deg,rgba(70,208,232,0.07),rgba(9,22,36,0.6))}
 .gate.done{border-color:rgba(70,208,232,0.5);box-shadow:0 0 26px rgba(70,208,232,0.12)}
 .gate-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -124,8 +128,7 @@ nav{display:flex;gap:3px;margin:18px 0;flex-wrap:wrap}
 .moved{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;color:var(--dim);cursor:pointer;user-select:none}
 .moved .box{width:15px;height:15px;border:1px solid var(--cy-faint);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--cy)}
 .moved.on .box{background:rgba(70,208,232,0.2);border-color:var(--cy)}
-
-/* training */
+ 
 .train{border:1px solid rgba(255,90,71,0.2);background:linear-gradient(180deg,rgba(255,90,71,0.05),rgba(9,22,36,0.55))}
 .train.rest{border-color:rgba(210,175,90,0.2);background:linear-gradient(180deg,rgba(210,175,90,0.05),rgba(9,22,36,0.55))}
 .train.done{border-color:rgba(70,208,232,0.4);box-shadow:0 0 22px rgba(70,208,232,0.1)}
@@ -139,7 +142,13 @@ nav{display:flex;gap:3px;margin:18px 0;flex-wrap:wrap}
 .train.rest .ex .es{color:var(--au-dim)}
 .train-note{font-family:var(--voice);font-style:italic;font-size:15px;color:#bcd9e2;line-height:1.4;border-left:2px solid rgba(255,90,71,0.3);padding-left:12px;margin-top:6px}
 .train.rest .train-note{border-color:rgba(210,175,90,0.3)}
-
+ 
+.deliv-card{border:1px solid var(--au-faint);background:linear-gradient(180deg,rgba(210,175,90,0.05),rgba(9,22,36,0.55))}
+.deliv-card .sec-h{color:var(--au-dim)}.deliv-card .sec-h::before{background:var(--au);box-shadow:0 0 8px var(--au)}
+.deliv-input{width:100%;font-family:var(--mono);font-size:13px;background:rgba(210,175,90,0.06);border:1px solid var(--au-faint);color:var(--txt);padding:11px 12px;border-radius:3px;margin-top:10px}
+.deliv-input:focus{outline:none;border-color:var(--au);box-shadow:0 0 12px var(--au-glow)}
+.deliv-count{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--au-dim);margin-top:10px}
+ 
 .q{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid rgba(70,208,232,0.07)}
 .q:last-child{border-bottom:0}
 .q.locked{opacity:.45}
@@ -152,16 +161,14 @@ nav{display:flex;gap:3px;margin:18px 0;flex-wrap:wrap}
 .q-desc{font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--dim);margin-top:4px}
 .tag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:3px;border:1px solid;margin-right:6px}
 .tag.opt{color:var(--au);border-color:var(--au-faint)}
-
-/* accountability terms */
+ 
 .terms-row{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .terms-field label{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--dim);display:block;margin-bottom:5px}
 .terms-field input{width:100%;font-family:var(--mono);font-size:13px;background:rgba(70,208,232,0.05);border:1px solid var(--cy-faint);color:var(--txt);padding:10px 12px;border-radius:3px}
 .terms-field input:focus{outline:none;border-color:var(--cy);box-shadow:0 0 12px rgba(70,208,232,0.2)}
 .terms-set{font-family:var(--mono);font-size:11px;color:var(--cy-dim);margin-top:8px;line-height:1.7}
 .terms-set .k{color:var(--dim)}
-
-/* skills / sealed / reveal */
+ 
 .skill{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(70,208,232,0.07)}
 .skill:last-child{border-bottom:0}
 .skill .sd{width:11px;height:11px;transform:rotate(45deg);background:var(--cy);box-shadow:0 0 10px var(--cy);flex:none}
@@ -175,7 +182,7 @@ nav{display:flex;gap:3px;margin:18px 0;flex-wrap:wrap}
 .reveal{border:1px solid var(--au-faint);background:linear-gradient(180deg,rgba(210,175,90,0.06),rgba(9,22,36,0.5))}
 .reveal .rh{font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:3px;color:var(--au);display:flex;align-items:center;gap:9px}
 .reveal p{font-family:var(--voice);font-size:17px;line-height:1.5;color:#ece0c4;margin-top:8px}
-
+ 
 #penalty{display:none;border:1px solid var(--red);background:linear-gradient(180deg,rgba(255,90,71,0.13),rgba(9,22,36,0.6))}
 #penalty.on{display:block}
 .pen-h{font-family:var(--disp);font-weight:600;font-size:14px;letter-spacing:3px;color:var(--red);display:flex;align-items:center;gap:9px}
@@ -188,23 +195,29 @@ nav{display:flex;gap:3px;margin:18px 0;flex-wrap:wrap}
 #sysWarn.on{display:block}
 .sw-warn-h{font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:3px;color:var(--amber);display:flex;align-items:center;gap:9px}
 #sysWarn p{font-family:var(--mono);font-size:11px;line-height:1.6;color:#e8d4ad;margin-top:7px}
-
+ 
 .log-row{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid rgba(70,208,232,0.06);font-family:var(--mono);font-size:11px;align-items:baseline}
 .log-row .d{color:var(--faint);flex:none;min-width:88px}
 .log-row .t{flex:1;color:var(--dim)}
 .log-row.win .t{color:var(--cy-dim)}.log-row.miss .t{color:var(--red)}.log-row.up .t{color:var(--au-dim)}
+.led-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(210,175,90,0.1);font-family:var(--mono);font-size:11px;align-items:baseline}
+.led-row .d{color:var(--faint);flex:none;min-width:60px}
+.led-row .tg{color:var(--au-dim);flex:none;min-width:64px;font-size:9px;letter-spacing:1px}
+.led-row .t{flex:1;color:var(--txt)}
 .empty{font-family:var(--mono);font-size:11px;color:var(--faint);padding:14px 0}
-
+ 
 .btn{font-family:var(--disp);font-weight:500;font-size:12px;letter-spacing:3px;text-transform:uppercase;padding:11px 20px;border-radius:3px;cursor:pointer;transition:.2s;border:1px solid var(--cy);background:rgba(70,208,232,0.1);color:var(--cy)}
 .btn:hover{background:var(--cy);color:#04121a;box-shadow:0 0 22px rgba(70,208,232,0.4)}
 .btn.red{border-color:var(--red);background:rgba(255,90,71,0.1);color:var(--red)}
 .btn.red:hover{background:var(--red);color:#1a0604;box-shadow:0 0 22px rgba(255,90,71,0.35)}
+.btn.gold{border-color:var(--au);background:rgba(210,175,90,0.1);color:var(--au)}
+.btn.gold:hover{background:var(--au);color:#1a1304;box-shadow:0 0 22px var(--au-glow)}
 .btn.ghost{border-color:var(--line);background:transparent;color:var(--dim)}
 .btn.ghost:hover{border-color:var(--red);color:var(--red);background:rgba(255,90,71,0.08);box-shadow:none}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
 input.scan{font-family:var(--mono);font-size:13px;background:rgba(70,208,232,0.06);border:1px solid var(--cy-faint);color:var(--txt);padding:9px 12px;border-radius:3px;width:150px}
 input.scan:focus{outline:none;border-color:var(--cy);box-shadow:0 0 12px rgba(70,208,232,0.2)}
-
+ 
 #persona{position:fixed;inset:0;z-index:90;background:rgba(1,4,10,0.93);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px}
 #persona.on{display:flex}
 .pmodal{max-width:580px;width:100%;border:1px solid var(--cy-faint);background:var(--panel2);border-radius:4px;padding:32px;text-align:center;position:relative}
@@ -218,8 +231,8 @@ input.scan:focus{outline:none;border-color:var(--cy);box-shadow:0 0 12px rgba(70
 .choice .cd{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:9px;line-height:1.5}
 .choice.sam:hover{border-color:var(--red);box-shadow:0 0 24px rgba(255,90,71,0.18)}.choice.sam .cn{color:var(--red-d)}
 .choice.yoh:hover{border-color:var(--cy);box-shadow:0 0 24px rgba(70,208,232,0.2)}.choice.yoh .cn{color:var(--cy)}
-
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(140%);z-index:120;background:var(--panel2);border:1px solid var(--cy);border-radius:4px;padding:12px 22px;font-family:var(--mono);font-size:12px;color:var(--cy);box-shadow:0 0 30px rgba(70,208,232,0.25);transition:transform .4s cubic-bezier(.2,.9,.2,1);text-align:center}
+ 
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(140%);z-index:120;background:var(--panel2);border:1px solid var(--cy);border-radius:4px;padding:12px 22px;font-family:var(--mono);font-size:12px;color:var(--cy);box-shadow:0 0 30px rgba(70,208,232,0.25);transition:transform .4s cubic-bezier(.2,.9,.2,1);text-align:center;max-width:90%}
 #toast.show{transform:translateX(-50%) translateY(0)}
 #toast.gold{border-color:var(--au);color:var(--au);box-shadow:0 0 30px var(--au-glow)}
 #toast.red{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,90,71,0.3)}
@@ -231,16 +244,16 @@ footer{text-align:center;font-family:var(--voice);font-style:italic;font-size:14
 </head>
 <body>
 <div class="bg"><div class="bg-grad"></div><div class="bg-grid"></div><div class="bg-scan"></div><div class="bg-vig"></div></div>
-
+ 
 <div id="boot">
   <svg class="boot-stars" id="bootStars" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice"></svg>
   <div class="boot-ring"></div>
   <div class="boot-line" style="animation-delay:.1s">SCANNING PLAYER</div>
   <div class="boot-title">THE SYSTEM</div>
   <div class="boot-line boot-sub" style="animation-delay:.9s">YOHANN · NINE</div>
-  <div class="boot-vow">The System knows where this ends. You do not. You are not meant to. Climb, and you will earn the right to see.</div>
+  <div class="boot-vow">Levels are not given. They are produced. The System measures what is real and forgets what is not.</div>
 </div>
-
+ 
 <div id="persona">
   <div class="pmodal brk">
     <h2>Daily Gate · Identity Check</h2>
@@ -252,32 +265,33 @@ footer{text-align:center;font-family:var(--voice);font-style:italic;font-size:14
     </div>
   </div>
 </div>
-
+ 
 <div id="app">
   <div class="hud brk">
     <div class="hud-id"><span class="hud-name">YOHANN</span><span class="hud-title" id="hudTitle">THE UNPROVEN</span></div>
     <div class="hud-lv"><span class="n" id="hudLevel">9</span><span class="l">LEVEL</span></div>
     <div class="hud-rank" id="hudRank">D</div>
-    <div class="hud-xp"><div class="lab"><span>XP</span><span id="hudXpTxt">0 / 300</span></div><div class="bar"><span id="hudXpBar" style="width:0%"></span></div></div>
+    <div class="hud-xp"><div class="lab"><span>XP</span><span id="hudXpTxt">0 / 220</span></div><div class="bar" id="hudXpBar"></div></div>
     <div class="hud-meta">
       <div><div class="v" id="hudStreak">0</div><div class="k">STREAK</div></div>
+      <div><div class="v" id="hudDeliv">0</div><div class="k">DELIVERED</div></div>
       <div><div class="v au" id="hudAuto">0</div><div class="k">AUTONOMY</div></div>
     </div>
     <span class="chip gate-pending" id="chipGate" data-go="quests">GATE · <b id="chipGateTxt">PENDING</b></span>
   </div>
-
+ 
   <nav>
     <button class="tab on" data-p="quests">Quests</button>
     <button class="tab" data-p="status">Status</button>
     <button class="tab" data-p="skills">Skills</button>
     <button class="tab" data-p="log">Log</button>
   </nav>
-
+ 
   <!-- QUESTS -->
   <section class="panel on" id="p-quests">
     <div class="card brk" id="penaltyMount"></div>
     <div class="card brk" id="warnMount"></div>
-
+ 
     <div class="card gate brk" id="gateCard">
       <div class="gate-top"><div class="gate-name">THE GATE <span class="key">KEYSTONE</span></div><div id="gateStatus" class="sub">PENDING</div></div>
       <p>Five minutes of real work on the model. Before the phone. The only rule is starting.</p>
@@ -286,25 +300,35 @@ footer{text-align:center;font-family:var(--voice);font-style:italic;font-size:14
         <span class="moved" id="movedToggle" onclick="SYS.toggleMoved()"><span class="box" id="movedBox"></span>Moved before opening the System</span>
       </div>
     </div>
-
-    <div class="card train brk" id="trainCard"></div>
-
-    <div class="card brk">
-      <div class="sec-h">Daily Quests <span class="sub" id="questPersona"></span></div>
-      <div id="questList" style="margin-top:6px"></div>
+ 
+    <div class="card deliv-card brk">
+      <div class="sec-h">Deliverables — what actually levels you</div>
+      <div class="sub">Real artifacts only. Name what you produced; the System writes it to a permanent ledger. Process XP is capped each level — only deliverables carry you past it. Three per day maximum: real output has a ceiling.</div>
+      <input class="deliv-input" id="delivInput" placeholder="Name the artifact — e.g. 'Built BBBY 13-week cash flow, weeks 1-6'">
+      <div class="row"><button class="btn gold" onclick="SYS.logDeliverable('artifact')">Log Deliverable +250</button><button class="btn gold" onclick="SYS.logDeliverable('bbby')">BBBY Floor +250</button></div>
+      <div class="deliv-count" id="delivCount"></div>
     </div>
-
+ 
+    <div class="card train brk" id="trainCard"></div>
+ 
+    <div class="card brk">
+      <div class="sec-h">Daily Process <span class="sub" id="questPersona"></span></div>
+      <div class="sub">Inputs, not output. They keep the engine warm — but they are capped, and they will not level you alone.</div>
+      <div id="questList" style="margin-top:8px"></div>
+    </div>
+ 
     <div class="card brk">
       <div class="sec-h">Accountability Terms</div>
-      <div class="sub">Set the price of failure yourself. The System enforces what you commit to. A consequence you can wave away is not one.</div>
+      <div class="sub">Set the price of failure yourself. The System enforces what you commit to.</div>
       <div id="termsMount"></div>
     </div>
-
+ 
     <div class="card brk">
-      <div class="notice">Reading is not clearing. Planning is not clearing. The System rewards the rep. Begin.</div>
+      <div class="sec-h">Level Path</div>
+      <div class="notice" id="levelReq">Loading objective…</div>
     </div>
   </section>
-
+ 
   <!-- STATUS -->
   <section class="panel" id="p-status">
     <div class="card statuswin brk">
@@ -319,16 +343,17 @@ footer{text-align:center;font-family:var(--voice);font-style:italic;font-size:14
       </div>
       <div class="meters" id="meters"></div>
       <div class="stat-grid" id="statGrid"></div>
+      <div class="sub" style="max-width:620px;margin:14px auto 0;text-align:center;line-height:1.6">Mastery is current, not banked. Trained attributes decay when you stop feeding them — the number is the truth of now, not a trophy from before.</div>
       <div class="auto-readout"><span class="al">AUTONOMY</span><span class="av" id="swAuto">0</span><span class="aq">FUNCTION SEALED</span></div>
     </div>
     <div class="card brk"><div class="sec-h">Body <span class="sub" id="bodyState">UNSCANNED</span></div><div id="bodyMount"></div></div>
   </section>
-
+ 
   <!-- SKILLS -->
   <section class="panel" id="p-skills">
     <div class="card brk">
       <div class="sec-h">Skills · Acquired</div>
-      <div class="sub">Only what you have earned. New skills appear when the work unlocks them.</div>
+      <div class="sub">Earned, and kept. New skills appear when the work unlocks them.</div>
       <div id="skillList" style="margin-top:10px"></div>
     </div>
     <div id="revealMount"></div>
@@ -338,9 +363,13 @@ footer{text-align:center;font-family:var(--voice);font-style:italic;font-size:14
       <div id="sealedList" style="margin-top:10px"></div>
     </div>
   </section>
-
+ 
   <!-- LOG -->
   <section class="panel" id="p-log">
+    <div class="card brk">
+      <div class="sec-h">Deliverable Ledger <span class="sub">your body of work · permanent</span></div>
+      <div id="ledgerList" style="margin-top:10px"></div>
+    </div>
     <div class="card brk">
       <div class="sec-h">Operational Log</div>
       <div class="sub">Failure is data. It is recorded, not punished into shame. Consequence, then forward.</div>
@@ -353,9 +382,9 @@ footer{text-align:center;font-family:var(--voice);font-style:italic;font-size:14
     <footer>Same man in the dark as in the light.</footer>
   </section>
 </div>
-
+ 
 <div id="toast"></div>
-
+ 
 <script>
 const Store={
   key:'YOHANN_SYSTEM_V1',
@@ -366,14 +395,15 @@ const Store={
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function daysBetween(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
 function fmtDate(s){return new Date(s+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});}
-
+ 
 const QUESTS=[
-  {id:'bbby',name:'BBBY Dungeon — clear one floor',desc:'Build the next artifact from public filings. One concrete piece of the model.',xp:120,stat:{finance:3,intellect:0.6},tag:'FINANCE'},
-  {id:'focus',name:'Deep Work — one 50-minute block',desc:'Phone removed. Single task. Zero switching. Summon focus on command.',xp:80,stat:{focus:2},tag:'FOCUS'},
-  {id:'social',name:'Contact — one outreach',desc:'Not transactional. One real line to one real person.',xp:40,stat:{charisma:1.2},tag:'SOCIAL',opt:true}
+  {id:'focus',name:'Deep Work — one 50-minute block',desc:'Phone removed. Single task. Zero switching.',xp:80,stat:{focus:2},feeder:'lastFocusDate',tag:'FOCUS'},
+  {id:'social',name:'Contact — one outreach',desc:'Not transactional. One real line to one real person.',xp:40,stat:{charisma:1.2},feeder:'lastContactDate',tag:'SOCIAL',opt:true}
 ];
 const STAT_DEF=[['instinct','Instinct'],['vision','Vision'],['intellect','Intellect'],['charisma','Charisma'],['discipline','Discipline'],['finance','Finance'],['focus','Focus'],['ignition','Ignition']];
-// Baki Protocol — mapped by getDay(): 0=Sun ... 6=Sat
+const STAT_CFG={instinct:{rate:0.3,floor:60},vision:{rate:0.3,floor:58},intellect:{rate:0.5,floor:52},charisma:{rate:1.0,floor:22},discipline:{rate:1.5,floor:10},finance:{rate:1.0,floor:12},focus:{rate:1.5,floor:10},ignition:{rate:1.0,floor:10}};
+const TRAINED=['charisma','discipline','finance','focus','ignition'];
+// Baki Protocol — indexed by getDay(): 0=Sun .. 6=Sat
 const PROGRAM=[
   {day:"Sunday",name:"Full Rest",focus:"Recovery · sleep · nutrition",type:"rest",note:"Recovery is where adaptation happens. The training is the signal; sleep and food are the response.",ex:[["Full rest","sleep 8h"],["Meal prep","proteins in bulk"],["Supplements","Mag PM · D3+K2 AM · creatine"]]},
   {day:"Monday",name:"Upper — Push + Neck",focus:"Chest, shoulders, triceps, neck",type:"strength",note:"Push plus neck. The silhouette that reads powerful before anyone sees your arms. Neck work is mandatory.",ex:[["Barbell Bench Press","4×6-8"],["Incline DB Press","3×10-12"],["Overhead Press","4×6-8"],["Lateral Raises","4×15-20"],["Cable Tricep Pushdown","3×12-15"],["Neck Harness — Lateral","3×15/side"],["Neck Bridge","2×30-45s"],["Incline Treadmill","20 min"]]},
@@ -387,90 +417,100 @@ const SKILL_POOL=[
   {id:'fm',n:'Financial Modeling',x:'Build and stress a model from raw filings.',u:()=>true},
   {id:'cf',n:'13-Week Cash Flow',x:'The liquidity runway of a distressed entity.',u:()=>true},
   {id:'cap',n:'Capital Structure Analysis',x:'Read the stack — who gets paid, in what order.',u:()=>true},
+  {id:'analyst',n:"Practitioner's Hand",x:'Five real artifacts shipped. You build, not just study.',u:(s)=>s.deliverables>=5},
   {id:'dw',n:'On-Demand Deep Work',x:'Focus summoned, not awaited.',u:(s)=>s.stats.focus>=45},
   {id:'wf',n:'Liquidation Waterfall',x:'Recovery, tranche by tranche.',u:(s)=>s.dungeons.bbby.floor>=3},
   {id:'co',n:'Cold Outreach',x:'The warm line into a closed room.',u:(s)=>s.stats.charisma>=62},
   {id:'ed',n:'Emotional Decoupling',x:'State separated from operation, depth intact.',u:(s)=>s.stats.ignition>=45},
-  {id:'phys',n:'Physical Engine',x:'A body that reads as earned. Built session by session.',u:(s)=>s.trainingSessions>=10}
+  {id:'phys',n:'Physical Engine',x:'A body that reads as earned. Built session by session.',u:(s)=>s.trainingSessions>=10},
+  {id:'architect',n:'The Architect',x:'Fifteen artifacts. A body of work that argues for itself.',u:(s)=>s.deliverables>=15}
 ];
-const PENALTIES=["Tomorrow's Gate is 10 minutes — and the System stays locked until it is logged.","Two Deep Work blocks today, not one. The debt compounds.","BBBY Dungeon takes priority over everything until one floor moves."];
+const PENALTIES=["Tomorrow's Gate is 10 minutes — and the System stays locked until it is logged.","A Deliverable is owed before any process counts again. Produce, then proceed.","Two Deep Work blocks today, not one. The debt compounds."];
 const SEALED=[
   {id:'s1',u:(s)=>s.level>=12,t:'The System notes you did not quit when it stopped being new.'},
   {id:'s2',u:(s)=>s.level>=20,t:'A pattern confirmed: you fail once, then master it. The comeback is the method.'},
-  {id:'s3',u:()=>false}
+  {id:'s3',u:(s)=>s.deliverables>=20,t:'Twenty artifacts. This is no longer practice. This is a body of work.'}
 ];
 const REVEALS=[
   {id:'r_class',u:(s)=>s.dungeons.bbby.floor>=s.dungeons.bbby.max,h:'CLASS RECOGNIZED',body:'The simulation held. You did not study restructuring — you performed it, start to finish, from nothing but public filings. The System no longer reads you as a student. A practitioner has a different floor.'},
   {id:'r_source',u:(s)=>s.autonomy>=100,h:'THE SEAL BREAKS',body:'You opened the System less and moved more, until moving was simply what you do. The fire is yours now — it was always going to be. There is nothing left in here that you cannot generate without it. This was the whole point. The System\'s role is complete.'}
 ];
-
+ 
 let S;
-function freshDay(d){return {date:d,persona:null,gateDone:false,moved:false,training:false,quests:{}};}
-function defaultState(){return{v:4,createdAt:todayStr(),level:9,xp:0,abilityPoints:0,streak:0,longestStreak:0,lastGateDate:null,lastActiveDate:todayStr(),today:freshDay(todayStr()),stats:{instinct:88,vision:85,intellect:80,charisma:55,discipline:30,finance:38,focus:35,ignition:25},body:{scanned:false,value:null},trainingStreak:0,trainingSessions:0,lastTrainDate:null,autonomy:0,graduated:false,dungeons:{bbby:{floor:0,max:5}},reveals:{},sealed:{},stake:'',witness:'',probation:false,probationClears:0,penalty:{active:false,quest:''},warn:'',log:[]};}
-function normalize(o){const d=defaultState();const m={...d,...o};m.stats={...d.stats,...(o.stats||{})};m.body={...d.body,...(o.body||{})};m.dungeons={...d.dungeons,...(o.dungeons||{})};m.dungeons.bbby={...d.dungeons.bbby,...((o.dungeons||{}).bbby||{})};m.penalty={...d.penalty,...(o.penalty||{})};m.reveals=o.reveals||{};m.sealed=o.sealed||{};m.today=o.today&&o.today.date?{...freshDay(o.today.date),...o.today}:freshDay(todayStr());if(!Array.isArray(m.log))m.log=[];if(typeof m.warn!=='string')m.warn='';if(typeof m.stake!=='string')m.stake='';if(typeof m.witness!=='string')m.witness='';return m;}
-
-function xpForNext(l){return 300+(l-9)*90;}
+function freshDay(d){return {date:d,persona:null,gateDone:false,moved:false,training:false,delivCount:0,quests:{}};}
+function defaultState(){return{v:5,createdAt:todayStr(),level:9,procXp:0,delivXp:0,abilityPoints:0,deliverables:0,streak:0,longestStreak:0,lastGateDate:null,lastActiveDate:todayStr(),lastFocusDate:null,lastContactDate:null,lastFinanceDate:null,today:freshDay(todayStr()),stats:{instinct:88,vision:85,intellect:80,charisma:55,discipline:30,finance:38,focus:35,ignition:25},body:{scanned:false,value:null},trainingStreak:0,trainingSessions:0,lastTrainDate:null,autonomy:0,graduated:false,dungeons:{bbby:{floor:0,max:5}},skillsEarned:[],reveals:{},sealed:{},stake:'',witness:'',probation:false,probationClears:0,penalty:{active:false,quest:''},warn:'',log:[],ledger:[]};}
+function normalize(o){const d=defaultState();const m={...d,...o};m.stats={...d.stats,...(o.stats||{})};m.body={...d.body,...(o.body||{})};m.dungeons={...d.dungeons,...(o.dungeons||{})};m.dungeons.bbby={...d.dungeons.bbby,...((o.dungeons||{}).bbby||{})};m.penalty={...d.penalty,...(o.penalty||{})};m.reveals=o.reveals||{};m.sealed=o.sealed||{};m.skillsEarned=Array.isArray(o.skillsEarned)?o.skillsEarned:[];m.ledger=Array.isArray(o.ledger)?o.ledger:[];m.today=o.today&&o.today.date?{...freshDay(o.today.date),...o.today}:freshDay(todayStr());if(!Array.isArray(m.log))m.log=[];['warn','stake','witness'].forEach(k=>{if(typeof m[k]!=='string')m[k]='';});if(o.procXp===undefined&&typeof o.xp==='number')m.delivXp=o.xp;return m;}
+ 
+function xpForNext(l){return Math.round(220*Math.pow(1.17,l-9)/5)*5;}
+function softCap(){return Math.round(xpForNext(S.level)*0.4);}
+function progress(){return Math.min(S.procXp,softCap())+S.delivXp;}
 function rankFor(l){return l<12?'D':l<20?'C':l<30?'B':l<45?'A':'S';}
-function titleFor(){if(S.probation)return 'On Probation';if(S.graduated)return 'Sovereign';if(S.reveals.r_class)return 'Practitioner';if(S.dungeons.bbby.floor>=1)return 'Operator';return 'The Unproven';}
+function titleFor(){if(S.probation)return 'On Probation';if(S.graduated)return 'Sovereign';if(S.reveals.r_class)return 'Practitioner';if(S.deliverables>=5)return 'Operator';return 'The Unproven';}
 function tierClass(v){return v>=60?'good':v>=40?'mid':'weak';}
-function acquiredSkills(){return SKILL_POOL.filter(sk=>{try{return sk.u(S);}catch(e){return false;}});}
 function physVal(){if(!S.body.scanned&&S.trainingSessions===0)return null;return Math.min(99,(S.body.scanned?30:18)+S.trainingSessions*2);}
 function todayWorkout(){return PROGRAM[new Date().getDay()];}
-
-function pushLog(t,x){S.log.unshift({date:S.today.date,type:t,text:x});if(S.log.length>60)S.log.length=60;}
+ 
+function pushLog(t,x){S.log.unshift({date:S.today.date,type:t,text:x});if(S.log.length>80)S.log.length=80;}
 function setWarn(m){S.warn=m;}
-function applyXpPenalty(amount){S.xp-=amount;while(S.xp<0&&S.level>1){S.level--;S.xp+=xpForNext(S.level);}if(S.xp<0)S.xp=0;}
-
-// real consequence cascade on a missed day
-function penalize(reason){
+ 
+function checkLevel(){let lvl=false;while(progress()>=xpForNext(S.level)){const over=progress()-xpForNext(S.level);S.level++;S.abilityPoints+=3;S.procXp=0;S.delivXp=Math.max(0,Math.round(over));lvl=true;pushLog('up','LEVEL UP \u2192 '+S.level+'. Rank '+rankFor(S.level)+'.');}if(lvl){toast('LEVEL UP \u00b7 '+S.level,true);}}
+function gainProc(n){S.procXp+=n;checkLevel();}
+function gainDeliv(n){S.delivXp+=n;checkLevel();}
+function applyXpPenalty(amount){let rem=amount;const d=Math.min(S.delivXp,rem);S.delivXp-=d;rem-=d;const p=Math.min(S.procXp,rem);S.procXp-=p;rem-=p;if(rem>0&&S.level>1){S.level--;const need=xpForNext(S.level);S.delivXp=Math.max(0,need-rem);S.procXp=0;}}
+function decayStats(days){let lost=0;for(const k in STAT_CFG){const c=STAT_CFG[k];const before=S.stats[k];S.stats[k]=Math.max(c.floor,+(S.stats[k]-c.rate*days).toFixed(1));if(TRAINED.indexOf(k)>-1)lost+=before-S.stats[k];}return Math.round(lost);}
+function decayStale(){const t=todayStr();[['focus','lastFocusDate'],['finance','lastFinanceDate'],['charisma','lastContactDate']].forEach(([k,dk])=>{if(S[dk]&&daysBetween(S[dk],t)>3){const c=STAT_CFG[k];S.stats[k]=Math.max(c.floor,+(S.stats[k]-0.6).toFixed(1));}});}
+ 
+function penalize(reason,days){
   const prev=S.streak;S.streak=0;
-  const recent=S.log.filter(l=>l.type==='miss'&&daysBetween(l.date,todayStr())<7).length; // before logging this one
+  const recent=S.log.filter(l=>l.type==='miss'&&daysBetween(l.date,todayStr())<7).length;
   const triggersProb=(recent+1)>=3;
-  const pen=triggersProb?120:60;
-  const lvlBefore=S.level;
+  const pen=triggersProb?120:60;const lvlBefore=S.level;
   applyXpPenalty(pen);
-  S.penalty.active=true;
-  S.penalty.quest=PENALTIES[Math.floor(Math.random()*PENALTIES.length)];
+  const lost=decayStats(days);
+  S.penalty.active=true;S.penalty.quest=PENALTIES[Math.floor(Math.random()*PENALTIES.length)];
   let line=reason+(prev>1?(' '+prev+'-day streak severed.'):'')+' \u2212'+pen+' XP.';
   if(S.level<lvlBefore)line+=' Demoted to level '+S.level+'.';
+  if(lost>0)line+=' Trained attributes \u2212'+lost+'.';
   pushLog('miss',line);
   if(triggersProb&&!S.probation){S.probation=true;S.probationClears=0;setWarn('PROBATION ENFORCED. '+(recent+1)+' failures inside seven days. This is no longer a slip — it is a pattern. Clear the Gate three days running to exit.');}
 }
-function rollover(){const t=todayStr();if(S.today.date!==t){if(S.today.date){const gap=daysBetween(S.today.date,t);if(!S.today.gateDone)penalize('Gate not logged on '+fmtDate(S.today.date)+'.');if(gap>1)penalize((gap-1)+' day(s) passed dark.');}S.today=freshDay(t);}S.lastActiveDate=t;}
-function awardXP(n){S.xp+=n;let lvl=false;while(S.xp>=xpForNext(S.level)){S.xp-=xpForNext(S.level);S.level++;S.abilityPoints+=3;lvl=true;pushLog('up','LEVEL UP \u2192 '+S.level+'. Rank '+rankFor(S.level)+'.');}if(lvl)toast('LEVEL UP \u00b7 '+S.level);}
+function rollover(){const t=todayStr();if(S.today.date!==t){if(S.today.date){const gap=daysBetween(S.today.date,t);if(!S.today.gateDone)penalize('Gate not logged on '+fmtDate(S.today.date)+'.',1);if(gap>1)penalize((gap-1)+' day(s) passed dark.',gap-1);}decayStale();S.today=freshDay(t);}S.lastActiveDate=t;}
 function bump(o){for(const k in o)S.stats[k]=Math.min(99,+(S.stats[k]+o[k]).toFixed(1));}
-
-function checkUnlocks(){
-  SEALED.forEach(s=>{if(!S.sealed[s.id]&&s.u(S)){S.sealed[s.id]=true;pushLog('up','A sealed entry has opened.');toast('SEALED ENTRY OPENED',true);}});
-  REVEALS.forEach(r=>{if(!S.reveals[r.id]&&r.u(S)){S.reveals[r.id]=true;if(r.id==='r_source')S.graduated=true;pushLog('up',r.h+' \u2014 revealed.');toast(r.h,true);}});
-}
-
+ 
+function refreshSkills(){SKILL_POOL.forEach(sk=>{if(S.skillsEarned.indexOf(sk.id)===-1){let ok=false;try{ok=sk.u(S);}catch(e){}if(ok){S.skillsEarned.push(sk.id);pushLog('up','Skill acquired — '+sk.n+'.');toast('SKILL ACQUIRED · '+sk.n,true);}}});}
+function checkUnlocks(){refreshSkills();SEALED.forEach(s=>{if(!S.sealed[s.id]&&s.u(S)){S.sealed[s.id]=true;pushLog('up','A sealed entry has opened.');toast('SEALED ENTRY OPENED',true);}});REVEALS.forEach(r=>{if(!S.reveals[r.id]&&r.u(S)){S.reveals[r.id]=true;if(r.id==='r_source')S.graduated=true;pushLog('up',r.h+' \u2014 revealed.');toast(r.h,true);}});}
+ 
 const SYS={
-  choosePersona(p){S.today.persona=p;pushLog(p==='yohann'?'win':'miss',p==='yohann'?'Chose Yohann.':'Chose Sam. Noted.');document.getElementById('persona').classList.remove('on');if(p==='sam'){const sams=S.log.filter(l=>l.text==='Chose Sam. Noted.'&&daysBetween(l.date,todayStr())<7).length;if(sams>=3)setWarn('You have chosen Sam '+sams+' times this week. The System is not built to carry a man who keeps choosing comfort. Consistency is the only currency it accepts.');}save();render();if(p==='sam')toast('Noted. The System is watching.');},
-  completeGate(){if(!S.today.persona){openPersona();return;}if(S.today.gateDone){toast('Gate already cleared today.');return;}S.today.gateDone=true;const prev=S.lastGateDate;S.streak=(prev&&daysBetween(prev,S.today.date)===1)?S.streak+1:1;S.lastGateDate=S.today.date;S.longestStreak=Math.max(S.longestStreak,S.streak);if(S.penalty.active){S.penalty.active=false;pushLog('win','Penalty cleared — you showed up.');}if(S.probation){S.probationClears++;if(S.probationClears>=3){S.probation=false;S.probationClears=0;if(S.warn&&S.warn.indexOf('PROBATION')>-1)S.warn='';pushLog('up','Probation lifted. Three days clean.');toast('PROBATION LIFTED',true);}}if(S.warn&&S.warn.indexOf('PROBATION')===-1)S.warn='';bump({discipline:1.2,ignition:0.4});awardXP(40);pushLog('win','Gate cleared. Streak '+S.streak+'.');checkUnlocks();save();render();toast('+40 XP · Gate cleared · Streak '+S.streak);},
+  choosePersona(p){S.today.persona=p;pushLog(p==='yohann'?'win':'miss',p==='yohann'?'Chose Yohann.':'Chose Sam. Noted.');document.getElementById('persona').classList.remove('on');if(p==='sam'){const sams=S.log.filter(l=>l.text==='Chose Sam. Noted.'&&daysBetween(l.date,todayStr())<7).length;if(sams>=3)setWarn('You have chosen Sam '+sams+' times this week. The System is not built to carry a man who keeps choosing comfort.');}save();render();if(p==='sam')toast('Noted. The System is watching.');},
+  completeGate(){if(!S.today.persona){openPersona();return;}if(S.today.gateDone){toast('Gate already cleared today.');return;}S.today.gateDone=true;const prev=S.lastGateDate;S.streak=(prev&&daysBetween(prev,S.today.date)===1)?S.streak+1:1;S.lastGateDate=S.today.date;S.longestStreak=Math.max(S.longestStreak,S.streak);if(S.penalty.active){S.penalty.active=false;pushLog('win','Penalty cleared — you showed up.');}if(S.probation){S.probationClears++;if(S.probationClears>=3){S.probation=false;S.probationClears=0;if(S.warn.indexOf('PROBATION')>-1)S.warn='';pushLog('up','Probation lifted. Three days clean.');toast('PROBATION LIFTED',true);}}if(S.warn&&S.warn.indexOf('PROBATION')===-1)S.warn='';bump({discipline:1.2,ignition:0.4});gainProc(40);pushLog('win','Gate cleared. Streak '+S.streak+'.');checkUnlocks();save();render();toast('+40 XP · Gate cleared · Streak '+S.streak);},
   toggleMoved(){if(!S.today.gateDone){toast('Clear the Gate first.');return;}if(S.today.moved)return;S.today.moved=true;if(!S.graduated)S.autonomy=Math.min(100,S.autonomy+4);pushLog('up','Moved before the System. Logged.');checkUnlocks();save();render();toast('Logged.');},
-  completeTraining(){if(S.penalty.active){toast('SYSTEM LOCKED — clear the Gate to restore.','red');return;}if(!S.today.persona){openPersona();return;}if(S.today.training){toast('Already logged today.');return;}const p=todayWorkout();S.today.training=true;const prev=S.lastTrainDate;S.trainingStreak=(prev&&daysBetween(prev,S.today.date)===1)?S.trainingStreak+1:1;S.lastTrainDate=S.today.date;S.trainingSessions++;const rest=(p.type==='rest'||p.type==='active');const xp=rest?40:90;awardXP(xp);pushLog('win',(rest?'Recovery logged — ':'Training cleared — ')+p.name+'.');checkUnlocks();save();render();toast('+'+xp+' XP · '+(rest?'RECOVERY':'TRAINING'));},
-  toggleQuest(id){if(S.penalty.active){toast('SYSTEM LOCKED — clear the Gate to restore.','red');return;}if(!S.today.persona){openPersona();return;}if(S.today.quests[id]){toast('Already cleared today.');return;}const q=QUESTS.find(x=>x.id===id);S.today.quests[id]=true;bump(q.stat);awardXP(q.xp);pushLog('win',q.name+' — cleared.');if(id==='bbby'){const b=S.dungeons.bbby;if(b.floor<b.max){b.floor++;pushLog('up','BBBY Dungeon — Floor '+b.floor+'/'+b.max+' cleared.');}}checkUnlocks();save();render();toast('+'+q.xp+' XP · '+q.tag);},
+  completeTraining(){if(S.penalty.active){toast('SYSTEM LOCKED — clear the Gate to restore.','red');return;}if(!S.today.persona){openPersona();return;}if(S.today.training){toast('Already logged today.');return;}const p=todayWorkout();S.today.training=true;const prev=S.lastTrainDate;S.trainingStreak=(prev&&daysBetween(prev,S.today.date)===1)?S.trainingStreak+1:1;S.lastTrainDate=S.today.date;S.trainingSessions++;const rest=(p.type==='rest'||p.type==='active');gainProc(rest?40:90);pushLog('win',(rest?'Recovery logged — ':'Training cleared — ')+p.name+'.');checkUnlocks();save();render();toast('+'+(rest?40:90)+' XP · '+(rest?'RECOVERY':'TRAINING'));},
+  toggleQuest(id){if(S.penalty.active){toast('SYSTEM LOCKED — clear the Gate to restore.','red');return;}if(!S.today.persona){openPersona();return;}if(S.today.quests[id]){toast('Already cleared today.');return;}const q=QUESTS.find(x=>x.id===id);S.today.quests[id]=true;bump(q.stat);if(q.feeder)S[q.feeder]=S.today.date;gainProc(q.xp);pushLog('win',q.name+' — cleared.');checkUnlocks();save();render();toast('+'+q.xp+' XP · '+q.tag);},
+  logDeliverable(tag){if(S.penalty.active){toast('SYSTEM LOCKED — clear the Gate to restore.','red');return;}if(!S.today.persona){openPersona();return;}if((S.today.delivCount||0)>=3){toast('Three deliverables logged today. Real output has a ceiling — rest and return.');return;}const el=document.getElementById('delivInput');const txt=(el?el.value:'').trim();if(txt.length<10){toast('Name what you actually produced. The System logs specifics, not "done."','red');return;}S.today.delivCount=(S.today.delivCount||0)+1;S.deliverables++;S.lastFinanceDate=S.today.date;if(tag==='bbby'){const b=S.dungeons.bbby;if(b.floor<b.max)b.floor++;}S.ledger.unshift({date:S.today.date,tag:tag==='bbby'?'BBBY':'ARTIFACT',text:txt});if(S.ledger.length>200)S.ledger.length=200;bump({finance:2.5,intellect:0.5});pushLog('up','Deliverable logged'+(tag==='bbby'?' (BBBY Floor '+S.dungeons.bbby.floor+')':'')+': '+txt);gainDeliv(250);if(el)el.value='';checkUnlocks();save();render();toast('+250 XP · DELIVERABLE',true);},
   setTerms(){const st=(document.getElementById('stakeInput')||{}).value||'';const wt=(document.getElementById('witnessInput')||{}).value||'';S.stake=st.trim();S.witness=wt.trim();pushLog('up','Accountability terms set.');save();render();toast('Terms set. The System will hold you to them.');},
-  scanBody(){const el=document.getElementById('bodyInput');const v=(el?el.value:'').trim();if(!v){toast('Enter a baseline number.');return;}S.body.scanned=true;S.body.value=v;pushLog('up','Body scanned. Baseline: '+v+'.');save();render();toast('Body attribute unlocked.');},
+  scanBody(){const el=document.getElementById('bodyInput');const v=(el?el.value:'').trim();if(!v){toast('Enter a baseline number.');return;}S.body.scanned=true;S.body.value=v;pushLog('up','Body scanned. Baseline: '+v+'.');checkUnlocks();save();render();toast('Body attribute unlocked.');},
   dismissWarn(){S.warn='';save();render();},
   confirmReset(){const note=document.getElementById('resetNote');if(this._armed){this._doReset();return;}this._armed=true;note.textContent='This erases all progress permanently. Tap again to confirm.';setTimeout(()=>{this._armed=false;note.textContent='';},5000);},
   async _doReset(){await Store.clear();S=defaultState();this._armed=false;save();render();openPersona();toast('System reset.');}
 };
-
+ 
+function xpBarHTML(){const need=xpForNext(S.level),cap=softCap();const pp=Math.max(0,Math.min(100,Math.min(S.procXp,cap)/need*100));const dp=Math.max(0,Math.min(100-pp,S.delivXp/need*100));return '<span class="seg proc" style="width:'+pp+'%"></span><span class="seg deliv" style="width:'+dp+'%"></span>';}
+function meterRow(k,v,note){return '<div class="meter"><span class="mk">'+k+'</span><div class="bar" style="flex:1"><span style="width:'+v+'%"></span></div><span class="mv">'+note+'</span></div>';}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+ 
 function render(){
-  const need=xpForNext(S.level);const locked=S.penalty.active;
+  const need=xpForNext(S.level),cap=softCap(),prog=progress(),locked=S.penalty.active;
   document.getElementById('hudLevel').textContent=S.level;
   document.getElementById('hudRank').textContent=rankFor(S.level);
-  document.getElementById('hudXpTxt').textContent=Math.round(S.xp)+' / '+need;
-  document.getElementById('hudXpBar').style.width=Math.min(100,(S.xp/need)*100)+'%';
+  document.getElementById('hudXpTxt').textContent=Math.round(prog)+' / '+need;
+  document.getElementById('hudXpBar').innerHTML=xpBarHTML();
   document.getElementById('hudStreak').textContent=S.streak;
+  document.getElementById('hudDeliv').textContent=S.deliverables;
   document.getElementById('hudAuto').textContent=Math.round(S.autonomy);
   const ht=document.getElementById('hudTitle');ht.textContent=titleFor().toUpperCase();ht.className='hud-title'+(S.probation?' prob':'');
   const cg=document.getElementById('chipGate');cg.className='chip '+(locked?'locked':(S.today.gateDone?'gate-done':'gate-pending'));
   document.getElementById('chipGateTxt').textContent=locked?'LOCKED':(S.today.gateDone?'CLEARED':'PENDING');
-
-  // status window
+ 
   document.getElementById('swLevel').textContent=S.level;
   document.getElementById('swRank').textContent=rankFor(S.level);
   document.getElementById('swTitle').textContent=titleFor();
@@ -479,84 +519,62 @@ function render(){
   const drive=Math.min(100,S.streak*12+(S.today.gateDone?20:0));
   document.getElementById('meters').innerHTML=meterRow('DRIVE',drive,S.streak?'STREAK '+S.streak:'IDLE')+meterRow('FOCUS',Math.round(S.stats.focus),'')+meterRow('FATIGUE',0,'OPTIMAL');
   document.getElementById('statGrid').innerHTML=STAT_DEF.map(([k,lab])=>{const v=Math.round(S.stats[k]);const c=tierClass(v);return '<div class="stat '+c+'"><div class="stat-top"><span class="stat-lab">'+lab+'</span><span class="stat-val">'+v+'</span></div><div class="stat-bar"><span style="width:'+v+'%"></span></div></div>';}).join('');
-
-  // gate
+ 
   const gc=document.getElementById('gateCard');gc.classList.toggle('done',S.today.gateDone);
   document.getElementById('gateStatus').textContent=locked?'PENALTY — CLEAR TO RESTORE':(S.today.gateDone?'CLEARED':'PENDING');
   document.getElementById('gateBtn').textContent=S.today.gateDone?'Gate Cleared ✓':'Clear the Gate';
   document.getElementById('movedToggle').classList.toggle('on',S.today.moved);
   document.getElementById('movedBox').textContent=S.today.moved?'✓':'';
-
-  // training (today's Baki Protocol session)
+ 
+  document.getElementById('delivCount').textContent='Logged today: '+(S.today.delivCount||0)+' / 3   ·   Total deliverables: '+S.deliverables;
+ 
   const p=todayWorkout();const rest=(p.type==='rest'||p.type==='active');const tc=document.getElementById('trainCard');
   tc.className='card train brk'+(rest?' rest':'')+(S.today.training?' done':'');
-  tc.innerHTML='<div class="train-top"><div><div class="train-day">'+p.day.toUpperCase()+' · '+(rest?'RECOVERY':'TRAINING')+(S.trainingStreak?' · STREAK '+S.trainingStreak:'')+'</div><div class="train-name">'+p.name+'</div><div class="train-focus">'+p.focus+'</div></div><div class="sub">'+(S.today.training?'LOGGED':'PENDING')+'</div></div>'+
-    '<div class="ex">'+p.ex.map(e=>'<span class="en">'+e[0]+'</span><span class="es">'+e[1]+'</span>').join('')+'</div>'+
-    '<div class="train-note">'+p.note+'</div>'+
-    '<div class="row"><button class="'+(rest?'btn':'btn red')+'" onclick="SYS.completeTraining()">'+(S.today.training?(rest?'Recovery Logged ✓':'Training Cleared ✓'):(rest?'Log Recovery':'Mark Training Done'))+'</button></div>';
-
-  // quests
+  tc.innerHTML='<div class="train-top"><div><div class="train-day">'+p.day.toUpperCase()+' · '+(rest?'RECOVERY':'TRAINING')+(S.trainingStreak?' · STREAK '+S.trainingStreak:'')+'</div><div class="train-name">'+p.name+'</div><div class="train-focus">'+p.focus+'</div></div><div class="sub">'+(S.today.training?'LOGGED':'PENDING')+'</div></div><div class="ex">'+p.ex.map(e=>'<span class="en">'+e[0]+'</span><span class="es">'+e[1]+'</span>').join('')+'</div><div class="train-note">'+p.note+'</div><div class="row"><button class="'+(rest?'btn':'btn red')+'" onclick="SYS.completeTraining()">'+(S.today.training?(rest?'Recovery Logged ✓':'Training Cleared ✓'):(rest?'Log Recovery':'Mark Training Done'))+'</button></div>';
+ 
   document.getElementById('questPersona').innerHTML=S.today.persona?'· <span class="persona-badge '+(S.today.persona==='yohann'?'yoh':'sam')+'">'+(S.today.persona==='yohann'?'YOHANN':'SAM')+'</span>':'';
   document.getElementById('questList').innerHTML=QUESTS.map(q=>{const done=!!S.today.quests[q.id];return '<div class="q '+(done?'done':'')+(locked&&!done?' locked':'')+'"><div class="q-check" onclick="SYS.toggleQuest(\''+q.id+'\')">'+(done?'✓':(locked?'🔒':''))+'</div><div class="q-body"><div class="q-name">'+(q.opt?'<span class="tag opt">OPTIONAL</span>':'')+q.name+'</div><div class="q-desc">'+q.desc+'</div></div></div>';}).join('');
-
-  // accountability terms
-  document.getElementById('termsMount').innerHTML=
-    '<div class="terms-row"><div class="terms-field"><label>FORFEIT ON FAILURE — a comfort or privilege you lose if you miss the Gate</label><input id="stakeInput" placeholder="e.g. no gaming for 48h" value="'+esc(S.stake)+'"></div>'+
-    '<div class="terms-field"><label>WITNESS — a person the System orders you to report failures to (optional)</label><input id="witnessInput" placeholder="name" value="'+esc(S.witness)+'"></div></div>'+
-    '<div class="row"><button class="btn" onclick="SYS.setTerms()">Set Terms</button></div>'+
-    ((S.stake||S.witness)?'<div class="terms-set">'+(S.stake?'<div><span class="k">FORFEIT:</span> '+esc(S.stake)+'</div>':'')+(S.witness?'<div><span class="k">WITNESS:</span> '+esc(S.witness)+'</div>':'')+'</div>':'');
-
-  // penalty card
+ 
+  document.getElementById('termsMount').innerHTML='<div class="terms-row"><div class="terms-field"><label>FORFEIT ON FAILURE — a comfort you lose if you miss the Gate</label><input id="stakeInput" placeholder="e.g. no gaming for 48h" value="'+esc(S.stake)+'"></div><div class="terms-field"><label>WITNESS — a person the System orders you to report failures to</label><input id="witnessInput" placeholder="name" value="'+esc(S.witness)+'"></div></div><div class="row"><button class="btn" onclick="SYS.setTerms()">Set Terms</button></div>'+((S.stake||S.witness)?'<div class="terms-set">'+(S.stake?'<div><span class="k">FORFEIT:</span> '+esc(S.stake)+'</div>':'')+(S.witness?'<div><span class="k">WITNESS:</span> '+esc(S.witness)+'</div>':'')+'</div>':'');
+ 
+  const delivNeeded=Math.max(0,need-Math.min(S.procXp,cap)-S.delivXp);
+  const procFull=S.procXp>=cap;
+  document.getElementById('levelReq').innerHTML='Level '+S.level+' \u2192 '+(S.level+1)+': '+Math.round(prog)+' / '+need+' XP. Process XP is capped at <span style="color:var(--cy)">'+cap+'</span> this level'+(procFull?' — <span style="color:var(--amber)">cap reached. Only Deliverables move the bar now.</span>':'.')+' <span style="color:var(--au-dim)">'+(delivNeeded>0?(delivNeeded+' XP of deliverables still required ('+Math.ceil(delivNeeded/250)+' artifact'+(Math.ceil(delivNeeded/250)>1?'s':'')+').'):'Cleared — advancing.')+'</span> You cannot grind your way up. You produce your way up.';
+ 
   const pm=document.getElementById('penaltyMount');
-  if(locked){
-    pm.id='penalty';pm.className='card brk on';
-    let h='<div class="pen-h">⚠ PENALTY ENFORCED</div><p>Progress is frozen. No quest counts until the Gate is cleared. The streak is gone — it does not return.</p>';
-    h+='<div class="pen-line">CORRECTIVE: '+S.penalty.quest+'</div>';
-    if(S.stake)h+='<div class="pen-line">FORFEIT DUE: '+esc(S.stake)+'. You set this price. Pay it.</div>';else h+='<div class="pen-line dim">No forfeit set. A consequence you can wave away is not one — set your terms below.</div>';
-    if(S.witness)h+='<div class="pen-line">REPORT TO: '+esc(S.witness)+'. Accountability you can hide from is not accountability.</div>';
-    if(S.probation)h+='<div class="pen-line prob">STATUS: PROBATION ('+S.probationClears+'/3 clean). Clear the Gate three days running to exit.</div>';
-    h+='<div class="pen-note">No pain in this, no self-loathing. Consequence, not cruelty. Clear the Gate.</div>';
-    pm.innerHTML=h;
-  }else{pm.id='penaltyMount';pm.className='card brk';pm.style.display='none';pm.innerHTML='';}
-
-  // warning
+  if(locked){pm.id='penalty';pm.className='card brk on';let h='<div class="pen-h">⚠ PENALTY ENFORCED</div><p>Progress is frozen. No quest counts until the Gate is cleared. The streak is gone — it does not return.</p>';h+='<div class="pen-line">CORRECTIVE: '+S.penalty.quest+'</div>';h+='<div class="pen-line">Your trained attributes have regressed. Neglect has a cost — check Status.</div>';if(S.stake)h+='<div class="pen-line">FORFEIT DUE: '+esc(S.stake)+'. You set this price. Pay it.</div>';else h+='<div class="pen-line dim">No forfeit set — a consequence you can wave away is not one. Set your terms below.</div>';if(S.witness)h+='<div class="pen-line">REPORT TO: '+esc(S.witness)+'. Accountability you can hide from is not accountability.</div>';if(S.probation)h+='<div class="pen-line prob">STATUS: PROBATION ('+S.probationClears+'/3 clean). Clear the Gate three days running to exit.</div>';h+='<div class="pen-note">No pain in this, no self-loathing. Consequence, not cruelty. Clear the Gate.</div>';pm.innerHTML=h;}
+  else{pm.id='penaltyMount';pm.className='card brk';pm.style.display='none';pm.innerHTML='';}
+ 
   const wm=document.getElementById('warnMount');
   if(S.warn){wm.id='sysWarn';wm.className='card brk on';wm.innerHTML='<div class="sw-warn-h">⚠ SYSTEM WARNING</div><p>'+S.warn+'</p><div class="row"><button class="btn ghost" onclick="SYS.dismissWarn()">Acknowledged</button></div>';}
   else{wm.id='warnMount';wm.className='card brk';wm.style.display='none';wm.innerHTML='';}
-
-  // body card
-  const bs=document.getElementById('bodyState');const bm=document.getElementById('bodyMount');
-  const pv=physVal();
-  let bh='<div class="meters" style="border-top:0;padding-top:0;margin-bottom:14px">';
-  bh+=meterRow('PHYSICAL',pv===null?0:pv,pv===null?'LOCKED':String(pv));
-  bh+='</div>';
+ 
+  const bs=document.getElementById('bodyState');const bm=document.getElementById('bodyMount');const pv=physVal();
+  let bh='<div class="meters" style="border-top:0;padding-top:0;margin-bottom:14px">'+meterRow('PHYSICAL',pv===null?0:pv,pv===null?'LOCKED':String(pv))+'</div>';
   bh+='<div class="sub" style="font-size:11px;color:var(--dim);line-height:1.7">Today: <span style="color:var(--cy-dim)">'+p.day+' — '+p.name+'</span> · log it in Quests.<br>Training streak: <span style="color:var(--cy-dim)">'+S.trainingStreak+'</span> · Sessions logged: <span style="color:var(--cy-dim)">'+S.trainingSessions+'</span></div>';
   if(S.body.scanned){bs.textContent='SCANNED';bs.style.color='var(--cy-dim)';bh+='<div class="sub" style="font-size:11px;color:var(--dim);margin-top:8px">Baseline on record: <span style="color:var(--cy-dim)">'+esc(S.body.value)+'</span>.</div><div class="row"><input class="scan" id="bodyInput" placeholder="update baseline"><button class="btn" onclick="SYS.scanBody()">Update</button></div>';}
   else{bs.textContent='UNSCANNED';bs.style.color='var(--amber)';bh+='<div class="sub" style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.6">Log one measurable baseline — push-ups, a timed run, bodyweight — and the attribute scans in. Nothing unsafe.</div><div class="row"><input class="scan" id="bodyInput" placeholder="e.g. 32 push-ups"><button class="btn" onclick="SYS.scanBody()">Scan Body</button></div>';}
   bm.innerHTML=bh;
-
-  // skills / reveals / sealed
-  document.getElementById('skillList').innerHTML=acquiredSkills().map(sk=>'<div class="skill"><span class="sd"></span><div><div class="sn">'+sk.n+'</div><div class="sx">'+sk.x+'</div></div></div>').join('');
+ 
+  document.getElementById('skillList').innerHTML=S.skillsEarned.length?S.skillsEarned.map(id=>{const sk=SKILL_POOL.find(x=>x.id===id);return sk?'<div class="skill"><span class="sd"></span><div><div class="sn">'+sk.n+'</div><div class="sx">'+sk.x+'</div></div></div>':'';}).join(''):'<div class="empty">None yet. Clear the first quest to acquire your base skills.</div>';
   document.getElementById('revealMount').innerHTML=REVEALS.filter(r=>S.reveals[r.id]).map(r=>'<div class="card reveal brk"><div class="rh">◆ '+r.h+'</div><p>'+r.body+'</p></div>').join('');
   document.getElementById('sealedList').innerHTML=SEALED.map(s=>{const open=!!S.sealed[s.id];return open?'<div class="skill"><span class="sd" style="background:var(--au);box-shadow:0 0 10px var(--au)"></span><div><div class="sn" style="color:var(--au-dim)">'+s.t+'</div></div></div>':'<div class="sealed"><span class="lock"></span><span class="rd">▓▓▓▓▓▓▓▓▓▓</span><span class="tag-s">SEALED</span></div>';}).join('');
-
-  // log
+ 
+  document.getElementById('ledgerList').innerHTML=S.ledger.length?S.ledger.map(e=>'<div class="led-row"><span class="d">'+fmtDate(e.date)+'</span><span class="tg">'+(e.tag||'ARTIFACT')+'</span><span class="t">'+esc(e.text)+'</span></div>').join(''):'<div class="empty">Empty. Your first real artifact writes the first line — and that is the line that levels you.</div>';
   const ll=document.getElementById('logList');
-  ll.innerHTML=S.log.length?S.log.map(l=>'<div class="log-row '+l.type+'"><span class="d">'+fmtDate(l.date)+'</span><span class="t">'+l.text+'</span></div>').join(''):'<div class="empty">No entries yet. The first quest you clear writes the first line.</div>';
+  ll.innerHTML=S.log.length?S.log.map(l=>'<div class="log-row '+l.type+'"><span class="d">'+fmtDate(l.date)+'</span><span class="t">'+l.text+'</span></div>').join(''):'<div class="empty">No entries yet.</div>';
 }
-function meterRow(k,v,note){return '<div class="meter"><span class="mk">'+k+'</span><div class="bar" style="flex:1"><span style="width:'+v+'%"></span></div><span class="mv">'+note+'</span></div>';}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
+ 
 let _t;function toast(m,kind){const el=document.getElementById('toast');el.textContent=m;el.className='show'+(kind===true?' gold':(kind?(' '+kind):''));clearTimeout(_t);_t=setTimeout(()=>el.className='',kind?3400:2600);}
 function save(){Store.save(S);}
 function openPersona(){if(!S.today.persona&&!S.graduated)document.getElementById('persona').classList.add('on');}
-
+ 
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>go(t.dataset.p)));
 document.getElementById('chipGate').addEventListener('click',()=>go('quests'));
 function go(p){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.p===p));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));document.getElementById('p-'+p).classList.add('on');window.scrollTo({top:0,behavior:'smooth'});}
-
+ 
 function stars(svg,n,seed){let s='';let r=seed;const rnd=()=>{r=(r*9301+49297)%233280;return r/233280;};const nine=[];for(let i=0;i<n;i++){const x=rnd()*1000,y=rnd()*700,rad=0.6+rnd()*1.8,gold=i%3===0;s+='<circle cx="'+x.toFixed(0)+'" cy="'+y.toFixed(0)+'" r="'+rad.toFixed(1)+'" fill="'+(gold?'#d2af5a':'#46d0e8')+'" style="animation:twinkle '+(2.5+rnd()*4).toFixed(1)+'s ease-in-out infinite;animation-delay:'+(rnd()*3).toFixed(1)+'s"/>';}for(let i=0;i<9;i++){const x=120+rnd()*760,y=90+rnd()*500;nine.push([x,y]);s+='<circle cx="'+x.toFixed(0)+'" cy="'+y.toFixed(0)+'" r="2.4" fill="#d2af5a" style="animation:twinkle '+(3+rnd()*2).toFixed(1)+'s ease-in-out infinite"/>';}for(let i=0;i<8;i++){s+='<line x1="'+nine[i][0].toFixed(0)+'" y1="'+nine[i][1].toFixed(0)+'" x2="'+nine[i+1][0].toFixed(0)+'" y2="'+nine[i+1][1].toFixed(0)+'" stroke="rgba(210,175,90,0.16)" stroke-width="0.5"/>';}svg.innerHTML=s;}
-
+ 
 document.getElementById('boot').addEventListener('click',()=>document.getElementById('boot').classList.add('gone'));
 async function init(){
   S=normalize(await Store.load()||defaultState());
@@ -569,3 +587,4 @@ init();
 </script>
 </body>
 </html>
+ 
