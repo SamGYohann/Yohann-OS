@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Trader OS — Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0e11;--bg-raised:#15171c;--bg-inset:#1b1e25;--bg-hover:#21242c;
+  --ink:#e9e4d8;--ink-dim:#9c978b;--ink-faint:#6a665e;
+  --line:#282b33;--line-bright:#3a3e48;
+  --amber:#e0a458;--amber-bright:#f3bd6e;--amber-deep:#a9762f;
+  --green:#82b07c;--green-deep:#3f5c3c;--red:#cf6f60;--red-deep:#5e302a;--warn:#d6a64c;
+  --shadow:0 1px 0 rgba(255,255,255,.02),0 8px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;}
+body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#16181e 0%,var(--bg) 55%) fixed,var(--bg);color:var(--ink);font-family:"Crimson Pro",Georgia,serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;}
+.label{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);}
+a{color:var(--amber);}
+.wrap{max-width:1020px;margin:0 auto;padding:0 20px;}
+header.top{position:sticky;top:0;z-index:50;background:rgba(13,14,17,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px;flex-wrap:wrap;}
+.brand{display:flex;align-items:baseline;gap:10px;}
+.brand .mark{font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:.07em;}
+.brand .mark b{color:var(--amber);font-weight:400;}
+.brand .sub{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);}
+.clock{display:flex;align-items:center;gap:12px;font-family:"JetBrains Mono",monospace;font-size:11px;}
+.clock .sess{padding:4px 9px;border-radius:20px;border:1px solid var(--line-bright);letter-spacing:.06em;text-transform:uppercase;}
+.clock .sess.open{color:var(--green);border-color:var(--green-deep);}
+.clock .sess.closed{color:var(--ink-dim);}
+.clock .sess.macro{color:var(--red);border-color:var(--red-deep);}
+.clock .t{color:var(--ink-dim);}
+nav.tabs{position:sticky;top:56px;z-index:40;background:rgba(13,14,17,.7);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);overflow-x:auto;}
+nav.tabs .wrap{display:flex;gap:2px;}
+nav.tabs button{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--ink-dim);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:12px 12px;cursor:pointer;white-space:nowrap;}
+nav.tabs button:hover{color:var(--ink);}
+nav.tabs button.active{color:var(--amber);border-bottom-color:var(--amber);}
+main{padding:24px 0 100px;}
+.view{display:none;animation:fade .25s ease;}
+.view.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+.panel{background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;padding:20px;margin:0 0 16px;box-shadow:var(--shadow);}
+.panel>.label{display:block;margin-bottom:14px;color:var(--amber);}
+h2.sec{font-family:"Bebas Neue",sans-serif;font-weight:400;font-size:30px;letter-spacing:.02em;text-transform:uppercase;margin:0 0 4px;}
+.subnote{color:var(--ink-faint);font-size:14px;margin:0 0 18px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:820px){.grid2,.grid3,.grid4{grid-template-columns:1fr 1fr;}}
+@media(max-width:560px){.grid2,.grid3,.grid4{grid-template-columns:1fr;}}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px;}
+.kv:first-child{border-top:none;}
+.kv .k{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;}
+.kv .v{color:var(--ink);text-align:right;}
+.kv .v.open{color:var(--green);} .kv .v.closed{color:var(--ink-dim);} .kv .v.macro{color:var(--red);}
+
+.perm{border-radius:12px;padding:18px;border:2px solid;}
+.perm.go{border-color:var(--green);} .perm.caution{border-color:var(--amber);} .perm.stop{border-color:var(--red);}
+.perm .pw{font-family:"Bebas Neue",sans-serif;font-size:32px;letter-spacing:.03em;}
+.perm.go .pw{color:var(--green);} .perm.caution .pw{color:var(--amber);} .perm.stop .pw{color:var(--red);}
+.perm .pd{color:var(--ink-dim);font-size:15px;margin-top:4px;}
+.allow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+@media(max-width:560px){.allow{grid-template-columns:1fr;}}
+.allow .col h4{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 8px;}
+.allow .ok h4{color:var(--green);} .allow .no h4{color:var(--red);}
+.allow ul{margin:0;padding-left:16px;} .allow li{font-size:14px;color:var(--ink-dim);margin:5px 0;}
+
+.scan-q{padding:12px 0;border-top:1px solid var(--line);}
+.scan-q:first-child{border-top:none;}
+.scan-q .qt{font-size:15.5px;color:var(--ink);margin-bottom:8px;}
+.opts{display:flex;flex-wrap:wrap;gap:8px;}
+.opt{font-family:"JetBrains Mono",monospace;font-size:12px;border:1px solid var(--line);background:var(--bg-inset);color:var(--ink-dim);border-radius:8px;padding:8px 12px;cursor:pointer;}
+.opt:hover{border-color:var(--line-bright);color:var(--ink);}
+.opt.on{border-color:var(--amber);color:var(--amber);background:rgba(224,164,88,.08);}
+.opt.bad.on{border-color:var(--red);color:var(--red);background:rgba(207,111,96,.1);}
+.opt.good.on{border-color:var(--green);color:var(--green);background:rgba(130,176,124,.1);}
+
+label.fld{display:block;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin:13px 0 5px;}
+input,select,textarea{width:100%;background:var(--bg-inset);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-family:"Crimson Pro",serif;font-size:15px;padding:9px 11px;resize:vertical;}
+input.mono,select{font-family:"JetBrains Mono",monospace;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--amber);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.frow4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:680px){.frow,.frow3,.frow4{grid-template-columns:1fr 1fr;}}
+@media(max-width:460px){.frow,.frow3,.frow4{grid-template-columns:1fr;}}
+.btn{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:11px 20px;border-radius:8px;cursor:pointer;border:1px solid var(--amber-deep);background:linear-gradient(180deg,var(--amber),var(--amber-deep));color:#1a1206;font-weight:700;}
+.btn:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-bright);font-weight:400;}
+.btn.ghost:hover{color:var(--amber);background:var(--bg-hover);}
+.btn.sm{padding:7px 13px;font-size:10px;}
+.btn.danger{border-color:var(--red-deep);background:transparent;color:var(--red);}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center;}
+
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
+@media(max-width:680px){.rules{grid-template-columns:1fr;}}
+.rule{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:var(--bg-inset);cursor:pointer;font-size:13.5px;color:var(--ink-dim);}
+.rule .rb{flex:none;width:15px;height:15px;border-radius:4px;border:1.5px solid var(--ink-faint);position:relative;}
+.rule.on{border-color:var(--green-deep);color:var(--ink);}
+.rule.on .rb{border-color:var(--green);background:rgba(130,176,124,.15);}
+.rule.on .rb::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:10px;}
+.rule.flag.on{border-color:var(--red-deep);}
+.rule.flag.on .rb{border-color:var(--red);background:rgba(207,111,96,.15);}
+.rule.flag.on .rb::after{color:var(--red);content:"!";}
+
+.chk{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer;}
+.chk:first-child{border-top:none;}
+.chk .box{flex:none;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--ink-faint);margin-top:2px;position:relative;}
+.chk.on .box{border-color:var(--green);background:rgba(130,176,124,.15);}
+.chk.on .box::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:12px;}
+.chk .ctxt{font-size:15px;color:var(--ink-dim);}.chk.on .ctxt{color:var(--ink);}
+.chk .ctxt small{display:block;color:var(--ink-faint);font-size:12.5px;}
+
+.scoregrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0;}
+@media(max-width:560px){.scoregrid{grid-template-columns:1fr 1fr;}}
+.score{border:1px solid var(--line);border-radius:10px;padding:13px;background:var(--bg-inset);text-align:center;}
+.score .sv{font-family:"Bebas Neue",sans-serif;font-size:30px;line-height:1;}
+.score .sk{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-top:4px;}
+.score.good .sv{color:var(--green);}.score.mid .sv{color:var(--amber);}.score.bad .sv{color:var(--red);}
+.decision{border-radius:10px;padding:16px;border:2px solid;text-align:center;margin-top:6px;}
+.decision .dw{font-family:"Bebas Neue",sans-serif;font-size:26px;letter-spacing:.03em;}
+.decision.appr{border-color:var(--green);}.decision.appr .dw{color:var(--green);}
+.decision.deny{border-color:var(--red);}.decision.deny .dw{color:var(--red);}
+.decision.rev{border-color:var(--amber);}.decision.rev .dw{color:var(--amber);}
+.decision .dr{color:var(--ink-dim);font-size:14px;margin-top:6px;}
+
+.ladder .step{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--line);}
+.ladder .step:first-child{border-top:none;}
+.ladder .dot{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line-bright);display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-faint);}
+.ladder .step.done .dot{border-color:var(--green);color:var(--green);}
+.ladder .step.current .dot{border-color:var(--amber);color:var(--amber);background:rgba(224,164,88,.1);}
+.ladder .sbody h4{font-family:"Bebas Neue",sans-serif;font-weight:400;font-size:20px;letter-spacing:.02em;margin:0;color:var(--ink);}
+.ladder .step.current .sbody h4{color:var(--amber);}
+.ladder .sgate{font-size:13.5px;color:var(--ink-faint);margin-top:3px;}
+.ladder .smet{font-family:"JetBrains Mono",monospace;font-size:11px;margin-top:4px;}
+.ladder .smet .y{color:var(--green);}.ladder .smet .n{color:var(--red);}
+
+.gatebox{border:2px solid var(--amber-deep);border-radius:14px;padding:20px;background:linear-gradient(180deg,var(--bg-inset),var(--bg-raised));}
+.gatebox.cleared{border-color:var(--green);}
+.crit{margin-bottom:12px;}
+.crit .crow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:5px;}
+.crit .cname{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-dim);}
+.crit .cval{font-family:"JetBrains Mono",monospace;font-size:12px;}
+.crit.met .cval{color:var(--green);}.crit.unmet .cval{color:var(--amber);}
+.track{height:7px;background:#0e0f12;border-radius:5px;overflow:hidden;border:1px solid var(--line);}
+.track i{display:block;height:100%;background:var(--amber);transition:width .6s;}.track i.good{background:var(--green);}
+
+.mcard{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--bg-inset);text-align:center;}
+.mcard .mv{font-family:"Bebas Neue",sans-serif;font-size:28px;line-height:1;color:var(--ink);}
+.mcard .mk{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-top:5px;}
+.mcard.hl .mv{color:var(--amber);}
+.banner{border:1px solid var(--amber-deep);border-left:3px solid var(--amber);background:linear-gradient(90deg,rgba(224,164,88,.06),transparent 70%);border-radius:9px;padding:13px 16px;font-size:14.5px;color:var(--ink-dim);margin-bottom:16px;}
+.banner b{color:var(--amber);}
+.banner.red{border-color:var(--red-deep);border-left-color:var(--red);background:linear-gradient(90deg,rgba(207,111,96,.07),transparent 70%);} .banner.red b{color:var(--red);}
+.tcard{border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:10px;background:var(--bg-inset);}
+.tcard.adherent{border-left:3px solid var(--green);}.tcard.broke{border-left:3px solid var(--red);}
+.tcard .th{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.tcard .ttick{font-family:"JetBrains Mono",monospace;font-size:14px;color:var(--ink);}
+.tcard .tmeta{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-faint);}
+.tcard .tbody{font-size:14px;color:var(--ink-dim);margin-top:6px;}
+.flagpill{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:12px;border:1px solid var(--line-bright);color:var(--ink-faint);}
+.flagpill.r{color:var(--red);border-color:var(--red-deep);}.flagpill.g{color:var(--green);border-color:var(--green-deep);}
+.tflags{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
+.res-win{color:var(--green);}.res-loss{color:var(--red);}.res-open{color:var(--amber);}.res-scratch{color:var(--ink-dim);}
+.empty{color:var(--ink-faint);font-size:14px;font-style:italic;padding:14px 0;}
+.warnbar{background:var(--red-deep);color:#fff;font-family:"JetBrains Mono",monospace;font-size:12px;text-align:center;padding:8px;display:none;}
+.foot{color:var(--ink-faint);font-size:12px;text-align:center;margin-top:30px;line-height:1.6;}
+.tablefoot{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-faint);margin-top:8px;}
+.macrorow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px;}
+.macrorow:first-child{border-top:none;}
+.macrorow .md{font-family:"JetBrains Mono",monospace;color:var(--ink-dim);}
+.macrorow.today{background:rgba(207,111,96,.06);border-radius:6px;padding:9px 8px;}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="warnbar" id="warnbar">⚠ Browser storage unavailable — download this file and open it locally so data persists. Export often.</div>
+<header class="top"><div class="wrap">
+  <div class="brand"><span class="mark"><b>◆</b> LIVE TRADER OS</span><span class="sub">Command Center</span></div>
+  <div class="clock" id="clock"></div>
+</div></header>
+<nav class="tabs"><div class="wrap" id="tabbar"></div></nav>
+<main><div class="wrap">
+  <section class="view" id="v-today"></section>
+  <section class="view" id="v-desk"></section>
+  <section class="view" id="v-journal"></section>
+  <section class="view" id="v-phase"></section>
+  <section class="view" id="v-course"></section>
+  <section class="view" id="v-signals"></section>
+  <section class="view" id="v-dashboard"></section>
+  <section class="view" id="v-calendar"></section>
+  <div class="foot" id="foot"></div>
+</div></main>
+
+<script>
+"use strict";
+/* ============== persistence ============== */
+const KEY="livetraderos_v1";
+let storageOK=true;
+function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}catch(e){storageOK=false;return null;}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){storageOK=false;document.getElementById("warnbar").style.display="block";}}
+
+/* ============== time / session engine (ET, from real clock) ============== */
+function nyParts(d){d=d||new Date();
+  const f=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
+  const p=f.formatToParts(d).reduce((a,x)=>{a[x.type]=x.value;return a;},{});
+  let hh=parseInt(p.hour,10); if(hh===24)hh=0;
+  return {y:+p.year,mo:+p.month,d:+p.day,hh,mm:+p.minute,wd:p.weekday,dateKey:`${p.year}-${p.month}-${p.day}`};
+}
+const HOLIDAYS_2026=["2026-01-01","2026-01-19","2026-02-16","2026-04-03","2026-05-25","2026-06-19","2026-07-03","2026-09-07","2026-11-26","2026-12-25"];
+const HALFDAYS_2026=["2026-11-27","2026-12-24"];
+function isHoliday(k){return HOLIDAYS_2026.includes(k);}
+function isHalfDay(k){return HALFDAYS_2026.includes(k);}
+function macroToday(k){return (DB.macro||[]).some(m=>m.date===k);}
+function macroLabel(k){const m=(DB.macro||[]).find(x=>x.date===k);return m?m.label:"";}
+function session(d){
+  const p=nyParts(d);const mins=p.hh*60+p.mm;
+  if(isHoliday(p.dateKey))return{s:"holiday",open:false,label:"Holiday — closed",p};
+  if(p.wd==="Sat"||p.wd==="Sun")return{s:"weekend",open:false,label:"Weekend — closed",p};
+  const halfClose=isHalfDay(p.dateKey);
+  if(mins>=240&&mins<570)return{s:"premarket",open:false,label:"Premarket",p};
+  if(mins>=570&&mins<(halfClose?780:960))return{s:"regular",open:true,label:halfClose?"Regular (early close 1pm ET)":"Regular session",p};
+  if(mins>=(halfClose?780:960)&&mins<1200)return{s:"afterhours",open:false,label:"After-hours",p};
+  return{s:"closed",open:false,label:"Closed",p};
+}
+
+/* ============== state ============== */
+const KNOWLEDGE=[
+  ["calls","Calls"],["puts","Puts"],["intrinsic","Intrinsic value"],["extrinsic","Extrinsic value"],
+  ["expiration","Expiration"],["strike","Strike selection"],["bidask","Bid/ask spread"],
+  ["volume","Volume"],["oi","Open interest"],["delta","Delta"],["theta","Theta"],["vega","Vega"],["gamma","Gamma"],["iv","Implied volatility"]
+];
+function freshDay(){return{scan:null,env:{bias:"",levels:"",vix:"",notes:""},startupDone:false,eodDone:false,eodNotes:""};}
+let DB=load()||{
+  settings:{created:new Date().toISOString(),startDate:nyParts().dateKey,notional:1000},
+  knowledge:{},trades:[],days:{},signals:[],course:{modules:[],mastery:{}},
+  macro:[
+    {date:"2026-01-28",label:"FOMC decision (verify)"},{date:"2026-03-18",label:"FOMC decision (verify)"},
+    {date:"2026-04-29",label:"FOMC decision (verify)"},{date:"2026-06-17",label:"FOMC decision (verify)"},
+    {date:"2026-07-29",label:"FOMC decision (verify)"},{date:"2026-09-16",label:"FOMC decision (verify)"},
+    {date:"2026-10-28",label:"FOMC decision (verify)"},{date:"2026-12-09",label:"FOMC decision (verify)"}
+  ],
+  ticketDraft:null
+};
+function dkey(){return nyParts().dateKey;}
+function day(){if(!DB.days[dkey()])DB.days[dkey()]=freshDay();return DB.days[dkey()];}
+if(!storageOK)document.getElementById("warnbar").style.display="block";
+
+/* ============== helpers ============== */
+const $=s=>document.querySelector(s);const $$=s=>Array.from(document.querySelectorAll(s));
+function el(t,c,h){const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+/* ============== trade rules / adherence ============== */
+const RULE_DEFS=[
+  {k:"plan",label:"Thesis + invalidation + target written BEFORE entry",flag:false},
+  {k:"sizing",label:"Risk ≤0.5% (premium = risk)",flag:false},
+  {k:"liquidity",label:"Liquidity filtered (tight spread, SPY/QQQ)",flag:false},
+  {k:"instrument",label:"Defined risk, swing expiry, NOT 0DTE / naked",flag:false},
+  {k:"exit",label:"Exited on plan (no moved stop)",flag:false},
+  {k:"noRevenge",label:"This was a REVENGE trade",flag:true},
+  {k:"noChase",label:"This was a CHASED / late FOMO entry",flag:true},
+];
+function tradeAdherent(t){for(const r of RULE_DEFS){const v=(t.rules&&t.rules[r.k])||false;if(r.flag&&v)return false;if(!r.flag&&!v)return false;}return true;}
+function paperTrades(){return DB.trades.filter(t=>!t.live||t.paperLive==="paper"||t.paperLive==="futures-paper").filter(t=>t.paperLive!=="live");}
+function liveTrades(){return DB.trades.filter(t=>t.paperLive==="live");}
+function futuresPaper(){return DB.trades.filter(t=>t.paperLive==="futures-paper");}
+function adherencePct(arr){arr=arr||DB.trades;if(!arr.length)return null;return Math.round(arr.filter(tradeAdherent).length/arr.length*100);}
+function greeksMissing(arr){arr=arr||DB.trades;return arr.filter(t=>!t.greeksExplained).length;}
+function revengeInLast(n,arr){arr=arr||DB.trades;return arr.slice(-n).filter(t=>t.rules&&t.rules.noRevenge).length;}
+function revengeStreak(arr){arr=arr||DB.trades;let s=0;for(let i=arr.length-1;i>=0;i--){if(arr[i].rules&&arr[i].rules.noRevenge)break;s++;}return s;}
+function expectancyLast(n){const r=DB.trades.slice(-n).map(t=>parseFloat(t.rMultiple)).filter(x=>!isNaN(x));if(!r.length)return null;return r.reduce((a,b)=>a+b,0)/r.length;}
+function knowledgeGate(){return KNOWLEDGE.every(([k])=>DB.knowledge[k]);}
+
+/* ============== phase engine ============== */
+const PHASES=[
+  {n:0,name:"Course Literacy",gate:"Learn the mechanics."},
+  {n:1,name:"Paper Options",gate:"Explain calls/puts, intrinsic/extrinsic, expiration, strike, bid/ask, volume, OI, basic Greeks."},
+  {n:2,name:"Paper + Signal Tracking",gate:"10+ paper trade tickets with full reasoning."},
+  {n:3,name:"50-Trade Gate Attempt",gate:"25+ logged paper trades, no major repeated rule breaks."},
+  {n:4,name:"Controlled Live Tuition",gate:"50+ paper trades, ≥90% adherence, 0 revenge in last 20, every contract explainable."},
+  {n:5,name:"Micro Futures Paper",gate:"20+ live tuition trades, ≥90% adherence, no loss-limit violations, no emotional trades."},
+  {n:6,name:"Futures / Prop Prep",gate:"100+ total trades, positive expectancy over last 50, clean futures paper sample."},
+];
+function lossLimitViolations(){ // any day with >2 live losses
+  const byDay={};liveTrades().forEach(t=>{(byDay[t.date]=byDay[t.date]||[]).push(t);});
+  return Object.values(byDay).some(arr=>arr.filter(t=>t.result==="loss").length>2);
+}
+function emotionalLiveTrades(){return liveTrades().filter(t=>t.source==="fomo"||/(angry|revenge|rushed|tilt)/i.test(t.emoBefore||"")).length;}
+function phaseChecks(){
+  const p=paperTrades(),adP=adherencePct(p),rev=p.filter(t=>t.rules&&t.rules.noRevenge).length,gm=greeksMissing(p);
+  const noMajor=(adP==null||adP>=70)&&rev<=3;
+  return {
+    1:knowledgeGate(),
+    2:knowledgeGate()&&p.length>=10,
+    3:knowledgeGate()&&p.length>=25&&noMajor,
+    4:knowledgeGate()&&p.length>=50&&adP!=null&&adP>=90&&revengeInLast(20,p)===0&&gm===0,
+    5:liveTrades().length>=20&&adherencePct(liveTrades())>=90&&!lossLimitViolations()&&emotionalLiveTrades()===0,
+    6:DB.trades.length>=100&&(expectancyLast(50)||-1)>0&&futuresPaper().length>=15&&adherencePct(futuresPaper())>=90,
+  };
+}
+function currentPhase(){const c=phaseChecks();let ph=0;for(let i=1;i<=6;i++){if(c[i])ph=i;else break;}return ph;}
+
+/* ============== gate (live unlock = phase 3->4) ============== */
+function gateCriteria(){
+  const p=paperTrades(),n=p.length,ad=adherencePct(p),gm=greeksMissing(p),streak=revengeStreak(p);
+  return[
+    {name:"50 paper trades logged",val:Math.min(n,50)+" / 50",pct:Math.min(n/50*100,100),met:n>=50},
+    {name:"Rule-adherence ≥ 90%",val:ad==null?"—":ad+"%",pct:ad==null?0:Math.min(ad,100),met:ad!=null&&ad>=90,good:true},
+    {name:"All Greeks explainable",val:n&&gm===0?"clean":gm+" gap",pct:n?(n-gm)/n*100:0,met:n>0&&gm===0},
+    {name:"0 revenge in last 20",val:n>=20?(revengeInLast(20,p)===0?"clean — "+streak+" streak":revengeInLast(20,p)+" in last 20"):streak+" / 20 streak",pct:Math.min(streak/20*100,100),met:n>=20&&revengeInLast(20,p)===0},
+  ];
+}
+
+/* ============== psych scan ============== */
+const EMOS=["angry","excited","bored","rushed","stressed","fast-money"];
+function scanRisk(scan){if(!scan)return{level:"none",flags:["scan not done"]};
+  let f=[];
+  if(scan.sleep!=null&&scan.sleep<6)f.push("low sleep");
+  (scan.emotions||[]).forEach(e=>f.push(e));
+  if(scan.lossBack)f.push("loss to make back");
+  if(scan.tempt)f.push("tempted to copy blindly");
+  if(scan.prove)f.push("trying to prove something");
+  if(scan.time===false)f.push("not enough time");
+  const lvl=f.length>=3?"high":f.length>=1?"caution":"clear";
+  return{level:lvl,flags:f};
+}
+
+/* ============== permission engine ============== */
+function permission(){
+  const ss=session();const ph=currentPhase();const sc=day().scan;const risk=scanRisk(sc);
+  const tt=todaysTrades().length,lt=todaysLosses();
+  let level,word,detail,allow=[],ban=[];
+  // base allowances
+  allow.push("Course study (full workflow)","Chart-replay & execution drills","Journal / trade review");
+  ban.push("0DTE","Naked options","Earnings gambles","Meme-stock options","Averaging down","Revenge trades","Late/chase entries","Trading on Discord hype");
+  const liveEligible = ph>=4;
+  if(!ss.open){
+    // market closed/weekend/holiday
+    ban.push("Any LIVE trade (market closed)");
+    allow.push("Paper trades (full rules) on replay / next-session prep");
+    if(ss.s==="weekend"||ss.s==="holiday"){ level="caution";word="STUDY / PREP";detail="Market closed. Build the week, log reps, run the weekly review."; }
+    else { level="caution";word="PAPER / PREP";detail=ss.label+". No live market — paper, prep, and study only."; }
+  } else if(risk.level==="high"){
+    level="stop";word="OBSERVATION ONLY";detail="Psych scan shows high emotional risk ("+risk.flags.slice(0,3).join(", ")+"). No trades today — observe, study, walk it off.";
+    ban.push("Any trade today (paper or live) — emotional risk");
+  } else if(!sc){
+    level="caution";word="SCAN REQUIRED";detail="Run the psychological risk scan before anything is unlocked.";
+    ban.push("Any trade until scan is complete");
+  } else if(tt>=2){
+    level="stop";word="DAILY LIMIT HIT";detail="2 trades already taken today. Done. Review, don't add.";
+    ban.push("Any further entries (max 2/day)");
+  } else if(lt>=2){
+    level="stop";word="TWO-LOSS STOP";detail="2 losses today. Session over. Forced walk-away.";
+    ban.push("Any further entries (2-loss stop)");
+  } else {
+    // tradeable
+    if(liveEligible){ level="go";word="CLEARED — TUITION";detail="Live tuition cleared (Phase 4+). Smallest size, defined risk, full ticket required."; allow.push("ONE planned live tuition trade (ticket required)","Paper trades"); }
+    else { level="caution";word="PAPER CLEARED";detail="Live is locked until the Phase 4 gate. Paper trades only, full rules, ticket required."; allow.push("Planned PAPER trade via trade ticket"); ban.push("Live leveraged size (gate not cleared)"); }
+    if(macroToday(ss.p.dateKey)){ detail+=" ⚠ High-risk macro day ("+macroLabel(ss.p.dateKey)+") — price may behave unusually; prefer observation/paper, reduce frequency."; }
+    if(risk.level==="caution"){ detail+=" Psych: caution ("+risk.flags.slice(0,2).join(", ")+") — size down, one trade max."; }
+  }
+  return{level,word,detail,allow,ban,ss,ph,risk,tt,lt};
+}
+function todaysTrades(){const k=dkey();return DB.trades.filter(t=>t.date===k);}
+function todaysLosses(){return todaysTrades().filter(t=>t.result==="loss").length;}
+
+/* ============== TODAY ============== */
+function renderToday(){
+  const v=$("#v-today");v.innerHTML="";
+  v.appendChild(el("h2","sec","Start Today"));
+  v.appendChild(el("p","subnote","Auto-run against the live clock. Answer the scan, accept your permission level, execute. Logged behavior beats ambition."));
+  const perm=permission();const ss=perm.ss;
+
+  // 1+2 environment
+  const env=el("div","panel");env.innerHTML=`<span class="label">1 · Environment</span>`;
+  const macro=macroToday(ss.p.dateKey);
+  env.appendChild(rowKV("Date / Time (ET)",`${ss.p.dateKey} · ${String(ss.p.hh).padStart(2,"0")}:${String(ss.p.mm).padStart(2,"0")}`));
+  env.appendChild(rowKV("Market session",ss.label,ss.open?"open":"closed"));
+  env.appendChild(rowKV("High-risk macro day",macro?("YES — "+macroLabel(ss.p.dateKey)):"none flagged",macro?"macro":""));
+  // env inputs (user supplies, never fabricated)
+  const d=day();
+  env.appendChild(el("p","subnote",'<span style="color:var(--ink-faint)">Live prices/levels aren\'t fetched — enter or confirm them yourself (or ask Claude with search on the day).</span>'));
+  const eg=el("div","frow");
+  eg.innerHTML=`<div><label class="fld">SPY/QQQ bias (your read)</label><input id="e_bias" value="${esc(d.env.bias)}" placeholder="e.g. above 50dma, constructive"></div>
+    <div><label class="fld">Key levels</label><input id="e_levels" value="${esc(d.env.levels)}" placeholder="SPY 540 sup / 548 res"></div>`;
+  env.appendChild(eg);
+  const eg2=el("div","frow");
+  eg2.innerHTML=`<div><label class="fld">Volatility note (VIX / regime)</label><input id="e_vix" value="${esc(d.env.vix)}" placeholder="optional"></div>
+    <div><label class="fld">Other notes</label><input id="e_notes" value="${esc(d.env.notes)}" placeholder="optional"></div>`;
+  env.appendChild(eg2);
+  ["e_bias","e_levels","e_vix","e_notes"].forEach(id=>{const m={e_bias:"bias",e_levels:"levels",e_vix:"vix",e_notes:"notes"}[id];$$("#"+id).forEach;});
+  v.appendChild(env);
+  setTimeout(()=>{const bind=(id,k)=>{const n=$("#"+id);if(n)n.oninput=()=>{d.env[k]=n.value;save();};};bind("e_bias","bias");bind("e_levels","levels");bind("e_vix","vix");bind("e_notes","notes");},0);
+
+  // 3 phase
+  const ph=el("div","panel");ph.innerHTML=`<span class="label">2 · Current phase</span>`;
+  const P=PHASES[perm.ph];
+  ph.appendChild(rowKV("Phase",`${perm.ph} — ${P.name}`));
+  const nxt=PHASES[perm.ph+1];
+  ph.appendChild(rowKV("Next unlock",nxt?nxt.gate:"— top phase —"));
+  const goPhase=el("div","btnrow");const pb=el("button","btn ghost sm","View phase ladder →");pb.onclick=()=>go("phase");goPhase.appendChild(pb);ph.appendChild(goPhase);
+  v.appendChild(ph);
+
+  // permission
+  const pm=el("div","panel");pm.innerHTML=`<span class="label">3 · Today's permission</span>`;
+  const box=el("div","perm "+perm.level);
+  box.innerHTML=`<div class="pw">${perm.word}</div><div class="pd">${esc(perm.detail)}</div>`;
+  const al=el("div","allow");
+  al.innerHTML=`<div class="col ok"><h4>Allowed today</h4><ul>${perm.allow.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+    <div class="col no"><h4>Banned today</h4><ul>${perm.ban.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;
+  box.appendChild(al);pm.appendChild(box);v.appendChild(pm);
+
+  // 4 psych scan
+  const sc=el("div","panel");sc.innerHTML=`<span class="label">4 · Psychological risk scan</span>`;
+  const cur=d.scan||{sleep:null,emotions:[],lossBack:false,tempt:false,prove:false,time:null};
+  // sleep
+  const q0=el("div","scan-q");q0.innerHTML=`<div class="qt">1 · How much sleep did you get?</div>`;
+  const so=el("div","opts");[["<6","lt"],["6–7","mid"],["7+","ok"]].forEach(([lab,v2])=>{
+    const on=(cur.sleep!=null)&&((v2==="lt"&&cur.sleep<6)||(v2==="mid"&&cur.sleep>=6&&cur.sleep<7)||(v2==="ok"&&cur.sleep>=7));
+    const o=el("div","opt"+(v2==="lt"?" bad":v2==="ok"?" good":"")+(on?" on":""));o.textContent=lab+" hrs";
+    o.onclick=()=>{cur.sleep=v2==="lt"?5:v2==="mid"?6.5:8;d.scan=cur;save();renderToday();};so.appendChild(o);});
+  q0.appendChild(so);sc.appendChild(q0);
+  // emotions
+  const q1=el("div","scan-q");q1.innerHTML=`<div class="qt">2 · Feeling any of these today? (tap all that apply)</div>`;
+  const eo=el("div","opts");
+  const clearOpt=el("div","opt good"+((cur.emotions||[]).length===0&&d.scan?" on":""));clearOpt.textContent="clear / calm";
+  clearOpt.onclick=()=>{cur.emotions=[];d.scan=cur;save();renderToday();};eo.appendChild(clearOpt);
+  EMOS.forEach(e=>{const on=(cur.emotions||[]).includes(e);const o=el("div","opt bad"+(on?" on":""));o.textContent=e;
+    o.onclick=()=>{cur.emotions=cur.emotions||[];if(on)cur.emotions=cur.emotions.filter(x=>x!==e);else cur.emotions.push(e);d.scan=cur;save();renderToday();};eo.appendChild(o);});
+  q1.appendChild(eo);sc.appendChild(q1);
+  // yes/no questions
+  [["lossBack","3 · A recent loss you want to make back?"],["tempt","4 · Tempted to copy a signal without understanding it?"],["prove","5 · Trying to prove something today?"]].forEach(([k,q])=>{
+    const qq=el("div","scan-q");qq.innerHTML=`<div class="qt">${q}</div>`;
+    const oo=el("div","opts");
+    [["yes",true],["no",false]].forEach(([lab,val])=>{const on=cur[k]===val;const o=el("div","opt"+(val?" bad":" good")+(on?" on":""));o.textContent=lab;
+      o.onclick=()=>{cur[k]=val;d.scan=cur;save();renderToday();};oo.appendChild(o);});
+    qq.appendChild(oo);sc.appendChild(qq);});
+  // time
+  const qt=el("div","scan-q");qt.innerHTML=`<div class="qt">6 · Enough time to do this properly?</div>`;
+  const to=el("div","opts");[["yes, unhurried",true],["no, forcing it",false]].forEach(([lab,val])=>{const on=cur.time===val;const o=el("div","opt"+(val?" good":" bad")+(on?" on":""));o.textContent=lab;
+    o.onclick=()=>{cur.time=val;d.scan=cur;save();renderToday();};to.appendChild(o);});
+  qt.appendChild(to);sc.appendChild(qt);
+  const risk=scanRisk(d.scan);
+  sc.appendChild(el("div","tablefoot","Scan status: "+(d.scan?risk.level.toUpperCase()+(risk.flags.length&&risk.level!=="clear"?" — "+risk.flags.join(", "):""):"not completed")));
+  v.appendChild(sc);
+
+  // accountability nudges
+  const nudges=accountabilityNudges(perm);
+  if(nudges.length){const nb=el("div","panel");nb.innerHTML=`<span class="label">Accountability</span>`;nudges.forEach(n=>nb.appendChild(el("div","banner"+(n.red?" red":""),n.t)));v.appendChild(nb);}
+
+  // actions
+  const act=el("div","btnrow");
+  const tk=el("button","btn","Submit a trade ticket →");tk.onclick=()=>go("desk");
+  const eod=el("button","btn ghost","End-of-day review");eod.onclick=()=>{const e=$("#eod");go("today");};
+  act.appendChild(tk);
+  if(ss.open){const ct=el("button","btn ghost","Can I trade?");ct.onclick=()=>{alert(canITrade(perm));};act.appendChild(ct);}
+  v.appendChild(act);
+
+  // 10 end of day
+  const ed=el("div","panel");ed.id="eod";ed.innerHTML=`<span class="label">End-of-day requirement</span>`;
+  ed.appendChild(el("p","subnote","Before you close out: journal every trade AND every setup you skipped. Score adherence, not P&L."));
+  ed.appendChild(el("label","fld","End-of-day note — what I did right, what I must fix, tomorrow's prep"));
+  const en=el("textarea");en.rows=3;en.value=d.eodNotes||"";en.oninput=()=>{d.eodNotes=en.value;save();};ed.appendChild(en);
+  const edb=el("div","btnrow");const mark=el("button","btn ghost sm",d.eodDone?"✓ Day closed":"Mark day closed");mark.onclick=()=>{d.eodDone=!d.eodDone;save();renderToday();};edb.appendChild(mark);ed.appendChild(edb);
+  v.appendChild(ed);
+}
+function rowKV(k,v,cls){const r=el("div","kv");r.innerHTML=`<span class="k">${esc(k)}</span><span class="v ${cls||""}">${esc(v)}</span>`;return r;}
+function accountabilityNudges(perm){
+  const out=[];const p=paperTrades();const ad=adherencePct(p);
+  if(perm.lt>=2)out.push({t:"Two losses today — session is over. Assign yourself a review, not another trade.",red:true});
+  if(revengeInLast(3,DB.trades)>0)out.push({t:"A revenge trade is logged in your recent history. That streak reset your gate. Walk-away rule is non-negotiable.",red:true});
+  if(perm.risk.level==="high")out.push({t:"High emotional-risk scan. Observation only. The market will be here tomorrow.",red:true});
+  const wins=DB.trades.slice(-5).filter(t=>t.result==="win").length;
+  if(wins>=4)out.push({t:"Hot streak detected (4+ recent wins). This is when overconfidence (your 94) bites. Reduce size, review your worst trades."});
+  if(ad!=null&&ad<70&&p.length>=5)out.push({t:"Adherence under 70% across your paper sample. The problem isn't the market — it's rule-following. Fix that before anything else.",red:true});
+  return out;
+}
+function canITrade(perm){
+  const lines=["CAN I TRADE? — "+perm.word];
+  lines.push("Session: "+perm.ss.label+(perm.ss.open?" (open)":" (closed)"));
+  lines.push("Phase: "+perm.ph+" — live "+(perm.ph>=4?"eligible":"LOCKED"));
+  lines.push("Psych: "+perm.risk.level+(perm.risk.flags.length&&perm.risk.level!=="clear"?" ("+perm.risk.flags.join(", ")+")":""));
+  lines.push("Today: "+perm.tt+"/2 trades, "+perm.lt+"/2 losses");
+  lines.push("");
+  if(perm.level==="stop")lines.push("VERDICT: No trade. "+perm.detail);
+  else if(perm.level==="go")lines.push("VERDICT: One planned live tuition trade allowed — submit a full ticket.");
+  else lines.push("VERDICT: Paper only, full rules, ticket required. "+perm.detail);
+  return lines.join("\n");
+}
+
+/* ============== TRADE DESK (ticket approval) ============== */
+function blankTicket(){return{id:null,date:dkey(),session:session().s,ticker:"SPY",direction:"long",setup:"",whyTrade:"",whyNow:"",
+  entry:"",stop:"",target:"",contract:"call",strike:"",expiration:"",spread:"",volume:"",oi:"",delta:"",gamma:"",theta:"",vega:"",iv:"",
+  whyStrike:"",whyExp:"",maxRisk:"",riskPct:"",invalidation:"",exitPlan:"",skipIf:"",emo:"",source:"plan",fromDiscord:false,understood:false,
+  paperLive:"paper",greeksExplained:false,rules:{plan:false,sizing:false,liquidity:false,instrument:false,exit:false,noRevenge:false,noChase:false},
+  result:"open",exit:"",rMultiple:"",lesson:"",emoBefore:"",emoDuring:"",emoAfter:""};}
+function gradeTicket(t){
+  // adherence
+  let good=0,total=6;[ "plan","sizing","liquidity","instrument","exit"].forEach(k=>{if(t.rules[k])good++;});if(t.greeksExplained)good++;
+  let adh=Math.round(good/total*100);if(t.rules.noRevenge)adh=Math.max(0,adh-50);if(t.rules.noChase)adh=Math.max(0,adh-40);
+  // quality (plan completeness)
+  const qf=[t.whyTrade,t.whyNow,t.whyStrike,t.whyExp,t.invalidation,t.exitPlan,t.setup];const qFilled=qf.filter(x=>x&&x.trim().length>2).length;
+  let qual=Math.round(qFilled/qf.length*100);if(!t.understood)qual=Math.min(qual,40);if(!t.greeksExplained)qual=Math.min(qual,50);
+  // risk (higher=safer)
+  let risk=100;const rp=parseFloat(t.riskPct);if(!isNaN(rp)){if(rp>2)risk-=70;else if(rp>1)risk-=40;else if(rp>0.5)risk-=15;}else risk-=20;
+  if(!t.rules.instrument)risk-=30;if(!t.rules.liquidity)risk-=15;risk=Math.max(0,Math.min(100,risk));
+  // emotional control (higher=calmer)
+  const sc=day().scan;const sr=scanRisk(sc);let emo=sr.level==="high"?20:sr.level==="caution"?60:90;
+  if(t.source==="fomo")emo-=40;if(t.fromDiscord&&!t.understood)emo-=30;emo=Math.max(0,Math.min(100,emo));
+  // decision
+  const ss=session();let decision="appr",word="Approved for Paper",reasons=[];
+  if(t.rules.noRevenge){decision="deny";word="Denied — Revenge";reasons.push("Flagged as a revenge trade. No trade earns a make-it-back.");}
+  else if(t.rules.noChase){decision="deny";word="Denied — Chase";reasons.push("Flagged as a late/chase entry. A missed move is not a trade.");}
+  else if(sr.level==="high"){decision="deny";word="Observation Only";reasons.push("Emotional-risk scan is high. No trade today.");}
+  else if(!t.understood||!t.greeksExplained){decision="rev";word="Needs Revision";reasons.push("Explain the contract + Greeks + why price should move before this can be approved.");}
+  else if(qFilled<5){decision="rev";word="Needs Revision";reasons.push("Plan incomplete — fill thesis, why-now, strike/expiration logic, invalidation, exit.");}
+  else if(t.paperLive==="live"){
+    if(currentPhase()<4){decision="deny";word="Live Not Allowed";reasons.push("Phase "+currentPhase()+" — live gate (Phase 4) not cleared. Re-submit as paper.");}
+    else if(!ss.open){decision="deny";word="Live Not Allowed";reasons.push("Market is closed. Live can't execute. Paper/replay only.");}
+    else {decision="appr";word="Approved — Live Tuition";reasons.push("Smallest size. Stops pre-set. One trade.");}
+  } else {
+    word="Approved for Paper";reasons.push("Execute on paper, follow the plan exactly, then journal it.");
+  }
+  if(adh<90&&decision==="appr")reasons.push("Note: adherence "+adh+"% — tighten before going live.");
+  return{adh,qual,risk,emo,decision,word,reasons};
+}
+function renderDesk(){
+  const v=$("#v-desk");v.innerHTML="";
+  v.appendChild(el("h2","sec","Trade Desk"));
+  v.appendChild(el("p","subnote","No trade without a full ticket. The desk grades it and approves, revises, or denies. P&L never overrides the rules."));
+  const perm=permission();
+  const pb=el("div","banner"+(perm.level==="stop"?" red":""));
+  pb.innerHTML=`<b>${perm.word}</b> — ${esc(perm.detail)}`;v.appendChild(pb);
+
+  if(!DB.ticketDraft)DB.ticketDraft=blankTicket();
+  const t=DB.ticketDraft;
+  const f=el("div","panel");f.innerHTML=`<span class="label">Trade ticket</span>`;
+  // context
+  const r0=el("div","frow3");
+  r0.innerHTML=`<div><label class="fld">Date</label><input class="mono" id="k_date" value="${t.date}"></div>
+    <div><label class="fld">Paper / Live</label><select id="k_pl"><option value="paper" ${t.paperLive==="paper"?"selected":""}>paper</option><option value="live" ${t.paperLive==="live"?"selected":""}>live tuition</option><option value="futures-paper" ${t.paperLive==="futures-paper"?"selected":""}>futures paper</option></select></div>
+    <div><label class="fld">Ticker</label><select id="k_ticker"><option ${t.ticker==="SPY"?"selected":""}>SPY</option><option ${t.ticker==="QQQ"?"selected":""}>QQQ</option><option value="other" ${t.ticker!=="SPY"&&t.ticker!=="QQQ"?"selected":""}>other (off-plan)</option></select></div>`;
+  f.appendChild(r0);
+  const r1=el("div","frow3");
+  r1.innerHTML=`<div><label class="fld">Direction</label><select id="k_dir"><option ${t.direction==="long"?"selected":""}>long</option><option ${t.direction==="short"?"selected":""}>short</option></select></div>
+    <div><label class="fld">Contract</label><select id="k_con"><option ${t.contract==="call"?"selected":""}>call</option><option ${t.contract==="put"?"selected":""}>put</option><option ${t.contract==="debit spread"?"selected":""}>debit spread</option></select></div>
+    <div><label class="fld">Setup</label><input id="k_setup" value="${esc(t.setup)}" placeholder="trend-pullback / breakout"></div>`;
+  f.appendChild(r1);
+  f.appendChild(field("k_why","Why this trade?",t.whyTrade,"textarea"));
+  f.appendChild(field("k_whynow","Why now?",t.whyNow));
+  const r2=el("div","frow3");
+  r2.innerHTML=`<div><label class="fld">Entry</label><input class="mono" id="k_entry" value="${esc(t.entry)}"></div>
+    <div><label class="fld">Stop</label><input class="mono" id="k_stop" value="${esc(t.stop)}"></div>
+    <div><label class="fld">Target</label><input class="mono" id="k_target" value="${esc(t.target)}"></div>`;
+  f.appendChild(r2);
+  const r3=el("div","frow3");
+  r3.innerHTML=`<div><label class="fld">Strike</label><input class="mono" id="k_strike" value="${esc(t.strike)}"></div>
+    <div><label class="fld">Expiration</label><input class="mono" id="k_exp" value="${esc(t.expiration)}"></div>
+    <div><label class="fld">IV</label><input class="mono" id="k_iv" value="${esc(t.iv)}"></div>`;
+  f.appendChild(r3);
+  const r4=el("div","frow4");
+  r4.innerHTML=`<div><label class="fld">Spread</label><input class="mono" id="k_spread" value="${esc(t.spread)}"></div>
+    <div><label class="fld">Volume</label><input class="mono" id="k_vol" value="${esc(t.volume)}"></div>
+    <div><label class="fld">Open int.</label><input class="mono" id="k_oi" value="${esc(t.oi)}"></div>
+    <div><label class="fld">Delta</label><input class="mono" id="k_delta" value="${esc(t.delta)}"></div>`;
+  f.appendChild(r4);
+  const r5=el("div","frow3");
+  r5.innerHTML=`<div><label class="fld">Gamma</label><input class="mono" id="k_gamma" value="${esc(t.gamma)}"></div>
+    <div><label class="fld">Theta</label><input class="mono" id="k_theta" value="${esc(t.theta)}"></div>
+    <div><label class="fld">Vega</label><input class="mono" id="k_vega" value="${esc(t.vega)}"></div>`;
+  f.appendChild(r5);
+  f.appendChild(field("k_whystrike","Why this strike?",t.whyStrike));
+  f.appendChild(field("k_whyexp","Why this expiration?",t.whyExp));
+  const r6=el("div","frow");
+  r6.innerHTML=`<div><label class="fld">Max risk ($)</label><input class="mono" id="k_risk" value="${esc(t.maxRisk)}"></div>
+    <div><label class="fld">Risk as % of account</label><input class="mono" id="k_riskpct" value="${esc(t.riskPct)}" placeholder="≤0.5"></div>`;
+  f.appendChild(r6);
+  f.appendChild(field("k_inval","Invalidation (what proves me wrong)",t.invalidation));
+  f.appendChild(field("k_exit","Exit plan",t.exitPlan));
+  f.appendChild(field("k_skip","What would make me SKIP this trade?",t.skipIf));
+  const r7=el("div","frow3");
+  r7.innerHTML=`<div><label class="fld">Emotional state</label><input id="k_emo" value="${esc(t.emo)}" placeholder="calm / rushed / excited"></div>
+    <div><label class="fld">Source</label><select id="k_src"><option value="plan" ${t.source==="plan"?"selected":""}>my plan</option><option value="fomo" ${t.source==="fomo"?"selected":""}>FOMO</option></select></div>
+    <div><label class="fld">From a Discord signal?</label><select id="k_disc"><option value="no" ${!t.fromDiscord?"selected":""}>no</option><option value="yes" ${t.fromDiscord?"selected":""}>yes</option></select></div>`;
+  f.appendChild(r7);
+  // gates
+  const gk=el("div","rule"+(t.understood?" on":""));gk.style.marginTop="14px";gk.innerHTML=`<span class="rb"></span><span>I understand this trade fully</span>`;
+  gk.onclick=()=>{t.understood=!t.understood;gk.classList.toggle("on");save();};
+  const gk2=el("div","rule"+(t.greeksExplained?" on":""));gk2.style.marginTop="8px";gk2.innerHTML=`<span class="rb"></span><span>I can explain the Greeks + why the price should move</span>`;
+  gk2.onclick=()=>{t.greeksExplained=!t.greeksExplained;gk2.classList.toggle("on");save();};
+  f.appendChild(el("label","fld","Knowledge gate"));f.appendChild(gk);f.appendChild(gk2);
+  // rules
+  f.appendChild(el("label","fld","Rule adherence — honest"));
+  const rules=el("div","rules");
+  RULE_DEFS.forEach(r=>{const on=t.rules[r.k];const node=el("div","rule"+(r.flag?" flag":"")+(on?" on":""));node.innerHTML=`<span class="rb"></span><span>${r.label}</span>`;
+    node.onclick=()=>{t.rules[r.k]=!t.rules[r.k];node.classList.toggle("on");save();};rules.appendChild(node);});
+  f.appendChild(rules);
+  // grade button
+  const br=el("div","btnrow");
+  const gb=el("button","btn","Grade ticket");gb.onclick=()=>{pullTicket();renderGrade(f);};
+  const clr=el("button","btn ghost","Clear");clr.onclick=()=>{DB.ticketDraft=blankTicket();save();renderDesk();};
+  br.appendChild(gb);br.appendChild(clr);f.appendChild(br);
+  const out=el("div");out.id="grade-out";f.appendChild(out);
+  v.appendChild(f);
+
+  // recent tickets
+  if(DB.trades.length){const rp=el("div","panel");rp.innerHTML=`<span class="label">Recent tickets</span>`;
+    DB.trades.slice(-3).reverse().forEach(x=>rp.appendChild(miniTrade(x)));v.appendChild(rp);}
+}
+function field(id,lab,val,type){const d=el("div");d.innerHTML=`<label class="fld">${lab}</label>${type==="textarea"?`<textarea id="${id}" rows="2">${esc(val)}</textarea>`:`<input id="${id}" value="${esc(val)}">`}`;return d;}
+function pullTicket(){const t=DB.ticketDraft;const g=id=>{const n=$("#"+id);return n?n.value:"";};
+  t.date=g("k_date");t.paperLive=g("k_pl");t.ticker=g("k_ticker");t.direction=g("k_dir");t.contract=g("k_con");t.setup=g("k_setup");
+  t.whyTrade=g("k_why");t.whyNow=g("k_whynow");t.entry=g("k_entry");t.stop=g("k_stop");t.target=g("k_target");
+  t.strike=g("k_strike");t.expiration=g("k_exp");t.iv=g("k_iv");t.spread=g("k_spread");t.volume=g("k_vol");t.oi=g("k_oi");
+  t.delta=g("k_delta");t.gamma=g("k_gamma");t.theta=g("k_theta");t.vega=g("k_vega");t.whyStrike=g("k_whystrike");t.whyExp=g("k_whyexp");
+  t.maxRisk=g("k_risk");t.riskPct=g("k_riskpct");t.invalidation=g("k_inval");t.exitPlan=g("k_exit");t.skipIf=g("k_skip");
+  t.emo=g("k_emo");t.source=g("k_src");t.fromDiscord=g("k_disc")==="yes";save();}
+function renderGrade(f){
+  const t=DB.ticketDraft;const G=gradeTicket(t);
+  const out=$("#grade-out");out.innerHTML="";
+  const sg=el("div","scoregrid");
+  const sc=(v,k)=>`<div class="score ${v>=80?'good':v>=55?'mid':'bad'}"><div class="sv">${v}</div><div class="sk">${k}</div></div>`;
+  sg.innerHTML=sc(G.qual,"Trade quality")+sc(G.adh,"Rule adherence")+sc(G.risk,"Risk (safer↑)")+sc(G.emo,"Emotional control");
+  out.appendChild(sg);
+  const dc=el("div","decision "+G.decision);
+  dc.innerHTML=`<div class="dw">${G.word}</div><div class="dr">${G.reasons.map(esc).join("<br>")}</div>`;
+  out.appendChild(dc);
+  if(G.decision==="appr"){
+    const br=el("div","btnrow");
+    const ex=el("button","btn","Mark executed → log to journal");
+    ex.onclick=()=>{const rec=JSON.parse(JSON.stringify(t));rec.id=uid();DB.trades.push(rec);DB.ticketDraft=blankTicket();save();go("journal");};
+    br.appendChild(ex);out.appendChild(br);
+    out.appendChild(el("div","tablefoot","Approved trades become journal entries you then close out with result + lesson."));
+  }
+  if(out.scrollIntoView)out.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function miniTrade(x){const ad=tradeAdherent(x);const c=el("div","tcard "+(ad?"adherent":"broke"));
+  c.innerHTML=`<div class="th"><span class="ttick">${esc(x.ticker)} ${esc(x.contract)} ${esc(x.strike)} <span class="tmeta">${esc(x.paperLive)}</span></span><span class="tmeta">${esc(x.date)} · <span class="res-${x.result}">${esc(x.result)}</span></span></div>`;return c;}
+
+/* ============== JOURNAL ============== */
+function renderJournal(){
+  const v=$("#v-journal");v.innerHTML="";
+  v.appendChild(el("h2","sec","Journal"));
+  v.appendChild(el("p","subnote","Close out every executed trade. Process grade = 70% rules · 15% planning · 10% emotion · 5% result. A profitable rule break is still failure."));
+  const ad=adherencePct(paperTrades());
+  v.appendChild(el("div","banner",`<b>Adherence: ${ad==null?"—":ad+"%"}</b> across ${paperTrades().length} paper trades. First 30 days: this is the only number that matters.`));
+  const list=el("div","panel");list.innerHTML=`<span class="label">Logged trades (${DB.trades.length})</span>`;
+  if(!DB.trades.length)list.appendChild(el("div","empty","No trades yet. Submit a ticket on the Trade Desk; approved tickets land here."));
+  [...DB.trades].reverse().forEach(t=>list.appendChild(journalCard(t)));
+  v.appendChild(list);
+}
+function processGrade(t){const ad=tradeAdherent(t)?100:Math.max(0,(["plan","sizing","liquidity","instrument","exit"].filter(k=>t.rules[k]).length/5*100)-(t.rules.noRevenge?50:0)-(t.rules.noChase?40:0));
+  const plan=[t.whyTrade,t.whyNow,t.invalidation,t.exitPlan].filter(x=>x&&x.length>2).length/4*100;
+  const emo=/(calm|clear|disciplin)/i.test(t.emoBefore||t.emo||"")?100:/(rushed|angry|fomo|revenge|excited)/i.test(t.emoBefore||t.emo||"")?30:65;
+  const res=t.result==="win"?100:t.result==="scratch"?60:t.result==="loss"?40:50;
+  return Math.round(ad*0.7+plan*0.15+emo*0.10+res*0.05);}
+function journalCard(t){
+  const ad=tradeAdherent(t);const c=el("div","tcard "+(ad?"adherent":"broke"));
+  let flags="";if(t.rules&&t.rules.noRevenge)flags+='<span class="flagpill r">revenge</span>';if(t.rules&&t.rules.noChase)flags+='<span class="flagpill r">chased</span>';
+  flags+=t.greeksExplained?'<span class="flagpill g">greeks ✓</span>':'<span class="flagpill r">greeks gap</span>';if(ad)flags+='<span class="flagpill g">clean</span>';
+  flags+=`<span class="flagpill">${esc(t.paperLive)}</span>`;
+  c.innerHTML=`<div class="th"><span class="ttick">${esc(t.ticker)} ${esc(t.contract)} ${esc(t.strike)} <span class="tmeta">exp ${esc(t.expiration||"—")}</span></span>
+    <span class="tmeta">${esc(t.date)} · <span class="res-${t.result}">${esc(t.result)}</span>${t.rMultiple!==""&&t.rMultiple!=null?` · ${esc(t.rMultiple)}R`:""} · grade ${processGrade(t)}</span></div>
+    <div class="tbody">${t.whyTrade?esc(t.whyTrade):'<i style="color:var(--ink-faint)">no thesis</i>'}${t.lesson?` — <b style="color:var(--ink-dim)">lesson:</b> ${esc(t.lesson)}`:""}</div>
+    <div class="tflags">${flags}</div>`;
+  // close-out controls
+  const cc=el("div");cc.style.marginTop="10px";
+  if(t.result==="open"){
+    const r=el("div","frow3");
+    r.innerHTML=`<div><label class="fld">Result</label><select id="r_${t.id}"><option value="open">open</option><option value="win">win</option><option value="loss">loss</option><option value="scratch">scratch</option></select></div>
+      <div><label class="fld">Exit</label><input class="mono" id="x_${t.id}" placeholder="premium"></div>
+      <div><label class="fld">R-multiple</label><input class="mono" id="rm_${t.id}" placeholder="+2 / -1"></div>`;
+    cc.appendChild(r);
+    cc.appendChild(field("ls_"+t.id,"Lesson",t.lesson||""));
+    const er=el("div","frow3");er.innerHTML=`<div><label class="fld">Emo before</label><input id="eb_${t.id}" value="${esc(t.emoBefore)}"></div><div><label class="fld">Emo during</label><input id="ed_${t.id}" value="${esc(t.emoDuring)}"></div><div><label class="fld">Emo after</label><input id="ea_${t.id}" value="${esc(t.emoAfter)}"></div>`;cc.appendChild(er);
+    const b=el("button","btn sm","Close out trade");b.style.marginTop="10px";
+    b.onclick=()=>{t.result=$("#r_"+t.id).value;t.exit=$("#x_"+t.id).value;t.rMultiple=$("#rm_"+t.id).value;t.lesson=$("#ls_"+t.id).value;
+      t.emoBefore=$("#eb_"+t.id).value;t.emoDuring=$("#ed_"+t.id).value;t.emoAfter=$("#ea_"+t.id).value;save();renderJournal();renderAll();};
+    cc.appendChild(b);
+  }
+  const dl=el("button","btn danger sm","Delete");dl.style.marginTop="10px";dl.style.marginLeft="8px";
+  dl.onclick=()=>{if(confirm("Delete this trade?")){DB.trades=DB.trades.filter(x=>x.id!==t.id);save();renderJournal();renderAll();}};
+  cc.appendChild(dl);c.appendChild(cc);return c;
+}
+
+/* ============== PHASE & GATE ============== */
+function renderPhase(){
+  const v=$("#v-phase");v.innerHTML="";
+  v.appendChild(el("h2","sec","Phase & Gate"));
+  v.appendChild(el("p","subnote","Only logged data unlocks phases — never confidence. \u201CNew argument is not new evidence. Bring logged trades.\u201D"));
+  const cur=currentPhase();const checks=phaseChecks();
+
+  // knowledge gate (phase 0->1)
+  const kg=el("div","panel");kg.innerHTML=`<span class="label">Phase 0 → 1 · Knowledge gate</span>`;
+  kg.appendChild(el("p","subnote","Check only what you can explain cold, out loud. Honesty here is the whole point."));
+  const grid=el("div","rules");
+  KNOWLEDGE.forEach(([k,lab])=>{const on=!!DB.knowledge[k];const node=el("div","rule"+(on?" on":""));node.innerHTML=`<span class="rb"></span><span>${lab}</span>`;
+    node.onclick=()=>{DB.knowledge[k]=!DB.knowledge[k];save();renderPhase();renderAll();};grid.appendChild(node);});
+  kg.appendChild(grid);
+  kg.appendChild(el("div","tablefoot",KNOWLEDGE.filter(([k])=>DB.knowledge[k]).length+" / "+KNOWLEDGE.length+" — "+(knowledgeGate()?"GATE CLEARED, Phase 1 unlocked":"locked")));
+  v.appendChild(kg);
+
+  // live gate (phase 3->4)
+  const gp=el("div","panel");gp.innerHTML=`<span class="label">Phase 3 → 4 · Live tuition gate</span>`;
+  const cleared=gateCriteria().every(c=>c.met);
+  const gb=el("div","gatebox "+(cleared?"cleared":""));
+  gateCriteria().forEach(c=>{const row=el("div","crit "+(c.met?"met":"unmet"));row.innerHTML=`<div class="crow"><span class="cname">${c.name}</span><span class="cval">${esc(c.val)} ${c.met?"✓":"○"}</span></div><div class="track"><i class="${c.met||c.good?'good':''}" style="width:${c.pct}%"></i></div>`;gb.appendChild(row);});
+  gp.appendChild(gb);v.appendChild(gp);
+
+  // ladder
+  const lp=el("div","panel");lp.innerHTML=`<span class="label">The 7-phase ladder</span>`;
+  const ladder=el("div","ladder");
+  PHASES.forEach(P=>{
+    const done=P.n<cur,isCur=P.n===cur;
+    const step=el("div","step"+(done?" done":"")+(isCur?" current":""));
+    let met="";if(P.n>0){met=checks[P.n]?'<span class="y">✓ unlocked</span>':'<span class="n">locked</span>';}
+    step.innerHTML=`<div class="dot">${P.n}</div><div class="sbody"><h4>${P.name}</h4><div class="sgate">${P.gate}</div>${P.n>0?`<div class="smet">${met}</div>`:""}</div>`;
+    ladder.appendChild(step);
+  });
+  lp.appendChild(ladder);v.appendChild(lp);
+
+  // readiness answers
+  const rp=el("div","panel");rp.innerHTML=`<span class="label">Readiness checks (data only)</span>`;
+  rp.appendChild(rowKV("Am I ready for LIVE?",cleared?"Gate cleared — Phase 4 tuition unlocked":"No — gate not cleared",cleared?"open":"closed"));
+  rp.appendChild(rowKV("Am I ready for FUTURES?",checks[5]?"Yes — Phase 5 unlocked":"No — clear live tuition first",checks[5]?"open":"closed"));
+  v.appendChild(rp);
+}
+
+/* ============== COURSE ============== */
+const STEPS=[["watch","Watch"],["summarize","Summarize"],["define","Define"],["chart","Chart"],["paper","Paper"],["journal","Journal"],["quiz","Quiz"],["review","Review"]];
+function renderCourse(){
+  const v=$("#v-course");v.innerHTML="";
+  v.appendChild(el("h2","sec","Course Mode"));
+  v.appendChild(el("p","subnote","No module counts until summarize\u2192define\u2192chart\u2192paper\u2192journal\u2192quiz\u2192review are done. Watching is not learning."));
+  const mp=el("div","panel");mp.innerHTML=`<span class="label">Modules</span>`;
+  const addrow=el("div","btnrow");const inp=el("input");inp.placeholder="Module (e.g. 'Theta & time decay')";inp.style.flex="1";
+  const ab=el("button","btn sm","+ Add");ab.onclick=()=>{if(inp.value.trim()){DB.course.modules.push({id:uid(),name:inp.value.trim(),steps:{}});save();renderCourse();}};
+  addrow.appendChild(inp);addrow.appendChild(ab);mp.appendChild(addrow);
+  if(!DB.course.modules.length)mp.appendChild(el("div","empty","Add modules as you work through the course."));
+  DB.course.modules.forEach(m=>{const card=el("div","tcard");const dn=STEPS.filter(s=>m.steps[s[0]]).length;
+    card.innerHTML=`<div class="th"><span class="ttick">${esc(m.name)}</span><span class="tmeta">${dn}/8</span></div>`;
+    const sr=el("div","tflags");sr.style.marginTop="10px";
+    STEPS.forEach(([k,lab])=>{const pill=el("span","flagpill"+(m.steps[k]?" g":""));pill.textContent=lab;pill.style.cursor="pointer";pill.onclick=()=>{m.steps[k]=!m.steps[k];save();renderCourse();};sr.appendChild(pill);});
+    card.appendChild(sr);const del=el("button","btn danger sm","Remove");del.style.marginTop="10px";del.onclick=()=>{DB.course.modules=DB.course.modules.filter(x=>x.id!==m.id);save();renderCourse();};card.appendChild(del);mp.appendChild(card);});
+  v.appendChild(mp);
+}
+
+/* ============== SIGNALS ============== */
+function renderSignals(){
+  const v=$("#v-signals");v.innerHTML="";
+  v.appendChild(el("h2","sec","Discord Signal Mode"));
+  v.appendChild(el("p","subnote","Signals are case studies, never live trades. Paper every one. Track the caller's edge before trusting it."));
+  const withR=DB.signals.filter(s=>!isNaN(parseFloat(s.r)));
+  const exp=withR.length?withR.reduce((a,s)=>a+parseFloat(s.r),0)/withR.length:null;
+  const late=DB.signals.filter(s=>s.late).length;const understoodPct=DB.signals.length?Math.round(DB.signals.filter(s=>s.understood).length/DB.signals.length*100):null;
+  const b=el("div","banner");
+  let verdict=exp==null?"Not enough data yet.":exp>=0.2?"Showing positive expectancy — keep tracking.":exp<=-0.2?"Negative expectancy — this is costing you. Treat as study only.":"Roughly break-even — variance, not edge.";
+  b.innerHTML=`<b>Caller expectancy: ${exp==null?"—":(exp>=0?"+":"")+exp.toFixed(2)+"R"}</b> over ${withR.length} graded · late entries: ${late} · understood: ${understoodPct==null?"—":understoodPct+"%"}. ${verdict}`;
+  v.appendChild(b);
+  const fp=el("div","panel");fp.innerHTML=`<span class="label">Log a signal (paper case study)</span>`;
+  const r1=el("div","frow3");r1.innerHTML=`<div><label class="fld">Date</label><input class="mono" id="g_date" value="${dkey()}"></div><div><label class="fld">Caller</label><input id="g_caller" value="Brett"></div><div><label class="fld">Ticker</label><input id="g_ticker" placeholder="SPY"></div>`;fp.appendChild(r1);
+  const r2=el("div","frow3");r2.innerHTML=`<div><label class="fld">Contract/Strike/Exp</label><input id="g_con" placeholder="540C 6/27"></div><div><label class="fld">Suggested entry</label><input class="mono" id="g_sug"></div><div><label class="fld">My paper fill</label><input class="mono" id="g_fill"></div>`;fp.appendChild(r2);
+  const r3=el("div","frow3");r3.innerHTML=`<div><label class="fld">R-multiple</label><input class="mono" id="g_r"></div><div><label class="fld">Spread</label><input class="mono" id="g_spread"></div><div><label class="fld">Posted vs now</label><input id="g_time" placeholder="late?"></div>`;fp.appendChild(r3);
+  fp.appendChild(field("g_thesis","Thesis (reconstruct caller's logic) + what invalidates it","","textarea"));
+  const tg=el("div","rules");tg.style.marginTop="10px";let sLate=false,sUnd=false,sLiq=false,sWould=false;
+  const mkR=(lab,flag,set)=>{const n=el("div","rule"+(flag?" flag":""));n.innerHTML=`<span class="rb"></span><span>${lab}</span>`;n.onclick=()=>{set(n.classList.toggle("on"));};return n;};
+  tg.appendChild(mkR("Entry was LATE / I'd chase",true,x=>sLate=x));
+  tg.appendChild(mkR("I understood the trade",false,x=>sUnd=x));
+  tg.appendChild(mkR("Liquidity was good",false,x=>sLiq=x));
+  tg.appendChild(mkR("Would I take this WITHOUT the signal?",false,x=>sWould=x));
+  fp.appendChild(tg);
+  const br=el("div","btnrow");const sb=el("button","btn","Save signal");
+  sb.onclick=()=>{DB.signals.push({id:uid(),date:$("#g_date").value,caller:$("#g_caller").value,ticker:$("#g_ticker").value,contract:$("#g_con").value,sug:$("#g_sug").value,fill:$("#g_fill").value,r:$("#g_r").value,spread:$("#g_spread").value,time:$("#g_time").value,thesis:$("#g_thesis").value,late:sLate,understood:sUnd,liq:sLiq,would:sWould});save();renderSignals();};
+  br.appendChild(sb);fp.appendChild(br);v.appendChild(fp);
+  const lp=el("div","panel");lp.innerHTML=`<span class="label">Signals (${DB.signals.length})</span>`;
+  if(!DB.signals.length)lp.appendChild(el("div","empty","No signals logged."));
+  [...DB.signals].reverse().forEach(s=>{const c=el("div","tcard");
+    c.innerHTML=`<div class="th"><span class="ttick">${esc(s.caller||"—")}: ${esc(s.ticker)} ${esc(s.contract)}</span><span class="tmeta">${esc(s.date)}${s.r?` · ${esc(s.r)}R`:""}</span></div>
+      <div class="tbody">${s.thesis?esc(s.thesis):'<i style="color:var(--ink-faint)">no thesis</i>'}</div>
+      <div class="tflags">${s.late?'<span class="flagpill r">late</span>':''}${s.understood?'<span class="flagpill g">understood</span>':'<span class="flagpill r">not understood</span>'}${s.liq?'<span class="flagpill g">liquid</span>':''}${s.would?'<span class="flagpill g">own-conviction</span>':'<span class="flagpill r">signal-only</span>'}</div>`;
+    const dl=el("button","btn danger sm","Delete");dl.style.marginTop="8px";dl.onclick=()=>{DB.signals=DB.signals.filter(x=>x.id!==s.id);save();renderSignals();};c.appendChild(dl);lp.appendChild(c);});
+  v.appendChild(lp);
+}
+
+/* ============== DASHBOARD ============== */
+function renderDashboard(){
+  const v=$("#v-dashboard");v.innerHTML="";
+  v.appendChild(el("h2","sec","Dashboard"));
+  const dayN=Math.max(1,Math.round((Date.now()-new Date(DB.settings.created).getTime())/864e5)+1);
+  v.appendChild(el("p","subnote",`Day ${dayN}. Phase ${currentPhase()}. Logged behavior beats ambition.`));
+  v.appendChild(el("div","banner",`<b>First 30 days:</b> rule-adherence % and can-explain-every-contract are the <b>only</b> metrics that count. P&L is noise until you have a real sample.`));
+  const ts=DB.trades,p=paperTrades(),closed=ts.filter(t=>t.result==="win"||t.result==="loss");
+  const ad=adherencePct(p),gm=greeksMissing(p);
+  const revC=ts.filter(t=>t.rules&&t.rules.noRevenge).length,fomoC=ts.filter(t=>t.rules&&t.rules.noChase).length;
+  const lateP=ts.length?Math.round(fomoC/ts.length*100):null;
+  const rs=ts.map(t=>parseFloat(t.rMultiple)).filter(x=>!isNaN(x));
+  const avgR=rs.length?rs.reduce((a,b)=>a+b,0)/rs.length:null;
+  const gw=rs.filter(r=>r>0).reduce((a,b)=>a+b,0),gl=Math.abs(rs.filter(r=>r<0).reduce((a,b)=>a+b,0));
+  const pf=gl>0?gw/gl:null;const winRate=closed.length?Math.round(ts.filter(t=>t.result==="win").length/closed.length*100):null;
+  const stopMoved=ts.filter(t=>t.rules&&!t.rules.exit&&t.result!=="open").length;const noPlan=ts.filter(t=>!t.rules||!t.rules.plan).length;
+
+  const p1=el("div","panel");p1.innerHTML=`<span class="label">Primary — what matters now</span>`;
+  const g1=el("div","grid3");g1.innerHTML=`<div class="mcard hl"><div class="mv">${ad==null?"—":ad+"%"}</div><div class="mk">Rule adherence</div></div><div class="mcard hl"><div class="mv">${p.length}/50</div><div class="mk">Gate trades</div></div><div class="mcard ${gm===0&&p.length?'hl':''}"><div class="mv">${p.length?(p.length-gm)+"/"+p.length:"—"}</div><div class="mk">Greeks explained</div></div>`;p1.appendChild(g1);v.appendChild(p1);
+
+  const p2=el("div","panel");p2.innerHTML=`<span class="label">Behavioral flags (lower is better)</span>`;
+  const g2=el("div","grid4");g2.innerHTML=`<div class="mcard"><div class="mv" style="color:${revC?'var(--red)':'var(--green)'}">${revC}</div><div class="mk">Revenge</div></div><div class="mcard"><div class="mv" style="color:${fomoC?'var(--red)':'var(--green)'}">${fomoC}</div><div class="mk">Chased/FOMO</div></div><div class="mcard"><div class="mv">${stopMoved}</div><div class="mk">Stops moved</div></div><div class="mcard"><div class="mv">${noPlan}</div><div class="mk">No-plan trades</div></div>`;p2.appendChild(g2);v.appendChild(p2);
+
+  const p3=el("div","panel");p3.innerHTML=`<span class="label">Volume & signals</span>`;
+  const g3=el("div","grid4");g3.innerHTML=`<div class="mcard"><div class="mv">${p.length}</div><div class="mk">Paper trades</div></div><div class="mcard"><div class="mv">${liveTrades().length}</div><div class="mk">Live trades</div></div><div class="mcard"><div class="mv">${DB.signals.length}</div><div class="mk">Signals tracked</div></div><div class="mcard"><div class="mv">${lateP==null?"—":lateP+"%"}</div><div class="mk">Late-entry %</div></div>`;p3.appendChild(g3);v.appendChild(p3);
+
+  const p4=el("div","panel");p4.innerHTML=`<span class="label">Performance — meaningful only at sample size</span>`;
+  const g4=el("div","grid4");g4.innerHTML=`<div class="mcard"><div class="mv">${winRate==null?"—":winRate+"%"}</div><div class="mk">Win rate</div></div><div class="mcard"><div class="mv">${avgR==null?"—":(avgR>=0?"+":"")+avgR.toFixed(2)}</div><div class="mk">Avg R</div></div><div class="mcard"><div class="mv">${pf==null?"—":pf.toFixed(2)}</div><div class="mk">Profit factor</div></div><div class="mcard"><div class="mv">${currentPhase()}</div><div class="mk">Phase</div></div>`;p4.appendChild(g4);v.appendChild(p4);
+
+  // what the data says
+  const p5=el("div","panel");p5.innerHTML=`<span class="label">What the data says</span>`;
+  const nxt=PHASES[currentPhase()+1];
+  let block=[];
+  if(!knowledgeGate())block.push("Blocking: knowledge gate. Finish the Phase 0→1 concept checklist.");
+  else if(p.length<50)block.push(`Blocking: trade volume (${p.length}/50 paper trades).`);
+  if(ad!=null&&ad<90)block.push(`Blocking: adherence (${ad}% < 90%).`);
+  if(gm>0)block.push(`Blocking: ${gm} trade(s) where you can't explain the Greeks.`);
+  if(revengeInLast(20,p)>0)block.push("Blocking: a revenge trade in your last 20. Streak must reach 20 clean.");
+  if(!block.length)block.push("No blocks at the current gate — keep logging clean reps.");
+  p5.innerHTML+=`<ul style="color:var(--ink-dim);font-size:15px;margin:0 0 10px;padding-left:18px">${block.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>`;
+  p5.innerHTML+=`<div class="kv"><span class="k">Next unlock</span><span class="v">${nxt?esc(nxt.gate):"top phase"}</span></div>`;
+  v.appendChild(p5);
+
+  const p6=el("div","panel");p6.innerHTML=`<span class="label">What matters when</span><ul style="color:var(--ink-dim);font-size:15px;margin:0;padding-left:18px;line-height:1.7"><li><b style="color:var(--ink)">30 days:</b> adherence % + explain-every-contract. Nothing else.</li><li><b style="color:var(--ink)">90 days:</b> add late-entry %, FOMO/revenge counts, expectancy, profit factor.</li><li><b style="color:var(--ink)">1 year:</b> full dashboard — expectancy, profit factor, drawdown discipline, live-vs-paper behavior delta.</li></ul>`;v.appendChild(p6);
+}
+
+/* ============== CALENDAR ============== */
+function renderCalendar(){
+  const v=$("#v-calendar");v.innerHTML="";
+  v.appendChild(el("h2","sec","Macro Calendar"));
+  v.appendChild(el("p","subnote","High-risk days = reduced frequency, prefer observation/paper. Live macro data isn't fetched — confirm the week each Sunday (ask Claude with search) and flag days here."));
+  const k=dkey();
+  if(macroToday(k))v.appendChild(el("div","banner red",`<b>Today is flagged high-risk:</b> ${esc(macroLabel(k))}. Price may behave unusually — reduce frequency, prefer observation/paper.`));
+  // add
+  const ap=el("div","panel");ap.innerHTML=`<span class="label">Add a high-risk day</span>`;
+  const r=el("div","frow");r.innerHTML=`<div><label class="fld">Date</label><input class="mono" id="m_date" value="${k}"></div><div><label class="fld">Label</label><input id="m_label" placeholder="CPI / FOMC / NFP / Fed speaker"></div>`;ap.appendChild(r);
+  const br=el("div","btnrow");const ab=el("button","btn sm","+ Add day");ab.onclick=()=>{const dt=$("#m_date").value,lb=$("#m_label").value||"macro";if(dt){DB.macro.push({date:dt,label:lb});DB.macro.sort((a,b)=>a.date<b.date?-1:1);save();renderCalendar();}};br.appendChild(ab);ap.appendChild(br);v.appendChild(ap);
+  // list
+  const lp=el("div","panel");lp.innerHTML=`<span class="label">Flagged days (${DB.macro.length}) — seeded FOMC dates are placeholders, verify against the Fed calendar</span>`;
+  const upcoming=[...DB.macro].sort((a,b)=>a.date<b.date?-1:1);
+  if(!upcoming.length)lp.appendChild(el("div","empty","No days flagged."));
+  upcoming.forEach((m,i)=>{const row=el("div","macrorow"+(m.date===k?" today":""));
+    row.innerHTML=`<span class="md">${esc(m.date)}</span><span style="flex:1">${esc(m.label)}</span>`;
+    const dl=el("button","btn danger sm","✕");dl.onclick=()=>{DB.macro=DB.macro.filter(x=>!(x.date===m.date&&x.label===m.label));save();renderCalendar();};row.appendChild(dl);lp.appendChild(row);});
+  v.appendChild(lp);
+  // holidays ref
+  const hp=el("div","panel");hp.innerHTML=`<span class="label">2026 market holidays (auto-detected as closed)</span>`;
+  hp.innerHTML+=`<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-dim);line-height:1.9">${HOLIDAYS_2026.join(" · ")}</div><div class="tablefoot">Half-days (1pm ET close): ${HALFDAYS_2026.join(" · ")}</div>`;
+  v.appendChild(hp);
+}
+
+/* ============== tabs / nav / data ============== */
+const TABS=[["today","Today"],["desk","Trade Desk"],["journal","Journal"],["phase","Phase & Gate"],["course","Course"],["signals","Signals"],["dashboard","Dashboard"],["calendar","Calendar"]];
+let active="today";
+function go(t){active=t;renderAll();window.scrollTo({top:0});}
+function renderTabs(){const bar=$("#tabbar");bar.innerHTML="";TABS.forEach(([k,lab])=>{const b=el("button",k===active?"active":"");b.textContent=lab;b.onclick=()=>go(k);bar.appendChild(b);});}
+function renderAll(){
+  renderTabs();
+  $$(".view").forEach(x=>x.classList.remove("active"));$("#v-"+active).classList.add("active");
+  if(active==="today")renderToday();if(active==="desk")renderDesk();if(active==="journal")renderJournal();
+  if(active==="phase")renderPhase();if(active==="course")renderCourse();if(active==="signals")renderSignals();
+  if(active==="dashboard")renderDashboard();if(active==="calendar")renderCalendar();
+  renderClock();
+}
+function renderClock(){
+  const ss=session();const c=$("#clock");if(!c)return;
+  const macro=macroToday(ss.p.dateKey);
+  const cls=macro?"macro":ss.open?"open":"closed";
+  c.innerHTML=`<span class="t">${ss.p.dateKey} · ${String(ss.p.hh).padStart(2,"0")}:${String(ss.p.mm).padStart(2,"0")} ET</span><span class="sess ${cls}">${macro?"⚠ MACRO":ss.label}</span><span class="t">Ph ${currentPhase()}</span>`;
+}
+function renderFoot(){
+  const f=$("#foot");f.innerHTML="";
+  const row=el("div","btnrow");row.style.justifyContent="center";
+  const ex=el("button","btn ghost sm","Export backup (.json)");ex.onclick=()=>{const blob=new Blob([JSON.stringify(DB,null,2)],{type:"application/json"});const a=el("a");a.href=URL.createObjectURL(blob);a.download="livetraderos-"+dkey()+".json";a.click();};
+  const imp=el("button","btn ghost sm","Import backup");const fi=el("input");fi.type="file";fi.accept=".json";fi.style.display="none";
+  fi.onchange=e=>{const file=e.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=()=>{try{const obj=JSON.parse(rd.result);
+    // tolerant: accept old console backups (trades-only) or full OS backups
+    if(obj.trades){DB.trades=obj.trades.map(t=>Object.assign(blankTicket(),t));}
+    if(obj.knowledge)DB.knowledge=obj.knowledge;if(obj.course)DB.course=obj.course;if(obj.signals)DB.signals=obj.signals;
+    if(obj.macro)DB.macro=obj.macro;if(obj.days)DB.days=obj.days;if(obj.settings)DB.settings=Object.assign(DB.settings,obj.settings);
+    save();renderAll();alert("Backup imported.");}catch(err){alert("Invalid backup.");}};rd.readAsText(file);};
+  imp.onclick=()=>fi.click();
+  const rs=el("button","btn danger sm","Reset all data");rs.onclick=()=>{if(confirm("Erase ALL data? Cannot be undone.")){localStorage.removeItem(KEY);location.reload();}};
+  row.appendChild(ex);row.appendChild(imp);row.appendChild(fi);row.appendChild(rs);f.appendChild(row);
+  f.appendChild(el("div",null,'<div style="margin-top:14px">Auto-detects ET date/time/session from your device clock. Data saved in this browser only — <b>download this file and open it locally</b> to persist. Export regularly.</div>'));
+  f.appendChild(el("div",null,'<div style="margin-top:6px;color:var(--ink-faint)">Live prices and the macro calendar are not fetched — you confirm those. This system enforces the rules; it can\'t make your inputs honest. The only person a false input fools is you.</div>'));
+}
+renderAll();renderFoot();
+setInterval(renderClock,30000);
+</script>
+</body>
+</html>
