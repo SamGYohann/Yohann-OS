@@ -410,6 +410,173 @@ canvas{display:block;width:100%}
   .ring-num b{font-size:62px}
 }
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ===== INEVITABLE ENGINE · injected styles ===== */
+/* ================= INEVITABLE ENGINE · added styles ================= */
+:root{--food:#7bb661;--calm:#5fb0a8;--mind:#6f8fd0;--foodln:rgba(123,182,97,.34);--calmln:rgba(95,176,168,.34);--mindln:rgba(111,143,208,.34)}
+
+/* collapsible "how this works" */
+.how{border:1px solid var(--line2);background:var(--panel);margin:0 0 14px}
+.how>summary{cursor:pointer;padding:11px 15px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);display:flex;align-items:center;gap:10px;list-style:none}
+.how>summary::-webkit-details-marker{display:none}
+.how>summary::before{content:'i';width:15px;height:15px;border:1px solid var(--brassln);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Crimson Pro',serif;font-style:italic;font-size:11px;color:var(--brass);flex-shrink:0}
+.how>summary::after{content:'open';margin-left:auto;color:var(--dim);font-size:8px}
+.how[open]>summary::after{content:'close'}
+.how[open]>summary{border-bottom:1px solid var(--line)}
+.how-b{padding:15px;font-size:12.5px;color:var(--ink2);line-height:1.65}
+.how-b p{margin-bottom:9px}.how-b b{color:var(--ink)}
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:10px 0}
+.how-cell{background:var(--panel2);padding:11px 13px}
+.how-cell .hk{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.how-cell.good .hk{color:var(--live)}.how-cell.bad .hk{color:var(--rust)}.how-cell.next .hk{color:var(--brass)}
+.how-cell .hv{font-size:12px;color:var(--ink2);line-height:1.45}
+
+/* onboarding + modal overlay */
+.ovl{position:fixed;inset:0;z-index:10050;background:rgba(6,7,9,.97);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.ovl-card{width:min(660px,95vw);background:var(--panel);border:1px solid var(--line2);position:relative;margin:auto}
+.ovl-head{padding:22px 26px 16px;border-bottom:1px solid var(--line2)}
+.ovl-bracket{font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--lived);margin-bottom:12px}
+.ovl-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:.04em;line-height:1}
+.ovl-sub{font-family:'Crimson Pro',serif;font-style:italic;font-size:15px;color:var(--mut);margin-top:5px}
+.ovl-body{padding:22px 26px;max-height:62vh;overflow-y:auto}
+.ovl-foot{padding:16px 26px;border-top:1px solid var(--line2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ovl-step{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-right:auto}
+
+/* command briefing grid */
+.brief-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:1px;background:var(--line);border:1px solid var(--line2);margin-bottom:8px}
+.brief{background:var(--panel);padding:13px 15px;border-left:2px solid var(--faint)}
+.brief.d-body{border-left-color:var(--rust)}.brief.d-food{border-left-color:var(--food)}.brief.d-mind{border-left-color:var(--mind)}.brief.d-edge{border-left-color:var(--live)}.brief.d-rec{border-left-color:var(--calm)}.brief.d-drift{border-left-color:var(--brass)}
+.brief .bk{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+.brief .bv{font-size:13px;color:var(--ink);line-height:1.35}
+.brief .bv .bvs{font-size:10px;color:var(--mut);display:block;margin-top:2px;font-family:'Crimson Pro',serif;font-style:italic}
+.brief .bbig{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.03em}
+
+/* recommendations */
+.rec{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--brassln);padding:12px 15px;margin-bottom:5px}
+.rec .ri{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--brass);flex-shrink:0;min-width:18px;line-height:1.4}
+.rec.urgent{border-left-color:var(--rustln)}.rec.urgent .ri{color:var(--rust)}
+.rec.good{border-left-color:var(--liveln)}.rec.good .ri{color:var(--live)}
+.rec .rc{flex:1}.rec .rt{font-size:12.5px;color:var(--ink);line-height:1.4}.rec .rs{font-size:11px;color:var(--mut);margin-top:2px;font-family:'Crimson Pro',serif;font-style:italic}
+.rec .rgo{align-self:center;flex-shrink:0}
+
+/* score breakdown + domain bars */
+.brk{background:var(--panel);border:1px solid var(--line2);padding:4px 16px}
+.brkrow{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+.brkrow:last-child{border:none}.brkrow .bn{flex:1;color:var(--ink2)}.brkrow .bp{font-family:'Bebas Neue',sans-serif;font-size:15px;min-width:46px;text-align:right}
+.brkrow .bp.pos{color:var(--live)}.brkrow .bp.neg{color:var(--rust)}.brkrow .bp.zero{color:var(--dim)}
+.dom{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.dom .dl{font-size:10px;letter-spacing:.06em;color:var(--ink2);min-width:128px;flex-shrink:0;text-transform:uppercase}
+.dom .dt{flex:1;height:9px;background:var(--raise);overflow:hidden}
+.dom .df{height:100%;transition:width .6s}
+.dom .dv{font-family:'Bebas Neue',sans-serif;font-size:15px;min-width:38px;text-align:right;color:var(--ink)}
+
+/* lab head (module identity banners) */
+.labhead{display:flex;align-items:center;gap:16px;padding:18px 20px;border:1px solid var(--line2);margin-bottom:14px;position:relative;overflow:hidden;background:linear-gradient(120deg,var(--panel2),var(--panel))}
+.labhead::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.lh-body::before{background:var(--rust)}.lh-food::before{background:var(--food)}.lh-mind::before{background:var(--mind)}.lh-edge::before{background:var(--live)}.lh-sys::before{background:var(--brass)}
+.lh-ico{font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;flex-shrink:0}
+.lh-body .lh-ico{color:var(--rust)}.lh-food .lh-ico{color:var(--food)}.lh-mind .lh-ico{color:var(--mind)}.lh-edge .lh-ico{color:var(--live)}.lh-sys .lh-ico{color:var(--brass)}
+.lh-t{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.05em;line-height:1}
+.lh-s{font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--mut);margin-top:3px}
+.lh-stat{text-align:center;flex-shrink:0;padding:0 6px}
+.lh-stat .v{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1}.lh-stat .l{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:3px}
+
+/* exercise rows (baki) */
+.exrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line2);padding:11px 14px;margin-bottom:3px}
+.exrow .exn{font-size:13px;color:var(--ink)}.exrow .exm{font-size:10px;color:var(--mut);letter-spacing:.04em}
+.exrow .exsr{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--live);letter-spacing:.04em;text-align:right}
+.exrow .exr{font-size:10px;color:var(--dim);text-align:right}
+.phasebar{display:flex;gap:2px;margin:10px 0}
+.phaseseg{flex:1;height:6px;background:var(--raise);position:relative}
+.phaseseg.on{background:var(--rust)}
+.std-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+.std-row .sn{flex:1;color:var(--ink2)}.std-row .sg{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--mut);min-width:90px;text-align:right}
+.std-row .scur{font-family:'Bebas Neue',sans-serif;font-size:14px;min-width:70px;text-align:right}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin:4px 0 10px}
+.chip-x{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--line2);color:var(--mut);cursor:pointer;transition:.12s}
+.chip-x:hover{border-color:var(--ink2);color:var(--ink)}
+.chip-x.on{background:var(--livedim);border-color:var(--liveln);color:var(--live)}
+.chip-x.on.body{background:var(--rustdim);border-color:var(--rustln);color:var(--rust)}
+
+/* nutrition */
+.macros{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:10px}
+.macro{background:var(--panel);border:1px solid var(--line2);padding:14px;text-align:center}
+.macro .mv{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1}.macro .ml{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:4px}
+.macro .mt{font-size:10px;color:var(--mut);margin-top:3px}
+.macro.p .mv{color:var(--food)}.macro.c .mv{color:var(--brass)}.macro.f .mv{color:var(--cyan)}.macro.k .mv{color:var(--ink)}.macro.w .mv{color:var(--calm)}
+.meal{background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--foodln);padding:13px 15px;margin-bottom:4px}
+.meal .mh{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em;color:var(--ink)}
+.meal .mm{font-size:11px;color:var(--mut);margin-top:3px;line-height:1.4}
+.meal .mk{font-size:9px;letter-spacing:.08em;color:var(--food);margin-top:4px}
+.grocery{columns:2;column-gap:18px;font-size:12px;color:var(--ink2)}
+.grocery div{padding:3px 0;break-inside:avoid;border-bottom:1px solid var(--line)}
+
+/* reading library */
+.tracks{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.track{background:var(--panel);border:1px solid var(--line2);border-top:2px solid var(--mindln);padding:15px;cursor:pointer;transition:.15s}
+.track:hover{background:var(--panel2);border-top-color:var(--mind)}
+.track.active{border-color:var(--mindln);background:linear-gradient(160deg,rgba(111,143,208,.08),transparent)}
+.track .tn{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.04em;color:var(--ink);line-height:1.05}
+.track .tw{font-size:11px;color:var(--mut);margin-top:5px;line-height:1.4;font-family:'Crimson Pro',serif;font-style:italic}
+.track .tsk{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mind);margin-top:7px}
+.tier{margin:10px 0}
+.tier-h{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.book{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line2);padding:10px 13px;margin-bottom:3px}
+.book .bt{flex:1;font-size:12.5px;color:var(--ink)}.book .ba{font-size:10px;color:var(--mut)}
+.book .bchk{width:17px;height:17px;border:1.5px solid var(--line3);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.book .bchk.on{background:var(--mind);border-color:var(--mind)}.book .bchk.on::after{content:'';width:8px;height:4px;border-left:2px solid #07121f;border-bottom:2px solid #07121f;transform:rotate(-45deg) translateY(-1px)}
+.book .bcur{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--mind);border:1px solid var(--mindln);padding:2px 7px;cursor:pointer}
+
+/* strategy lab */
+.concept{border:1px solid var(--line2);background:var(--panel);margin-bottom:6px}
+.concept>summary{cursor:pointer;list-style:none;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.concept>summary::-webkit-details-marker{display:none}
+.concept .cn{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.04em;color:var(--ink)}
+.concept .ctag{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--mind);border:1px solid var(--mindln);padding:2px 8px;margin-left:auto;flex-shrink:0}
+.concept[open] .cn{color:var(--mind)}
+.concept .cbody{padding:0 16px 16px;border-top:1px solid var(--line)}
+.cdef{font-size:13px;color:var(--ink);line-height:1.6;margin:12px 0}
+.cex{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:10px 0}
+.cex-cell{background:var(--panel2);padding:11px 13px}
+.cex-cell .ck{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mind);margin-bottom:4px}
+.cex-cell .cv{font-size:11.5px;color:var(--ink2);line-height:1.5}
+.cdrill{background:var(--brassdim);border:1px solid var(--brassln);padding:12px 14px;margin-top:10px}
+.cdrill .dk{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin-bottom:5px}
+.cdrill .dv{font-size:13px;color:var(--ink);line-height:1.5;font-family:'Crimson Pro',serif;font-style:italic}
+
+/* day modes */
+.modes{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.mode{padding:9px 14px;border:1px solid var(--line2);background:var(--panel);cursor:pointer;transition:.15s;text-align:left}
+.mode:hover{border-color:var(--ink2)}
+.mode.on{border-color:var(--liveln);background:var(--livedim)}
+.mode .mn{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.04em;color:var(--ink)}
+.mode.on .mn{color:var(--live)}
+.mode .ms{font-size:9px;color:var(--mut);letter-spacing:.03em}
+
+/* repair flow */
+.repair{background:linear-gradient(160deg,rgba(207,85,60,.07),var(--panel));border:1px solid var(--rustln);padding:18px}
+.repair-step{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line)}
+.repair-step:last-child{border:none}
+.repair-step .rsn{width:22px;height:22px;border:1.5px solid var(--rustln);color:var(--rust);font-family:'Bebas Neue',sans-serif;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.repair-step.done .rsn{background:var(--live);border-color:var(--live);color:#04140d}
+.repair-step .rst{font-size:12.5px;color:var(--ink2);line-height:1.5;padding-top:2px}
+
+/* manual */
+.man-toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:5px;margin-bottom:18px}
+.man-toc a{display:block;padding:11px 14px;border:1px solid var(--line2);background:var(--panel);color:var(--ink2);font-size:11px;letter-spacing:.04em;text-decoration:none;transition:.15s}
+.man-toc a:hover{border-color:var(--brassln);color:var(--brass)}
+.man-sec{border-top:1px solid var(--line2);padding:18px 0}
+.man-sec h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--ink);margin-bottom:4px}
+.man-sec .mlead{font-family:'Crimson Pro',serif;font-style:italic;font-size:14px;color:var(--brass);margin-bottom:10px}
+.man-sec p{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:9px;max-width:760px}
+.man-sec b{color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:8px 0}
+.kpi{background:var(--panel2);padding:12px 14px}
+.kpi .kk{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.kpi .kv{font-size:12px;color:var(--ink2);line-height:1.4}
+
+@media(max-width:560px){.grocery{columns:1}.exrow{grid-template-columns:1fr auto}.exrow .exr{display:none}}
+
 </style>
 </head>
 <body data-state="unmeasured">
@@ -435,6 +602,12 @@ canvas{display:block;width:100%}
     <div class="rail-grp">Live</div>
     <button class="navi on" data-c="command"><span class="ic">◎</span> Command</button>
     <button class="navi" data-c="chain"><span class="ic">⛓</span> Kill Chain</button>
+    <div class="rail-grp">Body</div>
+    <button class="navi" data-c="baki"><span class="ic">▲</span> Baki Protocol</button>
+    <button class="navi" data-c="nutrition"><span class="ic">◈</span> Nutrition</button>
+    <div class="rail-grp">Mind</div>
+    <button class="navi" data-c="reading"><span class="ic">▥</span> Reading</button>
+    <button class="navi" data-c="strategy"><span class="ic">◇</span> Strategy Lab</button>
     <div class="rail-grp">Prove</div>
     <button class="navi" data-c="vault"><span class="ic">▦</span> Proof Vault</button>
     <button class="navi" data-c="desk"><span class="ic">▤</span> The Desk</button>
@@ -447,6 +620,8 @@ canvas{display:block;width:100%}
     <div class="rail-grp">Debrief</div>
     <button class="navi" data-c="review"><span class="ic">❏</span> Review</button>
     <button class="navi" data-c="analytics"><span class="ic">∿</span> Analytics</button>
+    <div class="rail-grp">System</div>
+    <button class="navi" data-c="manual"><span class="ic">❖</span> Field Manual</button>
     <div class="rail-foot" id="rail-foot">— online —</div>
   </aside>
 
@@ -611,6 +786,11 @@ canvas{display:block;width:100%}
       <div class="lbl">Execution</div>
       <div class="stats s4" id="an-stats"></div>
     </section>
+    <section class="console" id="c-baki"></section>
+    <section class="console" id="c-nutrition"></section>
+    <section class="console" id="c-reading"></section>
+    <section class="console" id="c-strategy"></section>
+    <section class="console" id="c-manual"></section>
   </main>
 </div>
 
@@ -935,6 +1115,7 @@ function boot(){
   /* vault status */
   if(!STORAGE_OK){el("vdot").classList.add("off");el("vmsg").textContent="Session only — export to keep your record";}
   else updateBackupStatus();
+  engineBoot();
   buildIgnition();
 }
 function updateBackupStatus(){
@@ -1544,6 +1725,903 @@ function resetAll(){
   if(el("desk-catalyst"))el("desk-catalyst").value="";
   go("command");updateBackupStatus();toast("System wiped. Clean slate.","brass");
 }
+
+/* ===================== INEVITABLE ENGINE v3 ===================== */
+
+/* ================= INEVITABLE ENGINE · core ================= */
+function defProfile(){return{name:"Yohann",onboarded:false,mainGoal:"Become a discretionary macro trader; bridge through regional S&T",bodyGoal:"155+ lb at 8–10% body fat",trainingDays:5,mealPref:"High-protein, flexible, home-cooked",readingPriority:"strategy",tradingXp:"developing",financeFocus:"Macro / rates-FX & special situations",schedule:"student",sleepTarget:7.5,biggestLeak:"Emotional trading after a loss"};}
+function defBody(){return{h:67,wStart:157,wGoal:138,bfStart:23,bfGoal:12,phase:1,wlog:[]};}
+function defReading(){return{cur:{track:null,book:null},done:{},log:[],pages:{}};}
+function defDNT(){return["After two losses in a row","When you feel the urge to 'win it back'","Size larger than plan to recover a loss","No defined invalidation before entry","On under 6 hours of sleep","During a news event you haven't prepared for"];}
+
+/* extend freshState without touching the base */
+(function(){var base=freshState;freshState=function(){var s=base();
+  s.profile=s.profile||defProfile();s.body=s.body||defBody();s.nutri=s.nutri||{};s.training=s.training||{};
+  s.reading=s.reading||defReading();s.strategy=s.strategy||{done:{}};s.watchlist=s.watchlist||[];s.doNotTrade=s.doNotTrade||defDNT();
+  s.sleepLog=s.sleepLog||{};s.dayMode=s.dayMode||{};s.repairs=s.repairs||{};s.v=3;return s;};})();
+(function(){var f=freshState();for(var k in f)if(!(k in S))S[k]=f[k];})();
+function migrateV3(){
+  if(!S.profile)S.profile=defProfile();if(!S.body)S.body=defBody();if(!S.nutri)S.nutri={};if(!S.training)S.training={};
+  if(!S.reading)S.reading=defReading();if(!S.strategy)S.strategy={done:{}};if(!S.watchlist)S.watchlist=[];if(!S.doNotTrade)S.doNotTrade=defDNT();
+  if(!S.sleepLog)S.sleepLog={};if(!S.dayMode)S.dayMode={};if(!S.repairs)S.repairs={};
+  S.v=3;
+}
+
+/* ---- domains ---- */
+var DOMAINS=[{id:"body",label:"Physical",c:"var(--rust)"},{id:"food",label:"Nutrition",c:"var(--food)"},{id:"mind",label:"Intellect",c:"var(--mind)"},{id:"edge",label:"Trading",c:"var(--live)"},{id:"career",label:"Career",c:"var(--brass)"},{id:"rec",label:"Recovery",c:"var(--calm)"}];
+function catDomain(id){var m={deepwork:"mind",study:"mind",reading:"mind",journal:"edge",operator:"edge",macro:"edge",career:"career",project:"career",workout:"body",recovery:"rec",faith:"rec"};return m[id]||"mind";}
+function domColor(d){for(var i=0;i<DOMAINS.length;i++)if(DOMAINS[i].id===d)return DOMAINS[i].c;return"var(--live)";}
+
+/* ---- helpers ---- */
+function ensureBox(id,parentId,prepend){var e=el(id);if(e)return e;e=document.createElement("div");e.id=id;var p=el(parentId);if(!p)return e;if(prepend&&p.firstChild)p.insertBefore(e,p.firstChild);else p.appendChild(e);return e;}
+function howPanel(o){
+  var g="";if(o.cells){g='<div class="how-grid">'+o.cells.map(function(c){return '<div class="how-cell '+(c.k||"")+'"><div class="hk">'+c.t+'</div><div class="hv">'+c.v+'</div></div>';}).join("")+'</div>';}
+  return '<details class="how"><summary>How this works</summary><div class="how-b">'+(o.what?'<p>'+o.what+'</p>':"")+g+(o.use?'<p><b>Use it:</b> '+o.use+'</p>':"")+(o.affects?'<p><b>System effect:</b> '+o.affects+'</p>':"")+'</div></details>';
+}
+
+/* ================= CONTENT: READING CURRICULUM ================= */
+var READING_TRACKS=[
+ {id:"game",name:"Game Theory",skill:"Strategic interaction & equilibrium thinking",why:"See the board the way an operator does — every decision is a move in a game with other minds.",
+  starter:[["The Art of Strategy","Dixit & Nalebuff"],["Thinking in Bets","Annie Duke"]],inter:[["The Strategy of Conflict","Thomas Schelling"]],adv:[["Game Theory: An Introduction","Steven Tadelis"]]},
+ {id:"strat",name:"Strategy",skill:"Sequencing, leverage, positioning",why:"Long games are won by structure, not effort. This builds the architect's eye.",
+  starter:[["The Book of Five Rings","Miyamoto Musashi"],["The Art of War","Sun Tzu"]],inter:[["Good Strategy / Bad Strategy","Richard Rumelt"]],adv:[["On War (abridged)","Clausewitz"]]},
+ {id:"psy",name:"Psychology",skill:"Reading people & containing yourself",why:"Edge is mostly emotional. Know the machine you operate, and the ones across from you.",
+  starter:[["Thinking, Fast and Slow","Daniel Kahneman"],["Influence","Robert Cialdini"]],inter:[["Pre-Suasion","Robert Cialdini"]],adv:[["The Righteous Mind","Jonathan Haidt"]]},
+ {id:"beh",name:"Behavioral Economics",skill:"Decisions under bias & uncertainty",why:"Markets are bias machines. Learn the predictable errors and price them.",
+  starter:[["Misbehaving","Richard Thaler"]],inter:[["Superforecasting","Tetlock & Gardner"]],adv:[["Thinking, Fast and Slow","Kahneman"]]},
+ {id:"trade",name:"Trading & Markets",skill:"Market structure & operator mindset",why:"The craft itself — how real traders think, survive, and compound.",
+  starter:[["Market Wizards","Jack Schwager"],["Reminiscences of a Stock Operator","Edwin Lefèvre"]],inter:[["Trading in the Zone","Mark Douglas"]],adv:[["Inside the House of Money","Steven Drobny"]]},
+ {id:"fin",name:"Finance & Valuation",skill:"Valuation, credit, capital structure",why:"The technical bedrock for restructuring and special situations.",
+  starter:[["The Intelligent Investor","Benjamin Graham"]],inter:[["Valuation (McKinsey)","Koller et al."],["Competition Demystified","Bruce Greenwald"]],adv:[["Security Analysis","Graham & Dodd"]]},
+ {id:"neg",name:"Negotiation",skill:"Claiming & creating value",why:"Comp, deals, and influence run on negotiation. Most people never train it.",
+  starter:[["Never Split the Difference","Chris Voss"]],inter:[["Getting to Yes","Fisher & Ury"]],adv:[["Bargaining for Advantage","G. Richard Shell"]]},
+ {id:"pow",name:"Power & Institutions",skill:"How power actually moves",why:"Understand the rules of the rooms you want to enter. Ethics required.",
+  starter:[["The 48 Laws of Power","Robert Greene"]],inter:[["The Prince","Machiavelli"]],adv:[["The Dictator's Handbook","Bueno de Mesquita"]]},
+ {id:"dec",name:"Decision-Making",skill:"Process over outcome",why:"Separate good decisions from good results — the core discipline of a trader.",
+  starter:[["Thinking in Bets","Annie Duke"]],inter:[["Superforecasting","Tetlock"]],adv:[["Poor Charlie's Almanack","Charlie Munger"]]},
+ {id:"hist",name:"History & War",skill:"Pattern recognition across time",why:"Cycles repeat. History is leverage on the present.",
+  starter:[["The Lessons of History","Will & Ariel Durant"]],inter:[["Meditations","Marcus Aurelius"]],adv:[["The Guns of August","Barbara Tuchman"]]},
+ {id:"comm",name:"Communication",skill:"Signal clearly, persuade ethically",why:"Competence unseen is competence wasted. Learn to transmit it.",
+  starter:[["Made to Stick","Chip & Dan Heath"]],inter:[["On Writing Well","William Zinsser"]],adv:[["Pre-Suasion","Cialdini"]]},
+ {id:"disc",name:"Discipline & Self-Mastery",skill:"Building the operator",why:"The standard that survives inconvenience. The base everything else stands on.",
+  starter:[["Deep Work","Cal Newport"],["So Good They Can't Ignore You","Cal Newport"]],inter:[["Mastery","Robert Greene"],["Range","David Epstein"]],adv:[["The Psychology of Money","Morgan Housel"]]}
+];
+
+/* ================= CONTENT: STRATEGY LAB ================= */
+var STRATEGY_CONCEPTS=[
+ {id:"ev",n:"Expected Value",tag:"core",def:"The probability-weighted average outcome of a decision. You don't judge a choice by what happened once — you judge it by what it averages over many repetitions.",real:"Taking a 60/40 bet at even odds is correct even when you lose this one.",trade:"A setup with a 2:1 reward-to-risk only needs to win 35% of the time to be +EV. Track the math, not the last result.",career:"Sending 20 cold outreach messages for one strong lead is +EV even though 19 'fail'.",social:"Offer value early to many; the ones who reciprocate compound.",drill:"Before your next trade or decision, write the probabilities and payoffs. Act only if EV is positive."},
+ {id:"sig",n:"Signaling",tag:"social",def:"What you show changes what others believe you are capable of. Credible signals are costly to fake.",real:"A finished project signals competence louder than a claim of competence.",trade:"Position size and timing signal conviction — but false confidence to yourself destroys accounts.",career:"A public GitHub of real models out-signals a line on a resume.",social:"Reliability over time is the most expensive, most trusted signal there is.",drill:"Create one costly signal this week that proves seriousness without you saying a word."},
+ {id:"sec",n:"Second-Order Thinking",tag:"core",def:"Ask 'and then what?' Most people stop at the first consequence. Edge lives in the second and third.",real:"Everyone sees the rate hike; few price what it does to credit spreads two quarters out.",trade:"If this level breaks, who is trapped, and what must they do next? Trade their forced move.",career:"This job is fine first-order; where does it place you in three years?",social:"A win that humiliates someone creates a future enemy. Count that cost.",drill:"For today's biggest decision, write three downstream effects before acting."},
+ {id:"asym",n:"Asymmetric Information",tag:"core",def:"Whoever knows more, or interprets better, has the edge. You rarely have more data — so build better interpretation.",real:"You can't beat the market on speed; you beat it on a sharper read of the same facts.",trade:"Your edge is second-order interpretation of public data, not insider speed.",career:"Deep company research lets you ask the question nobody else in the room can.",social:"Listen twice as much as you speak; information is leverage.",drill:"Pick one market or company. Develop a view from public data that the consensus misses."},
+ {id:"ror",n:"Risk of Ruin",tag:"risk",def:"The probability that a series of losses wipes you out before your edge can play out. Survival is the precondition for everything.",real:"An edge means nothing if a drawdown ends the game first.",trade:"Risk a small fixed fraction per trade. Fractional Kelly, not full. Live to compound.",career:"Don't bet your whole runway on one opportunity; keep optionality.",social:"Never let one conflict torch an entire network.",drill:"Set a hard per-trade and per-day loss limit. Write it into The Standard."},
+ {id:"opt",n:"Optionality",tag:"risk",def:"Positioning so that you have many cheap ways to win and capped ways to lose. Limited downside, open-ended upside.",real:"Skills, relationships, and small bets are options on a bigger future.",trade:"Defined-risk structures cap the loss while leaving upside open.",career:"Building proof across domains creates options you can exercise later.",social:"Plant many seeds; you only need a few to grow.",drill:"Identify one cheap bet today with capped downside and large possible upside. Take it."},
+ {id:"com",n:"Commitment & Credible Threats",tag:"strat",def:"Sometimes removing your own options strengthens your position, because others must now believe you.",real:"Burning the boats makes retreat impossible — and signals it.",trade:"A pre-set stop is a commitment device against your own tilt.",career:"Publicly committing to ship by a date forces the work.",social:"A boundary you actually enforce once is believed forever.",drill:"Make one public, irreversible commitment that locks in good behavior."},
+ {id:"inc",n:"Incentives",tag:"core",def:"Show me the incentive and I'll show you the outcome. To predict behavior, find what the person is actually rewarded for.",real:"People don't do what's smart; they do what they're paid (in money, status, safety) to do.",trade:"Ask who is incentivized to defend or attack a level.",career:"Understand your manager's incentives to make your work matter to them.",social:"Align your ask with the other person's existing incentive and it gets easy.",drill:"For one person you deal with, map their real incentives and adjust your approach."},
+ {id:"iter",n:"Iterated Games",tag:"strat",def:"A one-time game rewards defection; a repeated game rewards cooperation and reputation. Most of life is repeated.",real:"Reputation is the memory of the game. Protect it.",trade:"The market is an infinite game — process and survival beat one big score.",career:"Treat every interaction as repeated; burned bridges compound against you.",social:"Be the person worth playing with again. Tit-for-tat with forgiveness wins.",drill:"Identify one relationship you've been treating as one-shot. Play it as repeated."},
+ {id:"zs",n:"Zero-Sum vs Positive-Sum",tag:"strat",def:"In zero-sum, your gain is another's loss. In positive-sum, the pie grows. Know which game you're in before you play.",real:"Trading a single contract is zero-sum; building a skill is positive-sum.",trade:"Markets are near zero-sum after costs — your edge must come from someone's mistake.",career:"Collaboration and reputation are positive-sum; play them most of the time.",social:"Look for trades where both sides genuinely win; they last.",drill:"Classify your three biggest current efforts as zero- or positive-sum. Rebalance toward positive."},
+ {id:"exp",n:"Exploration vs Exploitation",tag:"core",def:"Spend some effort exploiting what works, some exploring what might work better. Too much of either is a trap.",real:"Always exploiting goes stale; always exploring never compounds.",trade:"Run your proven setup as the core; test new ideas with small size.",career:"Master one craft deeply while sampling adjacent skills.",social:"Deepen key relationships while still meeting new people.",drill:"Allocate this week: ~80% to your proven edge, ~20% to one deliberate experiment."},
+ {id:"base",n:"Base Rates",tag:"risk",def:"Start from how often something happens in general before adjusting for the specific case. It anchors you against hype.",real:"Most startups fail; most setups are average. Begin there, then adjust.",trade:"Know the historical win rate of your setup before trusting today's gut.",career:"Most applications get no reply — so volume and signal both matter.",social:"People rarely change fast; weight the base rate of past behavior.",drill:"For your next prediction, state the base rate first, then your adjustment."},
+ {id:"bluff",n:"Bluffing & Deception Defense",tag:"social",def:"Understand bluffing to defend against it — never to harm. A bluff is a bet that the other side will fold.",real:"Confidence is often a bluff; verify with evidence, not volume.",trade:"The tape can 'bluff' with fake breakouts; demand confirmation.",career:"Don't be moved by performative certainty; ask for the reasoning.",social:"Calm questions expose bluffs faster than aggression.",drill:"This week, when someone projects strong certainty, ask one quiet question that tests it."},
+ {id:"lev",n:"Leverage",tag:"risk",def:"A small input moving a large output — money, skills, relationships, or code. Amplifies both wins and mistakes.",real:"Leverage without control is how good operators blow up.",trade:"Leverage magnifies edge and error equally; respect it or it ends you.",career:"One built tool or audience can leverage years of effort.",social:"A single well-placed introduction can outweigh a hundred cold ones.",drill:"Find one point of leverage in your week and pour disproportionate effort there."},
+ {id:"rep",n:"Reputation Games",tag:"strat",def:"Your reputation is an asset that compounds or decays based on consistency. It opens doors competence alone can't.",real:"People bet on who you've shown yourself to be, repeatedly.",trade:"Your track record is your reputation with capital — document it.",career:"Proof filed publicly builds a reputation that recruits for you.",social:"Be predictable in the ways that matter; reliability is rare.",drill:"File one piece of public proof this week that strengthens your reputation."},
+ {id:"obs",n:"Observation & Patience",tag:"core",def:"The disciplined edge of waiting — gathering information and acting only when conditions are clearly in your favor.",real:"Restraint is a position. Doing nothing well is a skill.",trade:"Most of the day is a no-trade. The patience to wait for your setup is the edge.",career:"Watch the room before you move; the prepared move lands harder.",social:"Listen and observe first; act once you understand the dynamics.",drill:"Today, deliberately pass on one mediocre opportunity to hold out for a clearly better one."}
+];
+
+/* ================= CONTENT: TRAINING (PPL, cut phase) ================= */
+var TRAINING_SPLIT={
+ 1:{name:"Push · Chest/Shoulders/Triceps",focus:"strength + hypertrophy",ex:[["Barbell Bench Press","4","5–8","2–3 min"],["Incline DB Press","3","8–12","90s"],["Standing OHP","3","6–10","2 min"],["Lateral Raise","3","12–18","60s"],["Cable Triceps Pushdown","3","10–15","60s"],["Overhead Triceps Ext.","2","12–15","60s"]],cond:"10 min incline walk finisher",mob:"Shoulder dislocates + thoracic openers"},
+ 2:{name:"Pull · Back/Biceps/Rear Delts",focus:"strength + hypertrophy",ex:[["Weighted Pull-up / Lat Pulldown","4","5–10","2–3 min"],["Barbell Row","4","6–10","2 min"],["Seated Cable Row","3","10–12","90s"],["Face Pull","3","15–20","60s"],["DB Curl","3","8–12","60s"],["Hammer Curl","2","10–15","60s"]],cond:"Farmer carries 4×40m",mob:"Lat + biceps stretch, band pull-aparts"},
+ 3:{name:"Legs · Quads/Hams/Glutes/Calves",focus:"strength + conditioning",ex:[["Back Squat","4","5–8","3 min"],["Romanian Deadlift","3","8–10","2 min"],["Bulgarian Split Squat","3","8–12 / leg","90s"],["Leg Curl","3","12–15","60s"],["Standing Calf Raise","4","12–20","60s"]],cond:"Bike intervals 6×30s hard / 90s easy",mob:"Hip flexor + ankle mobility"},
+ 4:{name:"Conditioning + Mobility (active recovery)",focus:"engine + recovery",ex:[["Zone-2 cardio (incline walk / bike)","1","30–40 min","—"],["Core circuit (planks, hanging leg raises)","3","45s","45s"],["Full mobility flow","1","12 min","—"]],cond:"Keep heart rate conversational",mob:"Full-body flow, focus tight areas"},
+ 5:{name:"Push #2 · volume/pump",focus:"hypertrophy",ex:[["Incline Barbell Press","4","6–10","2 min"],["Flat DB Press","3","10–12","90s"],["Arnold Press","3","10–12","90s"],["Cable Lateral Raise","3","15–20","45s"],["Dips (assisted ok)","3","8–12","90s"],["Rope Pushdown","3","12–15","60s"]],cond:"Optional 10 min steady cardio",mob:"Shoulder + chest opener"},
+ 6:{name:"Pull #2 / Legs accessory",focus:"hypertrophy + posterior chain",ex:[["Deadlift (technical, moderate)","3","4–6","3 min"],["Chest-Supported Row","4","10–12","90s"],["Lat Pulldown","3","10–15","75s"],["Hip Thrust","3","10–12","90s"],["Rear-Delt Fly","3","15–20","45s"],["Incline DB Curl","3","10–12","60s"]],cond:"Sled push or hill sprints 6×",mob:"Hamstring + spine decompression"},
+ 0:{name:"Full Rest · recovery priority",focus:"recovery",ex:[["Sleep 7.5–9 h","—","—","—"],["10k+ easy steps","—","—","—"],["Light stretch / sauna optional","—","—","—"]],cond:"No training. Recovery is the adaptation.",mob:"Gentle full-body, no load"}
+};
+var STRENGTH_STD=[["Back Squat","1.5× bodyweight"],["Bench Press","1.25× bodyweight"],["Deadlift","2× bodyweight"],["Overhead Press","0.75× bodyweight"],["Weighted Pull-up","BW + 25%"],["Pull-ups (strict)","12–15 reps"]];
+
+/* ================= NUTRITION ENGINE ================= */
+function nutriTargets(){
+  var w=S.body.wNow||S.body.wStart||157;var phase=S.body.phase||1;
+  var cal,pro,fat,carb;
+  if(phase===1){cal=Math.round(w*11.5);pro=Math.min(190,Math.round(w*1.05));fat=Math.round(w*0.4);}
+  else{cal=Math.round(w*16);pro=Math.round(w*1.0);fat=Math.round(w*0.45);}
+  carb=Math.max(60,Math.round((cal-pro*4-fat*9)/4));
+  var water=Math.round(w*0.5);/* oz */
+  return{cal:cal,pro:pro,fat:fat,carb:carb,water:water};
+}
+var MEAL_TEMPLATES=[
+ {h:"Meal 1 · Breakfast",m:"4 whole eggs + 3 egg whites, 60g oats, berries, black coffee",k:"~520 kcal · 38g protein"},
+ {h:"Meal 2 · Lunch",m:"200g chicken breast, 150g (cooked) rice, large mixed veg, olive oil drizzle",k:"~600 kcal · 52g protein"},
+ {h:"Snack · Pre/Post training",m:"Greek yogurt (200g) + scoop whey + banana, or a protein shake",k:"~350 kcal · 45g protein"},
+ {h:"Meal 3 · Dinner",m:"200g lean beef or salmon, potatoes or quinoa, greens, fruit",k:"~620 kcal · 48g protein"},
+ {h:"If still short on protein",m:"Casein or second shake before bed; cottage cheese works too",k:"+30–40g protein"}
+];
+var GROCERY=["Eggs (2 dozen)","Chicken breast","Lean beef (90/10)","Salmon / white fish","Greek yogurt","Whey + casein protein","Oats","Rice / quinoa","Potatoes","Mixed frozen veg","Spinach / greens","Berries + bananas","Olive oil","Cottage cheese","Black coffee / tea","Sparkling water"];
+function nutriResponse(kind){
+  var r={hard:["Trained hard — refeed cleanly","Add 30–50g carbs and 25g protein post-session. This fuels recovery, it is not a cheat. Hydrate with electrolytes."],
+   low:["Low energy — diagnose, don't just push","First check sleep and water. If both are fine, add a small carb feeding (rice, fruit) pre-task. Crashing daily on a cut means the deficit is too aggressive — raise calories ~150."],
+   over:["Overate — no spiral, just correct","One day does not undo a week. Tomorrow: protein-forward, lighter carbs, +3k steps, full water. Do not skip meals to 'make up' — that starts the binge cycle."],
+   missed:["Missed protein — close the gap","Add a shake now and make the next meal protein-dense (chicken, eggs, yogurt). Protein is the one macro you defend on a cut — it protects muscle."]};
+  return r[kind];
+}
+
+/* ================= MULTI-SCORE SYSTEM ================= */
+function trainedDays7(){var n=0;last7().forEach(function(ds){if(S.training[ds]&&S.training[ds].done)n++;});return n;}
+function nutriDays7(){var n=0;last7().forEach(function(ds){var x=S.nutri[ds];if(x&&(x.protein>=nutriTargets().pro*0.85))n++;});return n;}
+function readingDays7(){var n=0;last7().forEach(function(ds){if((S.reading.pages[ds]||0)>0)n++;});return n;}
+function strategyDrills7(){var n=0;for(var k in S.strategy.done){if(last7().indexOf((S.strategy.done[k]||{}).date)>=0)n++;}return n;}
+function tradeJournals7(){return (S.journal||[]).filter(function(j){return last7().indexOf(j.date)>=0;}).length;}
+function physicalScore(){var t=trainedDays7();var goal=Math.max(3,Math.min(6,S.profile.trainingDays||5));var base=Math.min(100,Math.round(t/goal*100));if(S.training[today()]&&S.training[today()].done)base=Math.min(100,base+8);return base;}
+function nutritionScore(){return Math.min(100,Math.round(nutriDays7()/7*100));}
+function intellectScore(){return Math.min(100,Math.round(readingDays7()/7*70)+Math.min(30,strategyDrills7()*10));}
+function tradingScore(){var j=tradeJournals7();var careerP=(S.evidence||[]).filter(function(e){return last7().indexOf(e.date)>=0&&catDomain(e.type)==="career";}).length;return Math.min(100,j*16+careerP*14);}
+function recoveryScore(){var s=0,c=0;last7().forEach(function(ds){var h=S.sleepLog[ds];if(h!=null){c++;s+=Math.min(100,h/(S.profile.sleepTarget||7.5)*100);}});var sleep=c?Math.round(s/c):60;var restOk=trainedDays7()<=6?0:-10;return Math.max(0,Math.min(100,sleep+restOk));}
+function proofVelocity(){return (S.evidence||[]).filter(function(e){return last7().indexOf(e.date)>=0;}).length;}
+function proofScore(){return Math.min(100,proofVelocity()*9);}
+function driftScore(){return Math.max(4,Math.min(96,integration()-currentZeroStreak()*6));}
+function domainScores(){return[["Physical","body",physicalScore()],["Nutrition","food",nutritionScore()],["Intellect","mind",intellectScore()],["Trading","edge",tradingScore()],["Recovery","rec",recoveryScore()],["Proof","proof",proofScore()]];}
+
+/* ================= ADAPTIVE RECOMMENDATION ENGINE ================= */
+function lastTrained(){for(var i=0;i<14;i++){var ds=addDays(today(),-i);if(S.training[ds]&&S.training[ds].done)return i;}return 99;}
+function lastRead(){for(var i=0;i<14;i++){var ds=addDays(today(),-i);if((S.reading.pages[ds]||0)>0)return i;}return 99;}
+function openTilt(){return (S.journal||[]).some(function(j){return last7().indexOf(j.date)>=0&&(j.emotionalScore||0)>=7&&!j.repaired;});}
+function recommendations(){
+  var r=[];var d=getDay(today());
+  if(currentZeroStreak()>=3)r.push({k:"urgent",t:"Recovery Protocol is live.",s:currentZeroStreak()+" silent days. Run the 3-day rebuild: one filed receipt today, no heroics.",go:"manual"});
+  if(openTilt())r.push({k:"urgent",t:"Desk locked — emotional trade unrepaired.",s:"Run the repair flow in The Standard before taking another trade.",go:"standard"});
+  if(lastTrained()>=2)r.push({k:"normal",t:"No training in "+(lastTrained()===99?"a while":lastTrained()+" days")+".",s:"Open Baki Protocol — today's session is ready. Skipping is how the body goal slips.",go:"baki"});
+  if(lastRead()>=3)r.push({k:"normal",t:"No reading in "+(lastRead()===99?"a while":lastRead()+" days")+".",s:"10-page minimum today. Pick up your current book in the Reading engine.",go:"reading"});
+  var todayNut=S.nutri[today()];if(!todayNut||!todayNut.protein)r.push({k:"normal",t:"Nutrition unlogged today.",s:"Hit your protein target and log it — a cut is won on protein and consistency.",go:"nutrition"});
+  var careerP7=(S.evidence||[]).filter(function(e){return last7().indexOf(e.date)>=0&&catDomain(e.type)==="career";}).length;
+  if(careerP7===0)r.push({k:"normal",t:"No career proof this week.",s:"File one: an outreach message, a model, or a teardown. The record is what makes you evaluable.",go:"desk"});
+  var sl=S.sleepLog[addDays(today(),-1)];if(sl!=null&&sl<6)r.push({k:"normal",t:"Short sleep last night ("+sl+"h).",s:"Reduce training intensity today, prioritize protein and water, protect tonight's sleep.",go:"baki"});
+  /* balance */
+  var ds7=domainScores();var weak=ds7.slice().sort(function(a,b){return a[2]-b[2];})[0];
+  if(proofVelocity()>=4&&weak[2]<35)r.push({k:"normal",t:"Domain imbalance: "+weak[0]+" is neglected.",s:"You're active but lopsided. One rep in "+weak[0].toLowerCase()+" today balances the engine.",go:weak[1]==="edge"?"desk":weak[1]==="body"?"baki":weak[1]==="food"?"nutrition":weak[1]==="mind"?"reading":"command"});
+  if(!r.length)r.push({k:"good",t:"No corrections needed. Hold the line.",s:"Every domain is being fed. Bank today and protect the streak.",go:"chain"});
+  return r;
+}
+
+/* ================= DETAILED PROOF MODAL ================= */
+function openProofModal(){
+  var ovl=document.createElement("div");ovl.className="ovl";ovl.id="proof-ovl";
+  var opts=S.cats.map(function(c){return '<option value="'+c.id+'">'+esc(c.label)+'</option>';}).join("");
+  ovl.innerHTML='<div class="ovl-card"><div class="ovl-head"><div class="ovl-bracket">file detailed proof</div><div class="ovl-title">NEW RECEIPT</div><div class="ovl-sub">Evidence, not vibes. The more specific, the stronger the case file.</div></div>'+
+   '<div class="ovl-body">'+
+    '<div class="field"><label class="lab">Proof type</label><select id="pm-type">'+opts+'</select></div>'+
+    '<div class="field"><label class="lab">What you did <span class="hint">be concrete</span></label><input type="text" id="pm-desc" placeholder="Built a 3-statement model for XYZ; ran CPI playbook; etc."></div>'+
+    '<div class="grid2"><div class="field"><label class="lab">Difficulty 1–5</label><input type="number" id="pm-diff" min="1" max="5" value="3"></div>'+
+    '<div class="field"><label class="lab">Quality 1–5</label><input type="number" id="pm-qual" min="1" max="5" value="3"></div></div>'+
+    '<div class="grid2"><div class="field"><label class="lab">Time spent (min)</label><input type="number" id="pm-time" value="45"></div>'+
+    '<div class="field"><label class="lab">Skill built</label><input type="text" id="pm-skill" placeholder="Valuation · discipline · macro read"></div></div>'+
+    '<div class="field" style="margin:0"><label class="lab">Next step it unlocks</label><input type="text" id="pm-next" placeholder="What this makes possible"></div>'+
+   '</div>'+
+   '<div class="ovl-foot"><span class="ovl-step">receipts compound into a resume</span><button class="btn" onclick="closeProofModal()">Cancel</button><button class="btn solid" onclick="saveProofModal()">File receipt</button></div></div>';
+  document.body.appendChild(ovl);
+}
+function closeProofModal(){var o=el("proof-ovl");if(o)o.remove();}
+function saveProofModal(){
+  var type=el("pm-type").value;var c=catById(type);if(!c){closeProofModal();return;}
+  var desc=el("pm-desc").value.trim();var diff=+el("pm-diff").value||3;var qual=+el("pm-qual").value||3;
+  var mins=+el("pm-time").value||0;var skill=el("pm-skill").value.trim();var next=el("pm-next").value.trim();
+  var d=ensureDay(today());d.cat[type]=(d.cat[type]||0)+1;
+  var bonus=Math.round(c.pts*(0.6+(diff+qual)/10));/* weight by difficulty+quality */
+  S.evidence.push({id:uid(),date:today(),type:type,label:(desc||c.label),pts:bonus,diff:diff,qual:qual,mins:mins,skill:skill,next:next,domain:catDomain(type)});
+  closeProofModal();save();flashScore();refreshAll();toast("Detailed receipt filed · +"+bonus,"green");
+}
+
+/* ================= ONBOARDING ================= */
+function openOnboarding(){
+  var p=S.profile;
+  var ovl=document.createElement("div");ovl.className="ovl";ovl.id="onb-ovl";
+  ovl.innerHTML='<div class="ovl-card"><div class="ovl-head"><div class="ovl-bracket">initialize the engine</div><div class="ovl-title">CALIBRATION</div><div class="ovl-sub">Set the targets the system steers toward. Everything has a default — edit later anytime in the Field Manual.</div></div>'+
+   '<div class="ovl-body">'+
+    '<div class="grid2"><div class="field"><label class="lab">Name</label><input type="text" id="on-name" value="'+esc(p.name)+'"></div>'+
+    '<div class="field"><label class="lab">Training days / week</label><input type="number" id="on-days" min="2" max="7" value="'+(p.trainingDays)+'"></div></div>'+
+    '<div class="field"><label class="lab">Main goal</label><input type="text" id="on-goal" value="'+esc(p.mainGoal)+'"></div>'+
+    '<div class="field"><label class="lab">Body goal</label><input type="text" id="on-body" value="'+esc(p.bodyGoal)+'"></div>'+
+    '<div class="grid2"><div class="field"><label class="lab">Current weight (lb)</label><input type="number" id="on-w" value="'+(S.body.wStart)+'"></div>'+
+    '<div class="field"><label class="lab">Goal weight (lb)</label><input type="number" id="on-wg" value="'+(S.body.wGoal)+'"></div></div>'+
+    '<div class="grid2"><div class="field"><label class="lab">Sleep target (h)</label><input type="number" step="0.5" id="on-sleep" value="'+(p.sleepTarget)+'"></div>'+
+    '<div class="field"><label class="lab">Finance focus</label><input type="text" id="on-fin" value="'+esc(p.financeFocus)+'"></div></div>'+
+    '<div class="field" style="margin:0"><label class="lab">Your single biggest leak right now</label><input type="text" id="on-leak" value="'+esc(p.biggestLeak)+'"></div>'+
+   '</div>'+
+   '<div class="ovl-foot"><span class="ovl-step">you can change all of this later</span><button class="btn" onclick="skipOnboarding()">Skip — use defaults</button><button class="btn solid" onclick="saveOnboarding()">Begin →</button></div></div>';
+  document.body.appendChild(ovl);
+}
+function saveOnboarding(){
+  var p=S.profile;
+  p.name=el("on-name").value.trim()||"Operator";p.trainingDays=+el("on-days").value||5;
+  p.mainGoal=el("on-goal").value.trim();p.bodyGoal=el("on-body").value.trim();
+  S.body.wStart=+el("on-w").value||157;S.body.wNow=S.body.wNow||S.body.wStart;S.body.wGoal=+el("on-wg").value||138;
+  p.sleepTarget=+el("on-sleep").value||7.5;p.financeFocus=el("on-fin").value.trim();p.biggestLeak=el("on-leak").value.trim();
+  p.onboarded=true;save();var o=el("onb-ovl");if(o)o.remove();refreshAll();toast("Engine calibrated. Welcome, "+p.name+".","brass");
+}
+function skipOnboarding(){S.profile.onboarded=true;S.body.wNow=S.body.wNow||S.body.wStart;save();var o=el("onb-ovl");if(o)o.remove();refreshAll();}
+
+/* ================= ENGINE BOOT (called from base boot) ================= */
+function engineBoot(){
+  migrateV3();
+  if(S.body&&!S.body.wNow)S.body.wNow=S.body.wStart;
+  if(!S.profile.onboarded)setTimeout(openOnboarding,400);
+}
+
+
+/* ============ shared ============ */
+function fileReceipt(type,label,pts,domain){var d=ensureDay(today());if(catById(type))d.cat[type]=(d.cat[type]||0)+1;S.evidence.push({id:uid(),date:today(),type:type,label:label,pts:pts,domain:domain||catDomain(type)});}
+function mainLeak(){
+  if(currentZeroStreak()>=2)return currentZeroStreak()+" silent days — unmeasured.";
+  if(openTilt())return "Emotional trade left unrepaired.";
+  if(lastTrained()>=2)return "Training has stalled.";
+  if(lastRead()>=3)return "Reading has gone quiet.";
+  var w=domainScores().slice().sort(function(a,b){return a[2]-b[2];})[0];
+  if(w[2]<35)return w[0]+" is the weak domain.";
+  if(weekConsistency()<70)return "Inconsistent week to week.";
+  return "No structural leak. The risk is comfort.";
+}
+function weekdayName(){return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()];}
+
+/* ============ COMMAND ENGINE (briefing + recs + breakdown) ============ */
+function renderEngine(){
+  var box=ensureBox("cmd-engine","c-command");
+  var d=getDay(today());var y=getDay(addDays(today(),-1));var ysc=dayScore(y),yact=dayActions(y);
+  var wd=new Date().getDay();var sess=TRAINING_SPLIT[wd];var trained=S.training[today()]&&S.training[today()].done;
+  var nt=nutriTargets();var todayNut=S.nutri[today()]||{};
+  var curBook=S.reading.cur.book;var bookName=null;
+  if(curBook){READING_TRACKS.forEach(function(t){["starter","inter","adv"].forEach(function(tk){t[tk].forEach(function(b){if(b[0]===curBook)bookName=b[0];});});});}
+  var sl=S.sleepLog[addDays(today(),-1)];
+  var brief=[
+    ["d-edge","Operating state","<span class='bbig' style='color:"+(pressureState()==='unmeasured'?'var(--rust)':pressureState()==='peak'?'var(--live)':'var(--brass)')+"'>"+pressureState().toUpperCase()+"</span>"],
+    ["d-edge","Yesterday",yact?("<span class='bbig'>"+ysc+"</span> / 100"):"<span class='bbig' style='color:var(--rust)'>—</span><span class='bvs'>unmeasured</span>"],
+    ["d-edge","Streak","<span class='bbig' style='color:var(--live)'>"+currentStreak()+"</span> days"],
+    ["d-drift","Drift pressure","<span class='bbig' style='color:"+(driftScore()>=60?'var(--live)':driftScore()>=40?'var(--brass)':'var(--rust)')+"'>"+driftScore()+"%</span><span class='bvs'>ground held</span>"],
+    ["d-drift","Main leak",mainLeak()],
+    ["d-edge","Required before noon","One filed receipt<span class='bvs'>proof beats intention</span>"],
+    ["d-edge","Non-negotiable",esc(S.standard.minStd||"One deep work block + one receipt")],
+    ["d-body","Training focus",esc(sess.name.split(" · ")[0])+(trained?" ✓":"")+"<span class='bvs'>"+esc(sess.focus)+"</span>"],
+    ["d-food","Nutrition target","<span class='bbig'>"+nt.pro+"g</span> protein<span class='bvs'>"+nt.cal+" kcal · "+nt.water+"oz water"+(todayNut.protein?" · "+todayNut.protein+"g logged":"")+"</span>"],
+    ["d-mind","Reading target",bookName?esc(bookName):"10 pages minimum"],
+    ["d-edge","Trading / career","1 journal + 1 career proof"],
+    ["d-rec","Recovery",(sl!=null&&sl<6)?("<span style='color:var(--rust)'>Short sleep ("+sl+"h) — ease intensity</span>"):(sl!=null?sl+"h sleep · on target":"Log last night's sleep")]
+  ];
+  var recs=recommendations();
+  /* score breakdown */
+  var rows=[];
+  if(d.missionDone)rows.push(["Prime objective",30,"pos"]);
+  var nc=(d.crit||[]).filter(function(t){return t.done;}).length;if(nc)rows.push(["Critical actions ×"+nc,nc*10,"pos"]);
+  var ns=(d.sec||[]).filter(function(t){return t.done;}).length;if(ns)rows.push(["Supporting moves ×"+ns,ns*5,"pos"]);
+  for(var k in (d.cat||{})){var c=catById(k);if(c&&d.cat[k])rows.push([c.label+" ×"+d.cat[k],c.pts*d.cat[k],"pos"]);}
+  if(d.reflectDone)rows.push(["Debrief",10,"pos"]);
+  if(dayRaw(d)>0)rows.push(["No-zero-day bonus",10,"pos"]);
+  if(!rows.length)rows.push(["Nothing logged yet",0,"zero"]);
+
+  box.innerHTML=
+    '<div class="lbl" style="margin-top:18px">Daily briefing <span class="aside">what matters, what you\'re avoiding, what\'s next</span></div>'+
+    '<div class="brief-grid">'+brief.map(function(b){return '<div class="brief '+b[0]+'"><div class="bk">'+b[1]+'</div><div class="bv">'+b[2]+'</div></div>';}).join("")+'</div>'+
+    '<div class="lbl">The engine recommends <span class="aside">computed from your data, not a guess</span></div>'+
+    recs.map(function(r){return '<div class="rec '+(r.k||"")+'"><div class="ri">▸</div><div class="rc"><div class="rt">'+esc(r.t)+'</div><div class="rs">'+esc(r.s)+'</div></div><button class="btn sm rgo" onclick="go(\''+r.go+'\')">Open</button></div>';}).join("")+
+    '<div class="lbl">Today\'s score breakdown <span class="aside">exactly why the number is what it is</span></div>'+
+    '<div class="brk">'+rows.map(function(r){return '<div class="brkrow"><span class="bn">'+esc(r[0])+'</span><span class="bp '+r[2]+'">'+(r[1]>0?"+":"")+r[1]+'</span></div>';}).join("")+
+      '<div class="brkrow"><span class="bn" style="color:var(--ink);font-weight:600">Execution score</span><span class="bp pos" style="font-size:19px">'+dayScore(d)+'</span></div></div>'+
+    '<div class="lbl">Domain balance <span class="aside">the engine wants every lane fed</span></div>'+
+    '<div class="card">'+domainScores().map(function(s){return '<div class="dom"><span class="dl">'+s[0]+'</span><div class="dt"><div class="df" style="width:'+s[2]+'%;background:'+domColor(s[1])+'"></div></div><span class="dv">'+s[2]+'</span></div>';}).join("")+'</div>';
+}
+
+/* ============ FIELD MANUAL ============ */
+function renderManual(){
+  var c=el("c-manual");
+  c.innerHTML=
+   '<div class="labhead lh-sys"><div class="lh-ico">§</div><div style="flex:1"><div class="lh-t">FIELD MANUAL</div><div class="lh-s">The whole system in plain language. Read once. Operate forever.</div></div>'+
+     '<div class="lh-stat"><div class="v">'+rankFor(totalXP()).cur.n.split(" ")[0]+'</div><div class="l">state</div></div></div>'+
+   '<div class="man-toc">'+["The Engine","The daily loop","Scoring","Ranks","Proof","The Drift","Training","Nutrition","Reading","Strategy","The Desk","Recovery"].map(function(s,i){return '<a href="#m'+i+'">'+(i+1).toString().padStart(2,"0")+' · '+s+'</a>';}).join("")+'</div>'+
+
+   man(0,"The Engine","This is not a tracker. It is the system you operate from.",
+     "<p>The Engine turns who you want to be into a daily set of measurable moves, then keeps an honest record of whether you made them. It covers <b>training, nutrition, reading, strategy, trading, career, school, and recovery</b> — because becoming undeniable is not one skill, it's a balanced portfolio of them.</p><p>The core belief: <b>proof beats intention</b>. The day is not real until it is documented. The system does not care how motivated you felt — only what is on the record.</p>")+
+
+   man(1,"The daily loop","Three honest modes, depending on your time.",
+     '<div class="kpis"><div class="kpi"><div class="kk">5 minutes</div><div class="kv">Open Command. Read the briefing. File one proof receipt. Mark the prime objective. That alone keeps the streak alive.</div></div>'+
+     '<div class="kpi"><div class="kk">30 minutes</div><div class="kv">Run the Kill Chain, log training or nutrition, read 10 pages, and write the end-of-day debrief.</div></div>'+
+     '<div class="kpi"><div class="kk">2 hours</div><div class="kv">Full protocol: deep work, a Baki session, market study + a journaled trade, a reading extraction, one career proof, and the debrief.</div></div></div>')+
+
+   man(2,"Scoring","Transparent, not manipulative. You can always see why.",
+     "<p>Your <b>execution score</b> (0–100) is built from real actions: prime objective +30, each critical action +10, each supporting move +5, logged proof by category, the debrief +10, and a no-zero-day bonus +10. Command shows the full breakdown every day.</p><p>Alongside it, the Engine computes <b>domain scores</b> — Physical, Nutrition, Intellect, Trading, Recovery, Proof — so a high execution score built only on easy wins still shows up as imbalance.</p>")+
+
+   man(3,"Ranks","States of becoming, earned by total proof over time.",
+     "<p>"+RANKS.map(function(r){return "<b>"+r.n+"</b> ("+r.x.toLocaleString()+" XP) — "+r.s;}).join(" · ")+".</p><p>XP is the sum of every day's raw points. Ranks don't reset on a bad day; the record is cumulative. You climb by stacking documented days, not by motivation.</p>")+
+
+   man(4,"Proof","The core of the Engine. Evidence you are becoming undeniable.",
+     "<p>A receipt is a fact the Drift can never produce. File quick proof with one tap on Command or in the Proof Vault, or file <b>detailed proof</b> (difficulty, quality, skill built, next step) that weights the case file higher. Receipts compound into a <b>brag sheet</b> you can export — raw material for a resume, LinkedIn, and interview stories.</p>")+
+
+   man(5,"The Drift","Your failure patterns, diagnosed — not a cartoon rival.",
+     "<p>The Drift is the version of you that talks big and disappears. It gains ground when you log nothing, skip training, ignore the meal plan, violate trading rules, or stop reading. It loses ground when you file proof, complete the hard thing, analyze a mistake, or finish the weekly review. The Drift names the <b>current leak, the pattern, the cost if repeated, and the correction</b>.</p>")+
+
+   man(6,"Training — Baki Protocol","Real periodization, no fantasy.",
+     "<p>Phase 1 is a <b>cut</b>: ~"+S.body.wStart+" lb toward ~"+S.body.wGoal+" lb at roughly 12% body fat, on a "+S.profile.trainingDays+"-day push/pull/legs split with conditioning and mobility. No steroids, no starvation, no reckless dehydration. Progressive overload, weekly check-ins, deloads when fatigue stacks. The long-term standard is 155+ lb at 8–10% body fat.</p>")+
+
+   man(7,"Nutrition","Won on protein and consistency, not perfection.",
+     "<p>The Engine sets calories, protein, carbs, fat, and water from your bodyweight and phase. On a cut, <b>protein is the macro you defend</b> — it protects muscle. Use the quick-response buttons (trained hard, low energy, overate, missed protein) for practical corrections instead of guilt.</p>")+
+
+   man(8,"Reading","A curriculum, not a wishlist.",
+     "<p>Twelve tracks from game theory to self-mastery, each with starter → intermediate → advanced books and the skill it builds. Pick a current book, log pages, and — most importantly — capture <b>what you extracted and how you'll apply it this week</b>. Reading without application is entertainment.</p>")+
+
+   man(9,"Strategy Lab","Train decisions, not definitions.",
+     "<p>A library of decision-science and game-theory concepts, each with a plain explanation plus trading, career, and social examples — and a <b>drill</b> to run this week. Mark a concept drilled when you've actually applied it. This shapes how you think under uncertainty.</p>")+
+
+   man(10,"The Desk","Process over P/L, always.",
+     "<p>Journal every trade with setup, invalidation, risk, size, process score, and emotional load. The Desk flags <b>tilt, revenge, overleverage, and FOMO</b> patterns, tracks your best setups and worst mistakes, and enforces 'do-not-trade' conditions. P/L is never asked for. Process is.</p>")+
+
+   man(11,"Recovery","Strict, but real. Falling off is data, not identity.",
+     '<div class="kpis"><div class="kpi"><div class="kk">5-minute reset</div><div class="kv">One receipt + tomorrow\'s prime objective. Streak stays alive.</div></div>'+
+     '<div class="kpi"><div class="kk">Same-day salvage</div><div class="kv">Half a day lost? Bank one critical action before midnight.</div></div>'+
+     '<div class="kpi"><div class="kk">3-day rebuild</div><div class="kv">After multiple misses: minimums only — one proof, one workout or read, one debrief — for three days, then resume full.</div></div>'+
+     '<div class="kpi"><div class="kk">Low-energy mode</div><div class="kv">Protocol drops to essentials; reduce training volume, protect sleep and protein.</div></div>'+
+     '<div class="kpi"><div class="kk">Sick / injured</div><div class="kv">Train around it or rest fully; nutrition and reading still count. No zero days.</div></div>'+
+     '<div class="kpi"><div class="kk">Post-loss (trading)</div><div class="kv">Run the repair flow in The Standard before the next trade. No revenge size.</div></div></div>')+
+
+   '<div class="man-sec"><h3>Your calibration</h3><div class="mlead">Edit anytime — defaults are provided.</div>'+
+   '<p>Name: <b>'+esc(S.profile.name)+'</b> · Main goal: <b>'+esc(S.profile.mainGoal)+'</b> · Body goal: <b>'+esc(S.profile.bodyGoal)+'</b> · Biggest leak: <b>'+esc(S.profile.biggestLeak)+'</b></p>'+
+   '<button class="btn brass" onclick="openOnboarding()">Edit profile / re-run calibration</button></div>';
+}
+function man(i,t,lead,body){return '<div class="man-sec" id="m'+i+'"><h3>'+(i+1).toString().padStart(2,"0")+' · '+t+'</h3><div class="mlead">'+lead+'</div>'+body+'</div>';}
+
+/* ============ BAKI PROTOCOL ============ */
+function renderBaki(){
+  var c=el("c-baki");var b=S.body;var wd=new Date().getDay();var sess=TRAINING_SPLIT[wd];
+  var trained=S.training[today()]&&S.training[today()].done;var tlog=S.training[today()]||{};
+  var lost=(b.wStart-(b.wNow||b.wStart));var togo=((b.wNow||b.wStart)-b.wGoal);
+  var trend=weightTrendDir();
+  c.innerHTML=
+   '<div class="labhead lh-body"><div class="lh-ico">▲</div><div style="flex:1"><div class="lh-t">BAKI PROTOCOL</div><div class="lh-s">Physical engine — build the frame the mission requires.</div></div>'+
+     '<div class="lh-stat"><div class="v" style="color:var(--rust)">'+(b.wNow||b.wStart)+'</div><div class="l">lb now</div></div>'+
+     '<div class="lh-stat"><div class="v">'+b.wGoal+'</div><div class="l">lb goal</div></div>'+
+     '<div class="lh-stat"><div class="v" style="color:var(--live)">'+trainedDays7()+'</div><div class="l">sessions/7d</div></div></div>'+
+   howPanel({what:"Your physical lab: a real training and nutrition program with progressive overload, conditioning, recovery, and check-ins.",cells:[{k:"good",t:"Good looks like",v:"Sessions hit on schedule, weight trending toward goal ~0.5–1%/week, strength holding."},{k:"bad",t:"Failure looks like",v:"Skipped sessions, weight flat for 2+ weeks, strength and energy crashing."},{k:"next",t:"Do next",v:"Complete today's session, log your weight, flag fatigue if it's stacking."}],use:"Complete the session below, then log it. Log bodyweight 2–3×/week. Use the flags to trigger deloads.",affects:"Drives your Physical domain score and feeds recovery recommendations."})+
+
+   '<div class="grid2">'+
+     '<div class="card acc-rust"><div class="card-h" style="color:var(--rust)">Body profile</div>'+
+       '<div class="grid2"><div class="field"><label class="lab">Current weight (lb)</label><input type="number" value="'+(b.wNow||b.wStart)+'" onchange="setBody(\'wNow\',+this.value)"></div>'+
+       '<div class="field"><label class="lab">Est. body fat %</label><input type="number" value="'+(b.bfNow||b.bfStart)+'" onchange="setBody(\'bfNow\',+this.value)"></div></div>'+
+       '<div class="gc-meta"><span>started <b>'+b.wStart+'lb</b></span><span>goal <b>'+b.wGoal+'lb @ '+b.bfGoal+'%</b></span></div>'+
+       '<div class="gc-meta"><span>down <b style="color:var(--live)">'+(lost>=0?lost.toFixed(1):"0")+'lb</b></span><span><b>'+(togo>0?togo.toFixed(1):"0")+'lb</b> to goal</span><span>trend: <b style="color:'+(trend.ok?'var(--live)':'var(--brass)')+'">'+trend.txt+'</b></span></div>'+
+       '<div class="row" style="margin-top:6px"><button class="btn sm live" onclick="logWeight()">Log today\'s weight</button></div>'+
+     '</div>'+
+     '<div class="card acc-rust"><div class="card-h">Phase</div>'+
+       '<div class="modes" style="margin-bottom:10px"><button class="mode '+(b.phase===1?"on":"")+'" onclick="setBody(\'phase\',1)"><div class="mn">Phase 1 · Cut</div><div class="ms">strip fat to ~'+b.wGoal+'lb @ '+b.bfGoal+'%</div></button>'+
+       '<button class="mode '+(b.phase===2?"on":"")+'" onclick="setBody(\'phase\',2)"><div class="mn">Phase 2 · Lean build</div><div class="ms">toward 155+ @ 8–10%</div></button></div>'+
+       '<div class="phasebar">'+[0,1,2,3].map(function(i){return '<div class="phaseseg '+((b.phase===1?(lost/(b.wStart-b.wGoal)*4):0)>i?"on":"")+'"></div>';}).join("")+'</div>'+
+       '<div style="font-size:11px;color:var(--mut);font-family:\'Crimson Pro\',serif;font-style:italic;margin-top:8px">'+(b.phase===1?"Aim for a steady 0.5–1% bodyweight loss per week. Faster than that on a natural cut costs muscle. If weight stalls 2 weeks, drop calories ~150 or add conditioning.":"Lean surplus: ~+150–250 kcal, push the big lifts, keep conditioning to stay sharp.")+'</div>'+
+     '</div>'+
+   '</div>'+
+
+   '<div class="lbl">Weight trend</div><div class="chartbox"><canvas id="baki-trend" height="150"></canvas>'+(b.wlog.length<2?'<div class="empty" style="padding:6px 2px">Log your weight a few times to see the trend.</div>':"")+'</div>'+
+
+   '<div class="lbl">Today\'s session <span class="aside">'+weekdayName()+' · '+esc(sess.focus)+'</span></div>'+
+   '<div class="card '+(trained?"acc-live":"acc-rust")+'"><div class="card-h">'+esc(sess.name)+'</div>'+
+     sess.ex.map(function(e){return '<div class="exrow"><div><div class="exn">'+esc(e[0])+'</div></div><div class="exm">rest '+esc(e[3])+'</div><div class="exsr">'+esc(e[1])+'×'+esc(e[2])+'</div><div class="exr">sets×reps</div></div>';}).join("")+
+     '<div class="gc-meta" style="margin-top:10px"><span>Conditioning: <b>'+esc(sess.cond)+'</b></span></div><div class="gc-meta"><span>Mobility: <b>'+esc(sess.mob)+'</b></span></div>'+
+     (trained?
+       '<div style="margin-top:12px"><span class="je-verdict jv-clean">SESSION LOGGED</span></div>'+
+       '<div class="field" style="margin-top:10px"><label class="lab">Session notes / RPE</label><textarea onchange="setTrain(\'notes\',this.value)">'+esc(tlog.notes||"")+'</textarea></div>'
+      :'<div class="row" style="margin-top:14px"><button class="btn solid" onclick="completeSession()">Complete session · file proof</button>'+
+       '<button class="btn rust" onclick="flagFatigue()">Flag fatigue / low energy</button></div>')+
+   '</div>'+
+
+   '<div class="grid2">'+
+     '<div><div class="lbl">Strength standards <span class="aside">targets at goal weight</span></div><div class="card">'+
+       STRENGTH_STD.map(function(s){return '<div class="std-row"><span class="sn">'+esc(s[0])+'</span><span class="sg">'+esc(s[1])+'</span></div>';}).join("")+'</div></div>'+
+     '<div><div class="lbl">Adaptive adjustments</div><div class="card">'+
+       '<div class="how-cell" style="background:transparent;padding:6px 0;border-bottom:1px solid var(--line)"><div class="hk" style="color:var(--brass)">Weight not moving (2 wk)</div><div class="hv">Drop calories ~150 or add 2 conditioning sessions. Don\'t slash protein.</div></div>'+
+       '<div class="how-cell" style="background:transparent;padding:6px 0;border-bottom:1px solid var(--line)"><div class="hk" style="color:var(--brass)">Energy crashing</div><div class="hv">Check sleep first. Then add a small pre-workout carb. Persistent crash = cut is too steep.</div></div>'+
+       '<div class="how-cell" style="background:transparent;padding:6px 0"><div class="hk" style="color:var(--brass)">Strength falling</div><div class="hv">Reduce deficit, prioritize sleep, consider a 4–5 day deload at 60% volume.</div></div>'+
+     '</div></div>'+
+   '</div>';
+  drawWeightTrend();
+}
+function setBody(f,v){S.body[f]=v;save();renderBaki();refreshHeaderOnly&&refreshHeaderOnly();}
+function setTrain(f,v){if(!S.training[today()])S.training[today()]={done:true};S.training[today()][f]=v;save();}
+function logWeight(){var w=parseFloat(prompt("Today's weight (lb):",(S.body.wNow||S.body.wStart)));if(!w||w<=0)return;var bf=parseFloat(prompt("Body fat % (optional, blank to skip):",""));S.body.wNow=w;if(!isNaN(bf))S.body.bfNow=bf;S.body.wlog.push({date:today(),w:w,bf:isNaN(bf)?null:bf});save();renderBaki();toast("Weight logged · "+w+"lb","green");}
+function completeSession(){var wd=new Date().getDay();S.training[today()]={done:true,type:TRAINING_SPLIT[wd].name,notes:"",rpe:0};fileReceipt("workout","Training — "+TRAINING_SPLIT[wd].name.split(" · ")[0],15,"body");save();flashScore&&flashScore();renderBaki();refreshHeaderOnly&&refreshHeaderOnly();toast("Session complete · +15 · proof filed","green");}
+function flagFatigue(){S.sleepLog[today()]=S.sleepLog[today()]||5;if(!S.training[today()])S.training[today()]={};S.training[today()].fatigue=true;save();toast("Fatigue flagged — Engine will ease intensity & prioritize recovery","brass");renderBaki();}
+function weightTrendDir(){var l=S.body.wlog;if(l.length<2)return{txt:"need data",ok:true};var recent=l.slice(-4);var first=recent[0].w,last=recent[recent.length-1].w;var diff=last-first;if(S.body.phase===1){if(diff<-0.1)return{txt:"dropping ✓",ok:true};if(diff>0.3)return{txt:"rising — tighten",ok:false};return{txt:"flat — adjust",ok:false};}else{if(diff>0.1)return{txt:"building ✓",ok:true};return{txt:"flat",ok:false};}}
+function drawWeightTrend(){var cv=el("baki-trend");if(!cv||!cv.getContext)return;var l=S.body.wlog;var ctx=cv.getContext("2d");var dpr=window.devicePixelRatio||1;var W=cv.clientWidth||600,H=150;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);if(l.length<2)return;var ws=l.map(function(x){return x.w;});var min=Math.min.apply(null,ws.concat([S.body.wGoal])),max=Math.max.apply(null,ws);var pad=(max-min)*0.15||2;min-=pad;max+=pad;var padL=4,padR=4,padT=10,padB=14,gw=W-8,gh=H-padT-padB;var X=function(i){return padL+i/(l.length-1)*gw;};var Y=function(v){return padT+gh-(v-min)/(max-min)*gh;};ctx.strokeStyle="#222a34";ctx.lineWidth=1;var gy=Y(S.body.wGoal);ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(padL,gy);ctx.lineTo(W-padR,gy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#5b636b";ctx.font="9px 'JetBrains Mono',monospace";ctx.fillText("goal "+S.body.wGoal,padL+2,gy-3);ctx.beginPath();ctx.moveTo(X(0),Y(ws[0]));for(var i=1;i<l.length;i++)ctx.lineTo(X(i),Y(ws[i]));ctx.strokeStyle="#cf553c";ctx.lineWidth=2;ctx.lineJoin="round";ctx.stroke();var lx=X(l.length-1),ly=Y(ws[ws.length-1]);ctx.beginPath();ctx.arc(lx,ly,3.5,0,Math.PI*2);ctx.fillStyle="#cf553c";ctx.fill();}
+
+/* ============ NUTRITION ENGINE ============ */
+function renderNutrition(){
+  var c=el("c-nutrition");var nt=nutriTargets();var log=S.nutri[today()]||{};
+  var resp=S._nutriResp;
+  c.innerHTML=
+   '<div class="labhead lh-food"><div class="lh-ico">◈</div><div style="flex:1"><div class="lh-t">NUTRITION</div><div class="lh-s">Meal command — a cut is won on protein and consistency.</div></div>'+
+     '<div class="lh-stat"><div class="v" style="color:var(--food)">'+(log.protein||0)+'</div><div class="l">g protein today</div></div>'+
+     '<div class="lh-stat"><div class="v">'+nutritionScore()+'</div><div class="l">7-day score</div></div></div>'+
+   howPanel({what:"Targets are computed from your bodyweight and training phase. Log intake, use the quick responses for real corrections.",cells:[{k:"good",t:"Good looks like",v:"Protein target hit daily, water in, calories near target most days."},{k:"bad",t:"Failure looks like",v:"Protein missed, mindless overeating, then skipping meals to compensate."},{k:"next",t:"Do next",v:"Hit your protein number today and log it. File meal compliance."}],use:"Log protein and water below. Tap a quick-response when something goes off-plan.",affects:"Drives your Nutrition domain score and recovery recommendations."})+
+
+   '<div class="lbl">Today\'s targets <span class="aside">phase '+S.body.phase+' · '+(S.body.phase===1?"cut":"lean build")+'</span></div>'+
+   '<div class="macros">'+
+     '<div class="macro k"><div class="mv">'+nt.cal+'</div><div class="ml">kcal</div></div>'+
+     '<div class="macro p"><div class="mv">'+nt.pro+'</div><div class="ml">protein g</div><div class="mt">'+(log.protein||0)+'g logged</div></div>'+
+     '<div class="macro c"><div class="mv">'+nt.carb+'</div><div class="ml">carbs g</div></div>'+
+     '<div class="macro f"><div class="mv">'+nt.fat+'</div><div class="ml">fat g</div></div>'+
+     '<div class="macro w"><div class="mv">'+nt.water+'</div><div class="ml">water oz</div><div class="mt">'+(log.water||0)+'oz logged</div></div>'+
+   '</div>'+
+   '<div class="card"><div class="row" style="align-items:center;gap:10px"><span class="lab" style="margin:0">Log intake</span>'+
+     '<button class="btn sm" onclick="logNutri(\'protein\',25)">+25g protein</button><button class="btn sm" onclick="logNutri(\'protein\',40)">+40g</button>'+
+     '<button class="btn sm" onclick="logNutri(\'water\',16)">+16oz water</button><button class="btn sm" onclick="logNutri(\'water\',32)">+32oz</button>'+
+     '<span style="flex:1"></span>'+
+     ((log.protein||0)>=nt.pro*0.85?'<span class="je-verdict jv-clean">PROTEIN HIT</span>':'<button class="btn sm live" onclick="mealCompliance()">File meal compliance</button>')+'</div>'+
+     '<div class="row" style="margin-top:12px"><span class="lab" style="margin:0;align-self:center">Quick response:</span>'+
+       '<button class="btn sm brass" onclick="nutriResp(\'hard\')">Trained hard</button><button class="btn sm brass" onclick="nutriResp(\'low\')">Low energy</button>'+
+       '<button class="btn sm brass" onclick="nutriResp(\'over\')">Overate</button><button class="btn sm brass" onclick="nutriResp(\'missed\')">Missed protein</button></div>'+
+     (resp?'<div class="card acc-brass" style="margin:12px 0 0"><div class="card-h" style="color:var(--brass);font-size:16px">'+esc(resp[0])+'</div><div style="font-size:12.5px;color:var(--ink2);line-height:1.6">'+esc(resp[1])+'</div></div>':"")+
+   '</div>'+
+
+   '<div class="lbl">Meal templates <span class="aside">simple, high-protein, repeatable</span></div>'+
+   MEAL_TEMPLATES.map(function(m){return '<div class="meal"><div class="mh">'+esc(m.h)+'</div><div class="mm">'+esc(m.m)+'</div><div class="mk">'+esc(m.k)+'</div></div>';}).join("")+
+
+   '<div class="grid2" style="margin-top:14px">'+
+     '<div><div class="lbl">Grocery list</div><div class="card"><div class="grocery">'+GROCERY.map(function(g){return '<div>'+esc(g)+'</div>';}).join("")+'</div></div></div>'+
+     '<div><div class="lbl">Cutting rules</div><div class="card" style="font-size:12.5px;color:var(--ink2);line-height:1.7">'+
+       '<p style="margin-bottom:8px">• <b>Protein first</b> every meal — it protects muscle in a deficit.</p>'+
+       '<p style="margin-bottom:8px">• <b>Refeed</b> ~1×/week: bring calories to maintenance with clean carbs to restore performance.</p>'+
+       '<p style="margin-bottom:8px">• <b>Diet break</b> every 6–8 weeks: 5–7 days at maintenance to reset hormones and sanity.</p>'+
+       '<p style="margin-bottom:8px">• <b>Eating out:</b> lean protein + veg/rice, sauces on the side, stop at comfortably full.</p>'+
+       '<p>• <b>Never</b> dehydrate, starve, or crash-diet. Slow and measured wins the frame.</p></div></div>'+
+   '</div>';
+}
+function logNutri(f,v){if(!S.nutri[today()])S.nutri[today()]={protein:0,water:0};S.nutri[today()][f]=(S.nutri[today()][f]||0)+v;save();renderNutrition();refreshHeaderOnly&&refreshHeaderOnly();}
+function mealCompliance(){if(!S.nutri[today()])S.nutri[today()]={protein:0,water:0};var nt=nutriTargets();S.nutri[today()].protein=Math.max(S.nutri[today()].protein||0,Math.round(nt.pro*0.9));fileReceipt("meal","Meal compliance — protein target hit",10,"food");save();flashScore&&flashScore();renderNutrition();refreshHeaderOnly&&refreshHeaderOnly();toast("Meal compliance filed","green");}
+function nutriResp(kind){S._nutriResp=nutriResponse(kind);if(kind==="over"){if(!S.nutri[today()])S.nutri[today()]={};S.nutri[today()].over=true;}save();renderNutrition();}
+
+/* ===================== READING & INTELLECT ENGINE ===================== */
+function trackById(id){for(var i=0;i<READING_TRACKS.length;i++)if(READING_TRACKS[i].id===id)return READING_TRACKS[i];return null;}
+function bookMeta(title){var found=null;READING_TRACKS.forEach(function(t){["starter","inter","adv"].forEach(function(tk){t[tk].forEach(function(b){if(b[0]===title)found={author:b[1],track:t.name};});});});return found;}
+function readingPages7(){var n=0;last7().forEach(function(ds){n+=(S.reading.pages[ds]||0);});return n;}
+function readingStreak(){var s=0;var cur=today();if(!(S.reading.pages[cur]>0))cur=addDays(cur,-1);while(S.reading.pages[cur]>0){s++;cur=addDays(cur,-1);}return s;}
+function booksDone(){var n=0;for(var k in S.reading.done)if(S.reading.done[k])n++;return n;}
+
+function renderReading(){
+  var c=el("c-reading");
+  var prioMap={game:"game",strat:"strat",psy:"psy",strategy:"strat",trading:"trade",finance:"fin"};
+  var sel=S.reading.cur.track||prioMap[S.profile.readingPriority]||"game";
+  var tr=trackById(sel)||READING_TRACKS[0];
+  var curBook=S.reading.cur.book;var cm=curBook?bookMeta(curBook):null;
+  var todayPages=S.reading.pages[today()]||0;
+  var log=(S.reading.log||[]).filter(function(x){return x.type==="extract";});
+
+  var tierHTML=function(label,arr){
+    if(!arr.length)return"";
+    return '<div class="tier"><div class="tier-h">'+label+'</div>'+arr.map(function(b){
+      var on=!!S.reading.done[b[0]];var isCur=curBook===b[0];
+      return '<div class="book">'+
+        '<div class="bchk'+(on?' on':'')+'" onclick="readToggleBook(\''+jsStr(b[0])+'\')"></div>'+
+        '<div class="bt">'+esc(b[0])+' <span class="ba">· '+esc(b[1])+'</span></div>'+
+        (isCur?'<span class="ba" style="color:var(--mind)">▸ reading</span>':'<span class="bcur" onclick="readSetCurrent(\''+jsStr(tr.id)+'\',\''+jsStr(b[0])+'\')">set current</span>')+
+      '</div>';
+    }).join("")+'</div>';
+  };
+
+  c.innerHTML=
+   '<div class="labhead lh-mind"><div class="lh-ico">▤</div><div style="flex:1"><div class="lh-t">READING ENGINE</div><div class="lh-s">A curriculum, not a wishlist. Read with a pen — extract, then apply.</div></div>'+
+     '<div class="lh-stat"><div class="v">'+booksDone()+'</div><div class="l">books done</div></div>'+
+     '<div class="lh-stat"><div class="v">'+readingStreak()+'</div><div class="l">day streak</div></div></div>'+
+
+   howPanel({what:"Twelve tracks from game theory to self-mastery. Each runs starter → intermediate → advanced. Reading without application is entertainment — every book here exists to change a decision you make.",
+     cells:[{t:"Good looks like",v:"10+ pages logged daily and one written extraction per book.",k:"good"},
+            {t:"Failure looks like",v:"Highlighting passively, finishing nothing, applying none of it.",k:"bad"},
+            {t:"Do next",v:"Pick a current book below, log today's pages, capture one lesson + how you'll use it this week.",k:"next"}],
+     affects:"Pages feed your Intellect score and reading streak; each extraction files a proof receipt into the Vault."})+
+
+   '<div class="lbl">Curriculum tracks <span class="aside">tap a track to load its path</span></div>'+
+   '<div class="tracks">'+READING_TRACKS.map(function(t){
+      return '<div class="track'+(t.id===sel?' active':'')+'" onclick="readSelTrack(\''+jsStr(t.id)+'\')"><div class="tn">'+esc(t.name)+'</div><div class="tk">'+esc(t.skill)+'</div></div>';
+   }).join("")+'</div>'+
+
+   '<div class="lbl" style="margin-top:16px">'+esc(tr.name)+' <span class="aside">'+esc(tr.skill)+'</span></div>'+
+   '<div class="card" style="border-top:2px solid var(--mindln)"><p style="font-family:\'Crimson Pro\',serif;font-style:italic;font-size:14px;color:var(--ink2);line-height:1.6;margin-bottom:8px">'+esc(tr.why)+'</p>'+
+     tierHTML("Starter",tr.starter)+tierHTML("Intermediate",tr.inter)+tierHTML("Advanced",tr.adv)+'</div>'+
+
+   '<div class="lbl">Current book <span class="aside">what you\'re reading right now</span></div>'+
+   (curBook?
+     '<div class="card" style="border-left:3px solid var(--mind)">'+
+       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;letter-spacing:.03em;color:var(--ink)">'+esc(curBook)+'</div>'+
+       '<div style="font-size:11px;color:var(--mut);margin-bottom:12px">'+(cm?esc(cm.author)+' · '+esc(cm.track)+' track':"")+' · '+todayPages+' pages logged today</div>'+
+       '<div class="row" style="gap:8px;margin-bottom:14px"><button class="btn sm solid" onclick="readLogPages()">Log pages read</button><button class="btn sm" onclick="readSetCurrent(null,null)">Clear</button></div>'+
+       '<div class="field"><label class="lab">What did you extract? <span class="hint">one real lesson, in your words</span></label><textarea id="re-extract" placeholder="The idea worth keeping"></textarea></div>'+
+       '<div class="field" style="margin-bottom:10px"><label class="lab">How will you apply it this week? <span class="hint">make it operational</span></label><textarea id="re-apply" placeholder="One concrete move"></textarea></div>'+
+       '<button class="btn solid" onclick="readFileExtraction()">File extraction · +receipt</button>'+
+     '</div>'
+     :'<div class="card empty" style="padding:18px">No current book set. Choose one from a track above — the Engine will track pages and extractions against it.</div>')+
+
+   '<div class="stats s4" style="margin-top:14px">'+
+     '<div class="stat"><div class="stat-l">Pages · 7 days</div><div class="stat-v '+(readingPages7()>=70?"g":readingPages7()>=30?"a":"c")+'">'+readingPages7()+'</div><div class="stat-s">10/day keeps the lane fed</div></div>'+
+     '<div class="stat"><div class="stat-l">Reading streak</div><div class="stat-v '+(readingStreak()>=3?"g":"a")+'">'+readingStreak()+'</div><div class="stat-s">consecutive days</div></div>'+
+     '<div class="stat"><div class="stat-l">Books completed</div><div class="stat-v g">'+booksDone()+'</div><div class="stat-s">across all tracks</div></div>'+
+     '<div class="stat"><div class="stat-l">Extractions filed</div><div class="stat-v g">'+log.length+'</div><div class="stat-s">lessons on the record</div></div>'+
+   '</div>'+
+
+   (log.length?('<div class="lbl">Extraction log <span class="aside">the lessons you actually pulled</span></div>'+
+     log.slice().reverse().slice(0,12).map(function(x){
+       return '<div class="meal" style="border-left-color:var(--mindln)"><div class="mh" style="font-size:14px">'+esc(x.book||"Reading")+' <span style="font-size:10px;color:var(--mut);font-family:\'JetBrains Mono\',monospace">'+esc(x.date)+'</span></div>'+
+         '<div class="mm"><b style="color:var(--mind)">Extract:</b> '+esc(x.extract)+(x.apply?'<br><b style="color:var(--brass)">Apply:</b> '+esc(x.apply):"")+'</div></div>';
+     }).join("")):"");
+}
+function readSelTrack(id){S.reading.cur.track=id;save();renderReading();}
+function readToggleBook(title){S.reading.done[title]=!S.reading.done[title];save();renderReading();
+  if(S.reading.done[title])toast("Marked read · "+title,"green");}
+function readSetCurrent(trackId,title){S.reading.cur.track=trackId||S.reading.cur.track;S.reading.cur.book=title;save();renderReading();
+  if(title)toast("Now reading · "+title,"brass");}
+function readLogPages(){
+  var n=parseInt(prompt("Pages read today:","10"),10);if(!n||n<=0)return;
+  S.reading.pages[today()]=(S.reading.pages[today()]||0)+n;
+  S.reading.log.push({type:"pages",date:today(),book:S.reading.cur.book,pages:n});
+  save();renderReading();refreshHeaderOnly&&refreshHeaderOnly();toast(n+" pages logged","green");
+}
+function readFileExtraction(){
+  var ex=(el("re-extract")?el("re-extract").value.trim():"");var ap=(el("re-apply")?el("re-apply").value.trim():"");
+  if(!ex){toast("Write the lesson first — that's the point","red");return;}
+  S.reading.log.push({type:"extract",date:today(),book:S.reading.cur.book||"Reading",extract:ex,apply:ap});
+  fileReceipt("reading","Reading extraction — "+(S.reading.cur.book||"book"),10,"mind");
+  save();flashScore&&flashScore();renderReading();refreshHeaderOnly&&refreshHeaderOnly();toast("Extraction filed · lesson on the record","green");
+}
+
+/* ===================== GAME THEORY / STRATEGY LAB ===================== */
+function strategyDrilledCount(){var n=0;for(var k in S.strategy.done)if(S.strategy.done[k])n++;return n;}
+function renderStrategy(){
+  var c=el("c-strategy");
+  var tagC={core:"var(--mind)",risk:"var(--rust)",strat:"var(--brass)",social:"var(--live)"};
+  var done=strategyDrilledCount();
+  c.innerHTML=
+   '<div class="labhead lh-mind"><div class="lh-ico">◈</div><div style="flex:1"><div class="lh-t">STRATEGY LAB</div><div class="lh-s">Train decisions, not definitions. Each concept ends in a drill you run this week.</div></div>'+
+     '<div class="lh-stat"><div class="v">'+done+'</div><div class="l">drilled</div></div>'+
+     '<div class="lh-stat"><div class="v">'+STRATEGY_CONCEPTS.length+'</div><div class="l">concepts</div></div></div>'+
+
+   howPanel({what:"A library of decision-science and game-theory concepts — the operating logic behind trading, negotiation, and reading a room. Each has plain meaning plus trading, career, and social examples, and a drill to apply it.",
+     cells:[{t:"Good looks like",v:"You can name the concept live, mid-decision, and act on it.",k:"good"},
+            {t:"Failure looks like",v:"Knowing the definition but never changing a single move.",k:"bad"},
+            {t:"Do next",v:"Open one concept, read the examples, run its drill today, then mark it drilled.",k:"next"}],
+     affects:"Each drill you complete feeds your Intellect score and files a proof receipt."})+
+
+   '<div class="lbl">Concept library <span class="aside">expand · read · drill · mark</span></div>'+
+   STRATEGY_CONCEPTS.map(function(x){
+     var dn=S.strategy.done[x.id];
+     return '<details class="concept"><summary><span class="cn">'+esc(x.n)+'</span>'+(dn?'<span class="ba" style="color:var(--live);font-size:10px">✓ drilled</span>':"")+'<span class="ctag" style="color:'+(tagC[x.tag]||"var(--mind)")+';border-color:'+(tagC[x.tag]||"var(--mind)")+'">'+esc(x.tag)+'</span></summary>'+
+       '<div class="cbody">'+
+         '<p style="font-size:13.5px;color:var(--ink2);line-height:1.65;margin:12px 0">'+esc(x.def)+'</p>'+
+         '<div class="cex">'+
+           '<div class="cex-cell"><div class="ck">Real life</div><div class="cv">'+esc(x.real)+'</div></div>'+
+           '<div class="cex-cell"><div class="ck">Trading</div><div class="cv">'+esc(x.trade)+'</div></div>'+
+           '<div class="cex-cell"><div class="ck">Career</div><div class="cv">'+esc(x.career)+'</div></div>'+
+           '<div class="cex-cell"><div class="ck">Social</div><div class="cv">'+esc(x.social)+'</div></div>'+
+         '</div>'+
+         '<div class="cdrill"><div class="dk">This week\'s drill</div><div class="dv">'+esc(x.drill)+'</div></div>'+
+         (dn?('<div class="row" style="margin-top:12px;align-items:center"><span class="lab" style="margin:0;color:var(--live)">Drilled '+esc(dn.date)+(dn.reflect?' — "'+esc(dn.reflect)+'"':"")+'</span><span style="flex:1"></span><button class="btn sm" onclick="strategyUndo(\''+x.id+'\')">Reset</button></div>')
+            :'<div class="row" style="margin-top:12px"><button class="btn sm solid" onclick="strategyMark(\''+x.id+'\')">Mark drilled · file receipt</button></div>')+
+       '</div></details>';
+   }).join("");
+}
+function strategyMark(id){
+  var con=null;for(var i=0;i<STRATEGY_CONCEPTS.length;i++)if(STRATEGY_CONCEPTS[i].id===id)con=STRATEGY_CONCEPTS[i];
+  var reflect=prompt("Optional — one line on how you applied it (blank to skip):","");
+  S.strategy.done[id]={date:today(),reflect:(reflect||"").trim()};
+  fileReceipt("strategy","Strategy drill — "+(con?con.n:id),10,"mind");
+  save();flashScore&&flashScore();renderStrategy();refreshHeaderOnly&&refreshHeaderOnly();toast("Drill logged · "+(con?con.n:"concept"),"green");
+}
+function strategyUndo(id){delete S.strategy.done[id];save();renderStrategy();}
+function jsStr(s){return(s==null?"":(""+s)).replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g," ");}
+
+/* ===================== SHARED MICRO-HELPERS (engine) ===================== */
+function kpi(k,v){return '<div class="kpi"><div class="kk">'+k+'</div><div class="kv" style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:var(--ink);letter-spacing:.03em">'+v+'</div></div>';}
+function statCard(l,v,cls,sub){return '<div class="stat" style="background:var(--panel2)"><div class="stat-l">'+l+'</div><div class="stat-v '+(cls||"")+'">'+v+'</div><div class="stat-s">'+(sub||"")+'</div></div>';}
+function fld(label,inner){return '<div class="field"><label class="lab">'+label+'</label>'+inner+'</div>';}
+function topKey(o){var best=null,bn=0;for(var k in o)if(o[k]>bn){bn=o[k];best=k;}return best;}
+
+/* ===================== THE DESK v3 ===================== */
+var DJ_PROC=null,DJ_EMO=null,DJ_FLAGS={},DJ_AGAIN=null;
+var DESK_SETUPS=["Trend pullback","Range break","Range fade","Breakout","Reversal","News fade","Momentum","Mean reversion","Other"];
+var DESK_FLAGS=[["revenge","Revenge"],["oversize","Oversized"],["fomo","FOMO"],["chased","Chased entry"],["noplan","No plan"]];
+var CAREER_PROOFS=["Outreach / networking message","Financial model built","Company research / teardown","Distressed / restructuring memo","Credit model","Interview prep block","Resume / LinkedIn update","Competitive intelligence memo"];
+
+function flagLabel(f){var l=f;DESK_FLAGS.forEach(function(d){if(d[0]===f)l=d[1];});return l;}
+function deskCount(flag,days){var lim=days||14;var dates=[];for(var i=0;i<lim;i++)dates.push(addDays(today(),-i));return (S.journal||[]).filter(function(j){return dates.indexOf(j.date)>=0&&(j.flags||[]).indexOf(flag)>=0;}).length;}
+function deskPatience(){var js=(S.journal||[]).slice(-12);if(!js.length)return null;var clean=js.filter(function(j){return (j.processScore||0)>=7&&(j.emotionalScore||0)<=4;}).length;return Math.round(clean/js.length*100);}
+
+function renderDeskV3(){
+  var js=S.journal||[];
+  var clean=0,tilt=0,se=0;
+  js.forEach(function(j){var v=jVerdict(j.processScore||0,j.emotionalScore||0)[0];if(v==="clean")clean++;else if(v==="tilt")tilt++;se+=j.emotionalScore||0;});
+  var n=js.length;var followed=n?Math.round((clean+(n-clean-tilt)*0.5)/n*100):0;
+  var pat=deskPatience();var rev=deskCount("revenge"),ovr=deskCount("oversize"),fom=deskCount("fomo");
+
+  el("desk-process").innerHTML=
+   '<div class="lbl" style="margin:0 0 12px">Process & behavioral read <span class="aside">process beats P/L — these flags are your real risk</span></div>'+
+   (n?('<div class="stats s4" style="margin-bottom:10px;border:none;background:transparent;gap:14px">'+
+     statCard("Process followed",followed+"%",followed>=70?"g":followed>=50?"a":"c",n+" entries logged")+
+     statCard("Patience",(pat==null?"—":pat+"%"),pat==null?"":(pat>=60?"g":pat>=40?"a":"c"),"clean & low-emotion share")+
+     statCard("Avg emotion",(n?(se/n).toFixed(1):"0"),(se/n)<=4?"g":(se/n)<=6?"a":"c","lower is steadier")+
+     statCard("Tilt trades",tilt,tilt===0?"g":"c","your #1 leak")+
+   '</div>'+
+   '<div class="stats s4" style="margin-bottom:0;border:none;background:transparent;gap:14px">'+
+     statCard("Revenge flags",rev,rev===0?"g":"c","14-day count")+
+     statCard("Oversize flags",ovr,ovr===0?"g":"c","14-day count")+
+     statCard("FOMO flags",fom,fom===0?"g":"c","14-day count")+
+     statCard("Clean trades",clean,"g","process held")+
+   '</div>')
+   :'<div class="empty" style="padding:4px 2px">No entries yet. The desk turns losses into data — log the first trade below.</div>');
+
+  el("desk-jform").innerHTML=
+   '<div class="card">'+
+     '<div class="grid2">'+
+       fld("Instrument / market",'<input type="text" id="dj-mkt" placeholder="ES · 10Y · EUR/USD · prop sim">')+
+       '<div class="field"><label class="lab">Setup type</label><select id="dj-setup">'+DESK_SETUPS.map(function(s){return '<option>'+s+'</option>';}).join("")+'</select></div>'+
+     '</div>'+
+     '<div class="grid2">'+
+       fld("Entry thesis <span class=\"hint\">the read</span>",'<textarea id="dj-thesis" placeholder="Why this trade"></textarea>')+
+       fld("Invalidation <span class=\"hint\">where you\'re wrong</span>",'<textarea id="dj-inval" placeholder="What proves it failed — where you exit"></textarea>')+
+     '</div>'+
+     '<div class="grid2">'+
+       fld("Risk <span class=\"hint\">R / % / $</span>",'<input type="text" id="dj-risk" placeholder="0.5R · 1% · $50">')+
+       fld("Position size",'<input type="text" id="dj-size" placeholder="1 contract · planned size">')+
+     '</div>'+
+     fld("What happened",'<textarea id="dj-result" placeholder="Entry, exit, what the trade did"></textarea>')+
+     '<div class="grid2">'+
+       fld("Mistake / what broke",'<textarea id="dj-mistake" placeholder="Honesty here is the edge"></textarea>')+
+       fld("Lesson extracted",'<textarea id="dj-lesson" placeholder="Extract the lesson. Close the leak."></textarea>')+
+     '</div>'+
+     '<div class="grid2" style="align-items:start">'+
+       '<div class="field" style="margin:0"><label class="lab">Process score <span class="hint">followed the plan? 1–10</span></label><div class="scorepick" id="djproc-pick">'+djPickBtns("proc")+'</div></div>'+
+       '<div class="field" style="margin:0"><label class="lab">Emotional load <span class="hint">how hot? 1–10</span></label><div class="scorepick" id="djemo-pick">'+djPickBtns("emo")+'</div></div>'+
+     '</div>'+
+     '<div class="field"><label class="lab">Behavioral flags <span class="hint">tap any that applied — this is your pattern data</span></label><div class="modes" style="margin-bottom:0">'+DESK_FLAGS.map(function(f){return '<div class="mode'+(DJ_FLAGS[f[0]]?" on":"")+'" id="djflag-'+f[0]+'" onclick="djToggleFlag(\''+f[0]+'\')" style="padding:7px 12px"><div class="mn" style="font-size:13px">'+f[1]+'</div></div>';}).join("")+'</div></div>'+
+     '<div class="grid2">'+
+       fld("Rule violated?",'<input type="text" id="dj-rule" placeholder="Which Standard rule, if any">')+
+       '<div class="field"><label class="lab">Would you take it again?</label><div class="modes" style="margin-bottom:0"><div class="mode'+(DJ_AGAIN===true?" on":"")+'" id="dj-again-yes" onclick="djSetAgain(true)"><div class="mn" style="font-size:13px">Yes — sound process</div></div><div class="mode'+(DJ_AGAIN===false?" on":"")+'" id="dj-again-no" onclick="djSetAgain(false)"><div class="mn" style="font-size:13px">No — wouldn\'t repeat</div></div></div></div>'+
+     '</div>'+
+     '<div class="row" style="margin-top:14px"><button class="btn solid" onclick="deskAddTrade()">File trade · +10 receipt</button><span style="flex:1"></span><span class="lab" style="margin:0;align-self:center">P/L is not asked for. Process is.</span></div>'+
+   '</div>';
+
+  el("desk-jlist").innerHTML=!js.length?"":js.slice().reverse().map(function(j){
+    var v=jVerdict(j.processScore||0,j.emotionalScore||0);
+    var pc=(j.processScore||0)*10,ec=(j.emotionalScore||0)*10;
+    var cells=[["Thesis",j.thesis],["Invalidation",j.invalidation],["Risk",j.risk],["Size",j.size],["Result",j.result],["Mistake",j.mistake],["Lesson",j.lesson],["Rule broken",j.rule]].filter(function(x){return x[1];});
+    var fc=(j.flags||[]).map(function(f){return '<span class="ctag" style="color:var(--rust);border-color:var(--rustln);margin-left:0">'+esc(flagLabel(f))+'</span>';}).join(" ");
+    var st=j.setupType||j.setup;
+    return '<div class="jentry">'+
+      '<div class="je-top"><div><span class="je-mkt">'+esc(j.market||"Trade")+'</span> <span class="je-date">'+esc(j.date)+(st?' · '+esc(st):"")+(j.wouldAgain===false?' · would not repeat':j.wouldAgain===true?' · would repeat':"")+'</span></div><span class="je-verdict jv-'+v[0]+'">'+v[1]+'</span></div>'+
+      (fc?'<div style="margin:8px 0 2px;display:flex;gap:5px;flex-wrap:wrap">'+fc+'</div>':"")+
+      (cells.length?'<div class="je-grid">'+cells.map(function(x){return '<div class="je-cell"><div class="jl">'+x[0]+'</div><div class="jvl">'+esc(x[1])+'</div></div>';}).join("")+'</div>':"")+
+      '<div class="je-bars"><div class="je-bar"><div class="bl"><span>Process</span><span>'+(j.processScore||0)+'/10</span></div><div class="bt"><div class="bf" style="width:'+pc+'%;background:var(--live)"></div></div></div>'+
+      '<div class="je-bar"><div class="bl"><span>Emotion</span><span>'+(j.emotionalScore||0)+'/10</span></div><div class="bt"><div class="bf" style="width:'+ec+'%;background:'+((j.emotionalScore||0)>=7?"var(--rust)":"var(--brass)")+'"></div></div></div>'+
+      '<button class="btn sm rust" onclick="deskDelTrade(\''+j.id+'\')">Strike</button></div>'+
+    '</div>';
+  }).join("");
+
+  renderDeskWatch();renderDeskCareer();renderDeskWeekly();renderDeskDNT();
+}
+function djPickBtns(kind){var v=kind==="proc"?DJ_PROC:DJ_EMO;var o="";for(var i=1;i<=10;i++){var on=v&&i<=v;o+='<button class="sp'+(on?" on":"")+(on&&kind==="emo"?" warn":"")+'" onclick="'+(kind==="proc"?"setDJProc":"setDJEmo")+'('+i+')">'+i+'</button>';}return o;}
+function setDJProc(n){DJ_PROC=n;paintDJ("djproc-pick",n,false);}
+function setDJEmo(n){DJ_EMO=n;paintDJ("djemo-pick",n,true);}
+function paintDJ(id,n,warn){var box=el(id);if(!box)return;var b=box.querySelectorAll(".sp");for(var i=0;i<b.length;i++){var on=(i+1)<=n;b[i].classList.toggle("on",on);b[i].classList.toggle("warn",on&&warn);}}
+function djToggleFlag(f){DJ_FLAGS[f]=!DJ_FLAGS[f];var box=el("djflag-"+f);if(box)box.classList.toggle("on",DJ_FLAGS[f]);}
+function djSetAgain(v){DJ_AGAIN=v;var y=el("dj-again-yes"),nq=el("dj-again-no");if(y)y.classList.toggle("on",v===true);if(nq)nq.classList.toggle("on",v===false);}
+function deskAddTrade(){
+  var g=function(id){return el(id)?el(id).value.trim():"";};
+  var mkt=g("dj-mkt"),setup=el("dj-setup")?el("dj-setup").value:"",thesis=g("dj-thesis"),inval=g("dj-inval"),risk=g("dj-risk"),size=g("dj-size"),result=g("dj-result"),mistake=g("dj-mistake"),lesson=g("dj-lesson"),rule=g("dj-rule");
+  if(!mkt&&!result&&!thesis){toast("Add at least the instrument, thesis, or what happened","red");return;}
+  var flags=[];for(var k in DJ_FLAGS)if(DJ_FLAGS[k])flags.push(k);
+  S.journal.push({id:uid(),date:today(),market:mkt,setup:setup,setupType:setup,thesis:thesis,invalidation:inval,risk:risk,size:size,result:result,mistake:mistake,lesson:lesson,rule:rule,wouldAgain:DJ_AGAIN,flags:flags,processScore:DJ_PROC||0,emotionalScore:DJ_EMO||0});
+  fileReceipt("journal","Trade journal"+(mkt?" — "+mkt:""),10,"edge");
+  DJ_PROC=null;DJ_EMO=null;DJ_FLAGS={};DJ_AGAIN=null;
+  save();flashScore&&flashScore();renderDeskV3();refreshHeaderOnly&&refreshHeaderOnly();
+  var lj=S.journal[S.journal.length-1];var v=jVerdict(lj.processScore,lj.emotionalScore);
+  toast(v[0]==="tilt"?"Logged — flagged TILT. That's the data.":"Trade filed · +10 · process on the record",v[0]==="tilt"?"brass":"green");
+}
+function deskDelTrade(id){if(!confirm("Strike this journal entry?"))return;S.journal=S.journal.filter(function(j){return j.id!==id;});save();renderDeskV3();}
+
+function renderDeskWatch(){
+  var box=ensureBox("desk-watch","c-desk");var wl=S.watchlist||[];
+  box.innerHTML=
+   '<div class="lbl" style="margin-top:18px">Watchlist <span class="aside">what you\'re tracking — instrument & catalyst</span></div>'+
+   '<div class="card">'+
+     (wl.length?wl.map(function(w,i){return '<div class="std-row"><span class="sn"><b style="color:var(--ink)">'+esc(w.sym)+'</b>'+(w.note?' — '+esc(w.note):"")+'</span><button class="btn sm rust" onclick="deskDelWatch('+i+')">Remove</button></div>';}).join(""):'<div class="empty" style="padding:6px 2px">Nothing tracked yet.</div>')+
+     '<div class="grid2" style="margin-top:12px"><div class="field" style="margin:0"><input type="text" id="wl-sym" placeholder="Instrument (ES, 10Y, EURUSD)"></div><div class="field" style="margin:0"><input type="text" id="wl-note" placeholder="Catalyst / level to watch"></div></div>'+
+     '<div class="row" style="margin-top:10px"><button class="btn sm solid" onclick="deskAddWatch()">+ Add to watchlist</button></div>'+
+   '</div>';
+}
+function deskAddWatch(){var s=el("wl-sym")?el("wl-sym").value.trim():"";var nt=el("wl-note")?el("wl-note").value.trim():"";if(!s){toast("Name the instrument","red");return;}S.watchlist.push({sym:s,note:nt});save();renderDeskWatch();toast("Added to watchlist","brass");}
+function deskDelWatch(i){S.watchlist.splice(i,1);save();renderDeskWatch();}
+
+function renderDeskCareer(){
+  var box=ensureBox("desk-career","c-desk");
+  var c7=(S.evidence||[]).filter(function(e){return last7().indexOf(e.date)>=0&&catDomain(e.type)==="career";}).length;
+  box.innerHTML=
+   '<div class="lbl" style="margin-top:18px">Finance career proof <span class="aside">'+c7+' filed this week · the record that makes you evaluable</span></div>'+
+   '<div class="card"><div class="modes" style="margin-bottom:0">'+CAREER_PROOFS.map(function(p){return '<div class="mode" onclick="deskFileCareer(\''+jsStr(p)+'\')"><div class="mn" style="font-size:13px">+ '+esc(p)+'</div></div>';}).join("")+'</div></div>';
+}
+function deskFileCareer(label){fileReceipt("career",label,10,"career");save();flashScore&&flashScore();renderDeskCareer();refreshHeaderOnly&&refreshHeaderOnly();toast("Career proof filed · "+label,"green");}
+
+function deskWeeklyRead(n,clean,tilt,best,worst){
+  if(!n)return "No trades journaled this week. The desk only sharpens what you feed it — log every trade, win or lose.";
+  var s="";
+  if(tilt>clean)s+="Tilt is outnumbering clean trades ("+tilt+" vs "+clean+") — emotion is driving the desk. ";
+  else s+=clean+" clean trade"+(clean===1?"":"s")+" to "+tilt+" tilt — process is mostly holding. ";
+  if(best)s+="Your "+best.toLowerCase()+" setups are where you're sharpest; lean into them. ";
+  if(worst)s+="The recurring leak is "+flagLabel(worst).toLowerCase()+" — engineer that out next week.";
+  else s+="No behavioral flags this week — discipline is clean.";
+  return s;
+}
+function renderDeskWeekly(){
+  var box=ensureBox("desk-weekly","c-desk");
+  var wk=(S.journal||[]).filter(function(j){return last7().indexOf(j.date)>=0;});
+  var n=wk.length,sp=0,clean=0,tilt=0,setups={},flags={};
+  wk.forEach(function(j){sp+=j.processScore||0;var v=jVerdict(j.processScore||0,j.emotionalScore||0)[0];if(v==="clean")clean++;else if(v==="tilt")tilt++;var st=j.setupType||j.setup;if(st&&v!=="tilt")setups[st]=(setups[st]||0)+1;(j.flags||[]).forEach(function(f){flags[f]=(flags[f]||0)+1;});});
+  var best=topKey(setups),worst=topKey(flags);var avgP=n?(sp/n).toFixed(1):"—";
+  box.innerHTML=
+   '<div class="lbl" style="margin-top:18px">Weekly trading review <span class="aside">read from the tape, not memory</span></div>'+
+   '<div class="card"><div class="kpis">'+
+     kpi("Trades journaled",n+"")+kpi("Avg process",avgP+(n?" /10":""))+kpi("Clean / tilt",clean+" / "+tilt)+
+     kpi("Best setup",best?esc(best):"—")+kpi("Top leak",worst?esc(flagLabel(worst)):"none")+
+   '</div>'+
+   '<p style="font-family:\'Crimson Pro\',serif;font-style:italic;font-size:13.5px;color:var(--ink2);line-height:1.6;margin-top:12px">'+deskWeeklyRead(n,clean,tilt,best,worst)+'</p></div>';
+}
+
+function renderDeskDNT(){
+  var box=ensureBox("desk-dnt","c-desk");var d=S.doNotTrade||[];
+  box.innerHTML=
+   '<div class="lbl" style="margin-top:18px">Do-not-trade conditions <span class="aside">if any are true, you do not trade — no exceptions</span></div>'+
+   '<div class="card" style="border-left:3px solid var(--rustln)">'+
+     (d.length?d.map(function(x,i){return '<div class="std-row"><span class="sn">✕ '+esc(x)+'</span><button class="btn sm rust" onclick="deskDelDNT('+i+')">Remove</button></div>';}).join(""):'<div class="empty" style="padding:6px 2px">No conditions set.</div>')+
+     '<div class="row" style="margin-top:12px"><div class="field" style="margin:0;flex:1"><input type="text" id="dnt-new" placeholder="Add a condition that locks you out"></div><button class="btn sm" onclick="deskAddDNT()">+ Add</button></div>'+
+   '</div>';
+}
+function deskAddDNT(){var v=el("dnt-new")?el("dnt-new").value.trim():"";if(!v)return;S.doNotTrade.push(v);save();renderDeskDNT();}
+function deskDelDNT(i){S.doNotTrade.splice(i,1);save();renderDeskDNT();}
+
+/* ===================== THE DRIFT — THREAT DIAGNOSTIC ===================== */
+function driftSignals(){
+  var sl=S.sleepLog[addDays(today(),-1)];
+  var careerP7=(S.evidence||[]).filter(function(e){return last7().indexOf(e.date)>=0&&catDomain(e.type)==="career";}).length;
+  var dT=getDay(today());var noDeep=!(dT.cat&&(dT.cat.deepwork||dT.cat.study));
+  return [
+   {n:"Silent days",active:currentZeroStreak()>0,detail:currentZeroStreak()+" day(s) with nothing logged",fix:"File one receipt today. Break the streak before it sets."},
+   {n:"Training skipped",active:lastTrained()>=2,detail:(lastTrained()===99?"no recent session":lastTrained()+" days since training"),fix:"Run today's Baki session — even a short one resets the pattern."},
+   {n:"Reading stalled",active:lastRead()>=3,detail:(lastRead()===99?"no recent reading":lastRead()+" days since pages"),fix:"10-page minimum. Open your current book now."},
+   {n:"Short sleep",active:sl!=null&&sl<6,detail:(sl!=null?sl+"h last night":"unlogged"),fix:"Ease training intensity, protect tonight's window."},
+   {n:"Emotional trading",active:openTilt(),detail:"an unrepaired tilt trade is on the desk",fix:"Run the repair flow in The Standard before the next trade."},
+   {n:"Overeating",active:!!(S.nutri[today()]&&S.nutri[today()].over),detail:"flagged an overshoot today",fix:"No spiral — protein-forward tomorrow, full water, extra steps."},
+   {n:"No career action",active:careerP7===0,detail:"zero career proof this week",fix:"One outreach or one model. Make yourself evaluable."},
+   {n:"No deep work",active:noDeep,detail:"no deep-work or study block today",fix:"One 45–90 min block before the day fragments."}
+  ];
+}
+function driftCost(k){if(k>=4)return "At "+k+" active leaks this is not a dip — it is a slide. A week of this erases a month of proof.";if(k>=2)return "Two or more leaks compound. Close the top one today before it drags the others down.";return "One leak, caught early, is cheap. Close it now and it costs nothing.";}
+function renderDriftDiag(){
+  var box=ensureBox("drift-diag","c-rival");
+  var sig=driftSignals();var active=sig.filter(function(s){return s.active;});var worst=active[0];
+  box.innerHTML=
+   '<div class="lbl" style="margin-top:20px">Threat diagnostic <span class="aside">the Drift gains ground where these stay red</span></div>'+
+   howPanel({what:"The Drift is the version of you that talks big and disappears. It is not a feeling — it is read from your last several days. Each signal is a specific way ground is being lost.",affects:"Clearing signals raises Drift Resistance; leaving them red lets the gap widen."})+
+   '<div class="card">'+sig.map(function(s){
+     return '<div class="std-row" style="border-bottom:1px solid var(--line)"><span class="sn"><span style="color:'+(s.active?"var(--rust)":"var(--live)")+';font-family:\'Bebas Neue\',sans-serif;margin-right:8px;font-size:13px">'+(s.active?"● ACTIVE":"○ clear")+'</span>'+esc(s.n)+(s.active?' — <span style="color:var(--mut)">'+esc(s.detail)+'</span>':"")+'</span></div>'+
+       (s.active?'<div style="font-size:11.5px;color:var(--brass);padding:2px 0 8px 2px;font-family:\'Crimson Pro\',serif;font-style:italic">▸ '+esc(s.fix)+'</div>':"");
+   }).join("")+'</div>'+
+   (worst?('<div class="repair" style="margin-top:12px"><div style="font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--rust);margin-bottom:8px">Current leak · '+esc(worst.n)+'</div>'+
+     '<p style="font-size:13px;color:var(--ink2);line-height:1.65"><b style="color:var(--ink)">Cost if repeated:</b> '+driftCost(active.length)+'<br><b style="color:var(--ink)">Correction move:</b> '+esc(worst.fix)+'</p></div>')
+     :'<div class="card" style="border-left:3px solid var(--liveln);margin-top:12px"><p style="font-size:13px;color:var(--ink2);line-height:1.6">No active threats. Every lane is being fed. This is what holding the line looks like — bank today and protect it.</p></div>');
+}
+
+/* ===================== BREACH → REPAIR PROTOCOL ===================== */
+var REPAIR_STEPS=["Stop trading for the day — close the platform.","Write exactly what happened, plainly.","Identify the trigger — what set it off?","Re-read the rule you broke in The Standard.","Create one prevention rule so it can't repeat the same way.","Log the lesson as proof — then the desk is clean."];
+function repairState(){return S.repairs[today()]||{steps:{}};}
+function renderRepair(){
+  var box=ensureBox("repair-flow","c-standard");
+  var tilt=openTilt();var rs=repairState();
+  var doneN=0;for(var i=0;i<REPAIR_STEPS.length;i++)if(rs.steps[i])doneN++;
+  var allDone=doneN===REPAIR_STEPS.length;
+  box.innerHTML=
+   '<div class="lbl" style="margin-top:20px">Breach → repair protocol <span class="aside">a breach is not a deduction — it is a procedure</span></div>'+
+   howPanel({what:"When you break a rule — especially a revenge or oversized trade — the fix is not guilt. It is a sequence that turns the breach into a closed leak. Work the steps in order.",affects:"Completing all six marks the open tilt repaired, files a recovery receipt, and returns the desk to clean."})+
+   (tilt?'<div class="card" style="border-left:3px solid var(--rustln);margin-bottom:10px"><p style="font-size:12.5px;color:var(--rust)">An unrepaired emotional trade is on the desk. Work the repair before trading again.</p></div>':"")+
+   '<div class="repair">'+REPAIR_STEPS.map(function(s,i){return '<div class="repair-step'+(rs.steps[i]?" done":"")+'" onclick="repairToggle('+i+')" style="cursor:pointer"><div class="rsn">'+(rs.steps[i]?"✓":(i+1))+'</div><div class="rst">'+esc(s)+'</div></div>';}).join("")+
+     '<div class="row" style="margin-top:14px"><button class="btn '+(allDone?"solid":"")+'" onclick="repairComplete()"'+(allDone?"":' disabled style="opacity:.5"')+'>Mark desk clean</button><span style="flex:1"></span><span class="lab" style="margin:0;align-self:center">'+doneN+' / '+REPAIR_STEPS.length+' steps</span></div>'+
+   '</div>';
+}
+function repairToggle(i){var rs=S.repairs[today()]||{steps:{}};rs.steps[i]=!rs.steps[i];S.repairs[today()]=rs;save();renderRepair();}
+function repairComplete(){
+  var rs=repairState();var doneN=0;for(var i=0;i<REPAIR_STEPS.length;i++)if(rs.steps[i])doneN++;
+  if(doneN<REPAIR_STEPS.length){toast("Work all six steps first","red");return;}
+  (S.journal||[]).forEach(function(j){if((j.emotionalScore||0)>=7)j.repaired=true;});
+  fileReceipt("recovery","Repair protocol completed — desk reset",10,"rec");
+  S.repairs[today()]={steps:{}};
+  save();flashScore&&flashScore();renderRepair();refreshHeaderOnly&&refreshHeaderOnly();toast("Desk clean. Leak closed and logged.","green");
+}
+
+/* ===================== PROTOCOL · DAY MODES ===================== */
+var DAY_MODES=[
+ {id:"full",n:"Full day",sub:"all systems",guide:"Run the complete protocol: deep work, a Baki session, market study + a journaled trade, a reading extraction, one career proof, and the debrief."},
+ {id:"school",n:"School day",sub:"study-weighted",guide:"Front-load a 45–90 min study block before anything else. Keep training short, protein high, 10 pages, one receipt. Career can wait a day."},
+ {id:"work",n:"Work day",sub:"time-boxed",guide:"Protect one deep-work block around your shift. Minimums on the rest: log nutrition, 10 pages, one proof. Don't trade tired."},
+ {id:"low",n:"Low energy",sub:"reduced load",guide:"Drop training to essentials or mobility only. Defend sleep and protein. One small win — a receipt or 10 pages — keeps the streak alive."},
+ {id:"recovery",n:"Recovery",sub:"rebuild",guide:"Deliberate rest. Light movement, full nutrition, early sleep. File a recovery receipt. Resting on purpose is not a zero day."},
+ {id:"emergency",n:"Emergency minimum",sub:"survival",guide:"Everything on fire? Do one thing: file a single receipt and set tomorrow's prime objective. That alone keeps the chain unbroken."}
+];
+function renderDayModes(){
+  var box=ensureBox("day-modes","c-protocol",true);
+  var cur=S.dayMode[today()]||"full";var m=null;for(var i=0;i<DAY_MODES.length;i++)if(DAY_MODES[i].id===cur)m=DAY_MODES[i];
+  box.innerHTML=
+   '<div class="labhead lh-sys" style="margin-top:0"><div class="lh-ico">⚙</div><div style="flex:1"><div class="lh-t">PROTOCOL · DAY MODE</div><div class="lh-s">The schedule bends to the day without breaking. Pick the mode you\'re actually in.</div></div></div>'+
+   '<div class="modes">'+DAY_MODES.map(function(x){return '<div class="mode'+(x.id===cur?" on":"")+'" onclick="setDayMode(\''+x.id+'\')"><div class="mn">'+esc(x.n)+'</div><div class="ms">'+esc(x.sub)+'</div></div>';}).join("")+'</div>'+
+   (m?'<div class="card" style="border-left:3px solid var(--liveln);margin-bottom:16px"><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--live);margin-bottom:6px">'+esc(m.n)+' — today\'s shape</div><p style="font-size:13.5px;color:var(--ink2);line-height:1.6;font-family:\'Crimson Pro\',serif;font-style:italic">'+esc(m.guide)+'</p></div>':"");
+}
+function setDayMode(id){S.dayMode[today()]=id;save();renderDayModes();}
+
+/* ===================== REVIEW + ===================== */
+function brutalTruth(weak,strong){
+  if(weak[2]<30)return "Your "+weak[0].toLowerCase()+" lane is starving at "+weak[2]+"/100 while "+strong[0].toLowerCase()+" sits at "+strong[2]+". A high overall number built on one strength is not balance — it is a blind spot. Feed the weak lane this week or it becomes the leak that defines you.";
+  if(weak[2]<55)return weak[0]+" is your soft lane at "+weak[2]+"/100. Not a crisis — but the gap between "+weak[2]+" and "+strong[2]+" is where the Drift lives. Close it on purpose.";
+  return "No lane is starving — "+weak[0].toLowerCase()+" is your floor at "+weak[2]+"/100. The work now is raising the floor, not chasing the ceiling. Consistency is the edge.";
+}
+function renderReviewPlus(){
+  var box=ensureBox("review-plus","c-review");
+  var goal=Math.max(3,Math.min(6,S.profile.trainingDays||5));
+  var ds=domainScores();var weak=ds.slice().sort(function(a,b){return a[2]-b[2];})[0];var strong=ds.slice().sort(function(a,b){return b[2]-a[2];})[0];
+  var recs=recommendations();var topRec=recs[0];
+  box.innerHTML=
+   '<div class="lbl" style="margin-top:20px">Engine debrief <span class="aside">the lanes the base report doesn\'t cover</span></div>'+
+   '<div class="kpis">'+
+     kpi("Training",trainedDays7()+" / "+goal+" days")+kpi("Nutrition",nutriDays7()+" / 7 protein")+kpi("Reading",readingPages7()+" pages")+
+     kpi("Strategy drills",strategyDrills7()+"")+kpi("Career proof",(S.evidence||[]).filter(function(e){return last7().indexOf(e.date)>=0&&catDomain(e.type)==="career";}).length+"")+kpi("Receipts filed",proofVelocity()+"")+
+   '</div>'+
+   '<div class="card" style="border-left:3px solid var(--rustln);margin-top:12px"><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--rust);margin-bottom:6px">One brutal truth</div>'+
+     '<p style="font-size:14px;color:var(--ink2);line-height:1.6;font-family:\'Crimson Pro\',serif;font-style:italic">'+brutalTruth(weak,strong)+'</p></div>'+
+   '<div class="card" style="border-left:3px solid var(--brassln);margin-top:8px"><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin-bottom:6px">One tactical correction</div>'+
+     '<p style="font-size:14px;color:var(--ink);line-height:1.6">'+(topRec?esc(topRec.t)+" "+esc(topRec.s):"Hold the line — every lane is fed.")+'</p></div>';
+}
+
+/* ===================== ANALYTICS + ===================== */
+function anProofRead(counts){var recent=counts.slice(-7).reduce(function(a,b){return a+b;},0);var prev=counts.slice(0,7).reduce(function(a,b){return a+b;},0);var tot=recent+prev;if(tot===0)return "No receipts in two weeks. The record is how you become undeniable — file one today.";if(recent>prev)return "Proof flow is accelerating — "+recent+" receipts this week vs "+prev+" last. Momentum is real. Protect it.";if(recent<prev)return "Proof flow slowed — "+recent+" this week vs "+prev+" last. Not a verdict, a warning. Re-fill the pipeline today.";return "Steady proof flow at "+recent+" receipts this week. Now raise the difficulty, not just the count.";}
+function consistencyRow(label,arr){
+  return '<div class="dom"><span class="dl">'+label+'</span><div style="flex:1;display:flex;gap:4px">'+arr.map(function(on){return '<div style="flex:1;height:18px;background:'+(on?"var(--live)":"var(--raise)")+';border:1px solid '+(on?"var(--liveln)":"var(--line2)")+'"></div>';}).join("")+'</div><span class="dv">'+arr.filter(Boolean).length+'/7</span></div>';
+}
+function renderAnalyticsPlus(){
+  var box=ensureBox("an-plus","c-analytics");
+  var days=[];for(var i=13;i>=0;i--)days.push(addDays(today(),-i));
+  var counts=days.map(function(ds){return (S.evidence||[]).filter(function(e){return e.date===ds;}).length;});
+  var maxC=Math.max(1,Math.max.apply(null,counts));
+  var ev7=(S.evidence||[]).filter(function(e){return last7().indexOf(e.date)>=0;});
+  var easy=ev7.filter(function(e){return e.type==="faith"||e.type==="recovery"||(e.diff&&e.diff<=2);}).length;
+  var share=ev7.length?Math.round(easy/ev7.length*100):0;
+  box.innerHTML=
+   '<div class="lbl" style="margin-top:20px">Proof flow · 14 days <span class="aside">receipts filed per day</span></div>'+
+   '<div class="card"><div style="display:flex;align-items:flex-end;gap:3px;height:80px">'+counts.map(function(c,i){var h=Math.max(3,c/maxC*76);var tb=days[i]===today();return '<div title="'+days[i]+' · '+c+' receipts" style="flex:1;background:'+(c?"linear-gradient(180deg,var(--live),var(--livedim))":"var(--raise)")+';height:'+h+'px;'+(tb?"outline:1px solid var(--brass);outline-offset:-1px":"")+'"></div>';}).join("")+'</div>'+
+     '<div style="font-size:11.5px;color:var(--mut);margin-top:8px;font-family:\'Crimson Pro\',serif;font-style:italic">'+anProofRead(counts)+'</div></div>'+
+   '<div class="lbl">Domain balance <span class="aside">where the proof actually comes from</span></div>'+
+   '<div class="card">'+domainScores().map(function(s){return '<div class="dom"><span class="dl">'+s[0]+'</span><div class="dt"><div class="df" style="width:'+s[2]+'%;background:'+domColor(s[1])+'"></div></div><span class="dv">'+s[2]+'</span></div>';}).join("")+
+     '<div style="font-size:11.5px;color:var(--mut);margin-top:6px;font-family:\'Crimson Pro\',serif;font-style:italic">'+(share>60?"Heads up — "+share+"% of this week's proof is low-difficulty. The Engine recommends one hard receipt (a model, a teardown, a journaled trade) to shift the mix.":(ev7.length?share+"% of proof is low-difficulty — a healthy mix. Keep filing the hard ones.":"No proof yet this week. File the first receipt."))+'</div></div>'+
+   '<div class="lbl">Consistency · 7 days <span class="aside">filled = done that day</span></div>'+
+   '<div class="card">'+
+     consistencyRow("Training",last7().map(function(ds){return !!(S.training[ds]&&S.training[ds].done);}))+
+     consistencyRow("Nutrition",last7().map(function(ds){var x=S.nutri[ds];return !!(x&&x.protein>=nutriTargets().pro*0.85);}))+
+     consistencyRow("Reading",last7().map(function(ds){return (S.reading.pages[ds]||0)>0;}))+
+     consistencyRow("Any proof",last7().map(function(ds){return (S.evidence||[]).some(function(e){return e.date===ds;});}))+
+   '</div>';
+}
+
+/* ===================== CONS OVERRIDES — wire the engine into navigation ===================== */
+function applyEngineOverrides(){
+  if(typeof CONS==="undefined"||!CONS)return;
+  CONS.command=function(){renderCommand();renderEngine();};
+  CONS.manual=renderManual;
+  CONS.baki=renderBaki;
+  CONS.nutrition=renderNutrition;
+  CONS.reading=renderReading;
+  CONS.strategy=renderStrategy;
+  CONS.desk=renderDeskV3;
+  CONS.rival=function(){renderRival();renderDriftDiag();};
+  CONS.standard=function(){renderStandard();renderRepair();};
+  CONS.protocol=function(){renderProtocol();renderDayModes();};
+  CONS.review=function(){renderReview();renderReviewPlus();};
+  CONS.analytics=function(){renderAnalytics();renderAnalyticsPlus();};
+}
+applyEngineOverrides();
+
 </script>
 </body>
 </html>
