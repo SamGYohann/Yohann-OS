@@ -1,0 +1,407 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE FULCRUM — RX Readiness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,800;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper:#E4E1D7;
+    --paper2:#EDEBE3;
+    --ink:#14161A;
+    --ink-soft:#5C5F63;
+    --rule:#C6C2B6;
+    --redline:#A81E22;
+    --stamp:#1F3F63;
+    --struck:#9A9689;
+    --doc:'Spectral',Georgia,serif;
+    --data:'IBM Plex Mono',ui-monospace,monospace;
+    --form:'IBM Plex Sans Condensed','Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--doc);font-weight:400;
+       line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:940px;margin:0 auto;padding:44px 22px 120px}
+  a{color:var(--stamp);text-underline-offset:3px}
+  :focus-visible{outline:2px solid var(--redline);outline-offset:3px}
+
+  /* ---- masthead ---- */
+  .mast{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:6px}
+  .cite{font-family:var(--data);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+        color:var(--ink-soft);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  h1{font-family:var(--doc);font-weight:800;font-size:clamp(38px,8vw,64px);line-height:.94;
+     letter-spacing:-.025em;margin:12px 0 8px}
+  .sub{font-style:italic;font-size:17px;color:var(--ink-soft);max-width:62ch}
+  .filed{font-family:var(--form);font-weight:700;font-size:10px;letter-spacing:.2em;
+         color:var(--stamp);border:1.5px solid var(--stamp);padding:3px 7px;
+         transform:rotate(-3deg);display:inline-block}
+
+  /* ---- clocks ---- */
+  .clocks{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);
+          border:1px solid var(--rule);margin:26px 0 10px}
+  .clock{background:var(--paper2);padding:16px 18px}
+  .clock .lab{font-family:var(--form);font-weight:700;font-size:10px;letter-spacing:.18em;
+              text-transform:uppercase;color:var(--ink-soft)}
+  .clock .num{font-family:var(--data);font-weight:600;font-size:34px;letter-spacing:-.02em;line-height:1.1;margin-top:4px}
+  .clock .num small{font-size:12px;font-weight:400;letter-spacing:.1em;color:var(--ink-soft)}
+  .clock .rng{font-family:var(--data);font-size:11px;color:var(--ink-soft);margin-top:2px}
+  .clock.hot .num{color:var(--redline)}
+  .clock.hot .lab{color:var(--redline)}
+  .warn{font-size:14.5px;font-style:italic;color:var(--ink);border-left:3px solid var(--redline);
+        padding:8px 0 8px 14px;margin:16px 0 40px;max-width:74ch}
+
+  /* ---- waterfall ---- */
+  .valuein{font-family:var(--form);font-weight:700;font-size:10px;letter-spacing:.2em;
+           text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:6px}
+  .pipe{width:2px;height:22px;background:var(--ink);margin:0 auto}
+  .pipe.dead{background:var(--struck);opacity:.45}
+
+  .tr{border:1px solid var(--ink);background:var(--paper2);position:relative}
+  .tr.done{border-color:var(--stamp)}
+  .tr.broke{border-color:var(--redline);border-width:2px}
+  .tr-head{display:flex;align-items:baseline;gap:12px;padding:13px 16px;
+           border-bottom:1px solid var(--rule);cursor:pointer;flex-wrap:wrap}
+  .tr-head:hover{background:#E7E5DC}
+  .tr-sec{font-family:var(--data);font-weight:600;font-size:11px;letter-spacing:.08em;color:var(--ink-soft);min-width:34px}
+  .tr-name{font-family:var(--doc);font-weight:800;font-size:19px;letter-spacing:-.01em;flex:1}
+  .tr-date{font-family:var(--data);font-size:11px;color:var(--ink-soft)}
+  .tr-tag{font-family:var(--form);font-weight:700;font-size:9.5px;letter-spacing:.16em;
+          padding:2px 6px;border:1px solid currentColor;color:var(--redline)}
+  .tr.done .tr-tag{color:var(--stamp)}
+  .tr-gloss{padding:0 16px 12px 62px;font-style:italic;font-size:14px;color:var(--ink-soft);
+            border-bottom:1px solid var(--rule)}
+  .tr-body{padding:6px 16px 16px}
+  .tr-body.hide{display:none}
+
+  .fulc{position:absolute;left:-11px;top:14px;width:20px;height:20px;background:var(--redline);
+        transform:rotate(45deg)}
+  .fulc-note{font-family:var(--form);font-weight:700;font-size:9.5px;letter-spacing:.16em;
+             color:var(--redline);text-align:right;padding:6px 16px 0}
+
+  /* ---- tasks ---- */
+  .task{display:flex;gap:12px;padding:9px 0;border-bottom:1px dotted var(--rule);align-items:flex-start}
+  .task:last-child{border-bottom:none}
+  .box{appearance:none;flex:0 0 auto;width:15px;height:15px;border:1.5px solid var(--ink);
+       background:transparent;cursor:pointer;margin-top:5px;position:relative}
+  .box:checked{border-color:var(--stamp);background:var(--stamp)}
+  .box:checked::after{content:"";position:absolute;left:4px;top:.5px;width:4px;height:9px;
+       border:solid var(--paper2);border-width:0 2px 2px 0;transform:rotate(43deg)}
+  .task .t-sec{font-family:var(--data);font-size:11px;color:var(--ink-soft);flex:0 0 34px;margin-top:4px}
+  .task .t-txt{font-size:15.5px;flex:1}
+  .task .t-txt b{font-weight:600}
+  .task .t-txt em{color:var(--ink-soft)}
+  .task.on .t-txt{color:var(--struck);text-decoration:line-through;text-decoration-color:var(--struck)}
+  .task.on .t-txt b{font-weight:400}
+
+  /* ---- panels ---- */
+  h2{font-family:var(--doc);font-weight:800;font-size:26px;letter-spacing:-.015em;
+     margin:56px 0 4px;padding-bottom:8px;border-bottom:2px solid var(--ink)}
+  .h2note{font-style:italic;color:var(--ink-soft);font-size:14px;margin-bottom:18px}
+
+  .bk{display:flex;gap:12px;padding:11px 0;border-bottom:1px dotted var(--rule);align-items:flex-start}
+  .bk .t-txt{flex:1}
+  .bk .title{font-weight:600;font-size:15.5px}
+  .bk .auth{font-family:var(--data);font-size:11px;color:var(--ink-soft);letter-spacing:.02em}
+  .bk .why{font-style:italic;font-size:13.5px;color:var(--ink-soft);margin-top:3px}
+  .bk.on .title,.bk.on .auth{color:var(--struck);text-decoration:line-through}
+  .bk .rank{font-family:var(--data);font-weight:600;font-size:11px;color:var(--redline);flex:0 0 20px;margin-top:5px}
+  .bk.on .rank{color:var(--struck)}
+
+  .q{padding:8px 0 8px 30px;border-bottom:1px dotted var(--rule);font-size:15px;position:relative}
+  .q::before{content:attr(data-n);position:absolute;left:0;top:8px;font-family:var(--data);
+             font-size:11px;color:var(--ink-soft)}
+  .q:last-child{border-bottom:none}
+
+  .src{padding:10px 0;border-bottom:1px dotted var(--rule)}
+  .src .nm{font-weight:600;font-size:15px}
+  .src .ds{font-size:13.5px;color:var(--ink-soft);font-style:italic}
+  .src .url{font-family:var(--data);font-size:11px;color:var(--stamp)}
+
+  .cut{border:1px solid var(--struck);background:transparent;padding:14px 16px;margin-top:14px}
+  .cut .lab{font-family:var(--form);font-weight:700;font-size:10px;letter-spacing:.18em;
+            color:var(--struck);text-transform:uppercase;margin-bottom:6px}
+  .cut p{font-size:14.5px;color:var(--ink-soft);margin-bottom:6px}
+  .cut p:last-child{margin-bottom:0}
+  .cut s{color:var(--struck)}
+
+  .foot{margin-top:64px;padding-top:14px;border-top:1px solid var(--rule);
+        font-family:var(--data);font-size:11px;color:var(--ink-soft);
+        display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .rst{font-family:var(--form);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+       background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:4px 9px;cursor:pointer}
+  .rst:hover{border-color:var(--redline);color:var(--redline)}
+  .stat{font-family:var(--data);font-size:11px;color:var(--ink-soft)}
+
+  @media(max-width:640px){
+    .clocks{grid-template-columns:1fr}
+    .tr-gloss{padding-left:16px}
+    .fulc{left:-9px;width:16px;height:16px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+
+  <div class="mast">
+    <div class="cite">
+      <span>In re: GEBREYOHANNES, S. — Adv. Proc. RX-2027</span>
+      <span id="today"></span>
+    </div>
+    <h1>The Fulcrum</h1>
+    <div class="sub">A readiness program for restructuring, structured the way the discipline is: value enters at the top, cascades through priority, and breaks somewhere. Where it breaks is where you actually are.</div>
+    <div style="margin-top:12px"><span class="filed">TWO CLOCKS · NOT ONE</span></div>
+  </div>
+
+  <div class="clocks">
+    <div class="clock hot">
+      <div class="lab">Clock 1 — Win the seat</div>
+      <div class="num" id="c1">—<small> days</small></div>
+      <div class="rng">16 JUL 2026 → 31 OCT 2026</div>
+    </div>
+    <div class="clock">
+      <div class="lab">Clock 2 — Do the job</div>
+      <div class="num" id="c2">—<small> days</small></div>
+      <div class="rng">01 NOV 2026 → 01 MAY 2027</div>
+    </div>
+  </div>
+  <div class="warn">You asked for ready by May 2027. May 2027 is when you <em>show up</em>. The seat is decided by roughly Halloween — mid-market and Big&nbsp;4 windows post from now through late fall 2026, and then they're gone. Clock 1 is the real one. Clock 2 only exists if Clock 1 lands.</div>
+
+  <div class="valuein">◆ Value in — enterprise readiness ◆</div>
+  <div class="pipe"></div>
+  <div id="stack"></div>
+
+  <h2>The Reading</h2>
+  <div class="h2note">Ranked. Not a list to complete — a list to start at the top of. Nobody finishes Moyer; that's not what Moyer is for.</div>
+  <div id="books"></div>
+
+  <div class="cut">
+    <div class="lab">Struck from the doc's plan</div>
+    <p><s>Read Moyer cover to cover, months 1–2.</s> It's a 450-page technical reference, not a novel. You read it the way you read a credit agreement — to answer a question you already have. Build first, look up second.</p>
+    <p><s>Reorg or Bloomberg as the daily scout.</s> Reorg runs five figures a year. Petition costs less than a textbook and covers the same fights in a register you'll actually read.</p>
+    <p><s>Network in month 8.</s> Month 8 is March 2027. Your window shut in November. Outreach starts in §1 and never stops.</p>
+    <p><s>"Position yourself as a downside-focused, analytically aggressive strategist."</s> That's a phrase, not a story, and every RX applicant has some version of it. Your version is a documented risk framework you ran with your own money and logged every outcome of. Lead with the artifact, never the adjective.</p>
+  </div>
+
+  <h2>The Question Bank</h2>
+  <div class="h2note">The RX set. Overlaps the IB set by maybe a third — everything below is what makes it different. Automatic, not recalled.</div>
+  <div id="qs"></div>
+
+  <h2>Free Sources</h2>
+  <div class="h2note">Everything you need to build every artifact in §0 and §1 costs nothing. The doc mentions none of it.</div>
+  <div id="srcs"></div>
+
+  <div class="foot">
+    <span class="stat" id="stat">Loading…</span>
+    <button class="rst" id="rst">Clear all progress</button>
+  </div>
+</div>
+
+<script>
+const TRANCHES = [
+  { sec:"§0", name:"Admin Claims", date:"16 JUL — 31 AUG 2026", open:true,
+    gloss:"Paid before anyone, or nothing below it matters. Six weeks, and Colombia is inside them — Caesars is a plane book, so build the schedule around the trip instead of pretending it isn't there.",
+    tasks:[
+      ["0.1","Read <b>The Caesars Palace Coup</b> cover to cover. First, before anything technical. It hands you the entire cast, vocabulary, and moral temperature of the modern RX world in one narrative pass. <em>Cartagena flight, BWI→CTG.</em>"],
+      ["0.2","<b>Pick one live Chapter 11 name.</b> Filed in the last six months, has a contested plan or LME, docket hosted free on Kroll / Epiq / Stretto / Verita. This name is your whole §0."],
+      ["0.3","Pull the <b>First Day Declaration</b>. Read it twice. Build the cap stack from it by hand — every tranche, every quantum, every maturity, every lien position."],
+      ["0.4","Pull the <b>DIP motion</b> and find the budget exhibit. That exhibit <em>is</em> a real 13-week, built by A&amp;M or Alix. Rebuild it in Excel from a blank sheet and reconcile to theirs."],
+      ["0.5","<b>Build the waterfall.</b> EV at low / mid / high, cascade down the priority list to zero. Mark the tranche where value breaks."],
+      ["0.6","<b>Write the memo.</b> One page. Where the fulcrum sits, recovery by tranche, and why. This page is the entire point of §0."],
+      ["0.7","<b>Moyer — lookup only.</b> Capital structure, valuation in distress, claims estimation. Open it when the model asks a question you can't answer. Close it after."]
+    ]},
+  { sec:"§1", name:"First Lien", date:"01 SEP — 31 OCT 2026", open:true,
+    gloss:"Where your recovery actually is. Every applicable door opens and closes inside these eight weeks. This tranche is the program — the others are scaffolding around it.",
+    tasks:[
+      ["1.1","<b>Publish workup #1</b> to samgyohann.github.io/Financial-Analysis. Clean writeup, model downloadable, memo on the page. An artifact nobody can open is not an artifact."],
+      ["1.2","<b>Credit agreement drill.</b> EDGAR full-text search → \"open market purchase.\" Pull five real agreements. Read §2.18 (pro rata sharing), §9.05 (assignments), investment baskets, restricted payments, the builder basket. One page each: <em>where could a sponsor drive a truck through this?</em>"],
+      ["1.3","Read the <b>Serta Fifth Circuit opinion</b> (free, ca5.uscourts.gov), then the <b>Lopez remand opinion</b> of 7 July 2026, then <b>Del Monte</b>. Write the split yourself: when is a cashless exchange a \"payment\"?"],
+      ["1.4","<b>Workup #2</b> — the contested LME name. Same four artifacts. This is the one you lead with, because it buys you the conversation everyone in RX is having this quarter."],
+      ["1.5","<b>Alazar.</b> Not a cold ask. Send workup #1 and one real question on the Serta/Del Monte split. He ran LevFin workout at BMO — he'll have a view, and a view is a conversation. Peer, not patron."],
+      ["1.6","<b>Outreach: five per week, every week, no exceptions.</b> Junior RX and TAS people. The artifact link is <em>in</em> the message. Nobody answers \"can I pick your brain.\" People answer \"I built this and I think I'm wrong about one thing.\""],
+      ["1.7","<b>Applications live:</b> MarshBerry TAS · Houlihan Lokey (extended timeline) · Big 4 TAS (windows open fall 2026) · A&amp;M / FTI / AlixPartners · Stifel, William Blair, Baird. Track close dates, not open dates."],
+      ["1.8","<b>Rebuild the resume around the model.</b> The BBBY sim and CME DCF stay, but they stop being the headline. The live-name workup is line one. Right now your portfolio argues you're an M&amp;A candidate who likes distressed stories."]
+    ]},
+  { sec:"§2", name:"Second Lien", date:"01 NOV 2026 — 28 FEB 2027", open:false,
+    gloss:"Where it gets contested. Interviews. You are now defending a position rather than building one.",
+    tasks:[
+      ["2.1","<b>Drill the RX technical set below</b> until it's automatic. Not recalled — automatic. Recalled reads as rehearsed; automatic reads as lived."],
+      ["2.2","<b>Case prep.</b> Big 4 TAS and the RX consultancies case you; banks don't. Different muscle, and the one most bank-focused candidates skip."],
+      ["2.3","<b>The pitch.</b> The Operator System is the only thing on your resume that proves temperament: rules-based sizing, real capital, every outcome logged, including the ones that went against you. That's the risk discipline the job screens for and almost nobody your age can evidence it. Lead with the log."],
+      ["2.4","<b>The GPA conversation.</b> Rehearse it cold. Two sentences, no flinch, no essay, pivot to the model. Over-explaining it is what makes it fatal — not the number."],
+      ["2.5","<b>Know your interviewer's deals.</b> Pull the docket of whatever their group is on. Ten minutes of docket beats an hour of firm-website research."]
+    ]},
+  { sec:"§3", name:"The Fulcrum", date:"01 MAR — 01 MAY 2027", open:false,
+    gloss:"Where value breaks. Show up not needing to be trained — the summer is a ten-week audition and week one sets the ceiling.",
+    tasks:[
+      ["3.1","<b>13-week from a blank sheet in 45 minutes.</b> Timed. Repeatedly."],
+      ["3.2","<b>Excel with no mouse.</b> Unplug it. This is not a flex, it's the actual bar."],
+      ["3.3","<b>Credit agreement cold read → baskets found in 20 minutes.</b> The skill that separates an analyst who gets staffed from one who gets managed."],
+      ["3.4","<b>Read the group's live dockets before day one.</b> Walking in already knowing the cap stack is the whole difference."]
+    ]},
+  { sec:"§4", name:"Residual", date:"CONTINUOUS", open:false,
+    gloss:"Equity. Nothing here has a deadline, which is exactly why it's the tranche that gets wiped out. Standing loops, forever.",
+    tasks:[
+      ["4.1","<b>Petition, daily.</b> Ten minutes. The scout you can afford."],
+      ["4.2","<b>One docket a week.</b> New filing, read the first day dec, sketch the cap stack. Twenty minutes. Fifty a year."],
+      ["4.3","<b>One book at a time</b> from the list below, top down."],
+      ["4.4","<b>Log the outreach.</b> Same discipline as the Operator System — who, when, what you sent, what came back. If you wouldn't take a position without a log, don't run a pipeline without one."]
+    ]}
+];
+
+const BOOKS = [
+  {g:"Restructuring", items:[
+    ["The Caesars Palace Coup","Max Frumes &amp; Sujeet Indap","Read first, read fast. Real-life psychological warfare with a cast list you'll meet again for twenty years."],
+    ["Distressed Debt Analysis","Stephen Moyer","The bible, and a reference. Cap structure, distressed valuation, claims estimation. Consult it — don't march through it."],
+    ["The Complete Credit Agreement Guide","Richard Wight (LSTA)","The document bible. The Fifth Circuit cited it in Serta to decide what 'open market purchase' means. That's how load-bearing it is."],
+    ["Distressed Investment Banking: To the Abyss and Back","Henry Owsley &amp; Peter Kaufman","The advisory seat specifically — what the banker actually does, as opposed to what the fund does."],
+    ["Creating Value Through Corporate Restructuring","Stuart Gilson","Cases. The closest thing to reps you can get from a book."],
+    ["Corporate Financial Distress, Restructuring, and Bankruptcy","Altman &amp; Hotchkiss","The academic backbone. Where Z-score and the empirical base rates come from."],
+    ["The Vulture Investors","Hilary Rosenberg","The buyside narrative. Who buys the paper and why they're not your friend."],
+    ["Barbarians at the Gate","Burrough &amp; Helyar","How the cap stacks you'll unwind got built in the first place."]
+  ]},
+  {g:"Game Theory", items:[
+    ["The Strategy of Conflict","Thomas Schelling","<b>The one.</b> Commitment, credible threats, focal points — and the central paradox that <em>destroying your own options is what creates leverage</em>. Burning the bridge is the move. Every co-op agreement and every priming threat is Schelling."],
+    ["Arms and Influence","Thomas Schelling","Coercion, deterrence, and the threat that leaves something to chance. Why a lender who <em>might</em> sue is more dangerous than one who will."],
+    ["Bargaining and Markets","Osborne &amp; Rubinstein","Alternating-offer bargaining — the creditor table, formalized. Who moves first, what discount factors do to leverage, why patience is a position."],
+    ["The Art of Strategy","Dixit &amp; Nalebuff","The operating manual. Accessible, applied, and the fastest way to make your intuition legible to other people."],
+    ["Thinking in Bets","Annie Duke","Decision quality vs. outcome quality, and resulting. Aimed straight at your two flags. Read it next to the Operator System log, not away from it."],
+    ["The Evolution of Cooperation","Robert Axelrod","Repeat players behave differently. Why the funds that will meet again in the next workout don't defect the way the model says they should."],
+    ["Game Theory: An Introduction","Steven Tadelis","If and when you want the math rigorous rather than intuitive. Optional — but it's the one that makes the intuition provable."]
+  ]}
+];
+
+const QS = [
+  "Walk me through a 13-week cash flow. What are the line items, and why 13?",
+  "What's the fulcrum security, and how do you find it?",
+  "How do you value a distressed company? Why isn't DCF the primary method?",
+  "363 sale vs. plan of reorganization — when does a debtor pick which?",
+  "Priority of claims, top to bottom. Where do the advisors sit?",
+  "What's a cramdown? What's the absolute priority rule, and when does it bend?",
+  "What is adequate protection and who's entitled to it?",
+  "Why does a DIP lender get priming liens? What does the existing secured lender get in exchange?",
+  "Walk me through an uptier. Why did Serta lose at the Fifth Circuit?",
+  "What's a dropdown? What's a double-dip? How do they differ from an uptier?",
+  "Out-of-court exchange vs. Chapter 11 — what drives the choice?",
+  "What's a co-op agreement and why did they proliferate after 2020?",
+  "Why do debtors file in S.D. Tex. or D.N.J.? Why does that now matter more after Del Monte?",
+  "$500M debt, $200M EBITDA, comps at 5x. Where does value break? Who owns the company on the way out?",
+  "Debtor-side vs. creditor-side advisory — different job, different incentives. Which do you want and why?",
+  "A company has enough liquidity for nine months but a maturity wall in six. What do you do first?"
+];
+
+const SRCS = [
+  ["EDGAR full-text search","Credit agreements filed as exhibits to 8-Ks and 10-Ks. Search a phrase — \"open market purchase\" — and read the real thing instead of reading about it.","sec.gov/edgar/search"],
+  ["Kroll · Epiq · Stretto · Verita","Claims agents host complete Chapter 11 dockets, free. Every motion, every exhibit, every objection.","cases.ra.kroll.com · dm.epiq11.com · cases.stretto.com"],
+  ["First Day Declarations","Sixty pages by the CRO explaining exactly why a company died, with the cap stack laid out. The single best restructuring document that exists. Nothing in Moyer beats one.","(inside any docket above)"],
+  ["DIP budget exhibits","A real 13-week, built by A&amp;M or Alix, filed publicly. Rebuild it from scratch and check your work against professionals.","(inside the DIP motion)"],
+  ["ca5.uscourts.gov","The Serta opinion. Judge Oldham works through \"open market purchase\" with dictionaries, LSTA guidance and the surplusage canon — a masterclass in how these people read paper.","ca5.uscourts.gov"],
+  ["Petition","The daily scout you can actually afford. Covers the same fights as Reorg, written like someone's enjoying it.","petition11.com"]
+];
+
+const KEY='fulcrum-state-v1';
+let S={tasks:{},books:{}};
+
+const $=s=>document.querySelector(s);
+const days=(a,b)=>Math.max(0,Math.ceil((b-a)/864e5));
+
+function renderClocks(){
+  const now=new Date();
+  $('#today').textContent=now.toLocaleDateString('en-US',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  $('#c1').innerHTML=days(now,new Date(2026,9,31))+'<small> days</small>';
+  $('#c2').innerHTML=days(now,new Date(2027,4,1))+'<small> days</small>';
+}
+
+function renderStack(){
+  const host=$('#stack'); host.innerHTML='';
+  let broken=false;
+  TRANCHES.forEach((t,i)=>{
+    const ids=t.tasks.map(x=>x[0]);
+    const done=ids.filter(id=>S.tasks[id]).length;
+    const full=done===ids.length;
+    const isBreak=!full&&!broken; if(!full)broken=true;
+
+    const el=document.createElement('div');
+    el.className='tr'+(full?' done':'')+(isBreak?' broke':'');
+    el.innerHTML=`
+      ${isBreak?'<div class="fulc"></div>':''}
+      <div class="tr-head" tabindex="0" role="button" aria-expanded="${t.open}">
+        <span class="tr-sec">${t.sec}</span>
+        <span class="tr-name">${t.name}</span>
+        <span class="tr-date">${t.date}</span>
+        <span class="tr-tag">${full?'FILED':done+'/'+ids.length}</span>
+      </div>
+      <div class="tr-gloss">${t.gloss}</div>
+      ${isBreak?'<div class="fulc-note">◆ Value breaks here — this is your fulcrum</div>':''}
+      <div class="tr-body${t.open?'':' hide'}">
+        ${t.tasks.map(([id,txt])=>`
+          <label class="task${S.tasks[id]?' on':''}">
+            <input type="checkbox" class="box" data-id="${id}" ${S.tasks[id]?'checked':''}>
+            <span class="t-sec">§${id}</span>
+            <span class="t-txt">${txt}</span>
+          </label>`).join('')}
+      </div>`;
+
+    const head=el.querySelector('.tr-head'), body=el.querySelector('.tr-body');
+    const tog=()=>{body.classList.toggle('hide');head.setAttribute('aria-expanded',!body.classList.contains('hide'))};
+    head.onclick=e=>{if(e.target.closest('.box'))return;tog()};
+    head.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}};
+
+    host.appendChild(el);
+    if(i<TRANCHES.length-1){
+      const p=document.createElement('div');
+      p.className='pipe'+(full?'':' dead');
+      host.appendChild(p);
+    }
+  });
+  host.querySelectorAll('.box').forEach(b=>b.onchange=()=>{S.tasks[b.dataset.id]=b.checked;save();renderStack();renderStat()});
+}
+
+function renderBooks(){
+  const host=$('#books'); host.innerHTML='';
+  BOOKS.forEach(g=>{
+    const h=document.createElement('div');
+    h.style.cssText='font-family:var(--form);font-weight:700;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin:22px 0 4px';
+    h.textContent=g.g; host.appendChild(h);
+    g.items.forEach((b,i)=>{
+      const id=g.g[0]+i;
+      const el=document.createElement('label');
+      el.className='bk'+(S.books[id]?' on':'');
+      el.innerHTML=`<input type="checkbox" class="box" data-bk="${id}" ${S.books[id]?'checked':''}>
+        <span class="rank">${String(i+1).padStart(2,'0')}</span>
+        <span class="t-txt"><span class="title">${b[0]}</span>
+        <span class="auth"> — ${b[1]}</span><div class="why">${b[2]}</div></span>`;
+      host.appendChild(el);
+    });
+  });
+  host.querySelectorAll('[data-bk]').forEach(b=>b.onchange=()=>{S.books[b.dataset.bk]=b.checked;save();renderBooks();renderStat()});
+}
+
+function renderStat(){
+  const tot=TRANCHES.reduce((a,t)=>a+t.tasks.length,0);
+  const done=Object.values(S.tasks).filter(Boolean).length;
+  const bk=Object.values(S.books).filter(Boolean).length;
+  $('#stat').textContent=`${done}/${tot} modules filed · ${bk} books down · saved automatically`;
+}
+
+async function save(){
+  try{ await window.storage.set(KEY,JSON.stringify(S)); }
+  catch(e){ $('#stat').textContent='Progress not saving — storage unavailable in this view.'; }
+}
+async function load(){
+  try{ const r=await window.storage.get(KEY); if(r&&r.value) S=JSON.parse(r.value); }
+  catch(e){ /* first run — no key yet */ }
+}
+
+$('#rst').onclick=async()=>{
+  S={tasks:{},books:{}};
+  try{ await window.storage.delete(KEY); }catch(e){}
+  renderStack();renderBooks();renderStat();
+};
+
+$('#qs').innerHTML=QS.map((q,i)=>`<div class="q" data-n="${String(i+1).padStart(2,'0')}">${q}</div>`).join('');
+$('#srcs').innerHTML=SRCS.map(s=>`<div class="src"><div class="nm">${s[0]}</div><div class="ds">${s[1]}</div><div class="url">${s[2]}</div></div>`).join('');
+
+renderClocks();renderStack();renderBooks();renderStat();
+load().then(()=>{renderStack();renderBooks();renderStat()});
+</script>
