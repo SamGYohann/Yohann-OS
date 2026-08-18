@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAPITAL STRUCTURE v2 — Personal Solvency Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0D10;
+  --slab:#12151A;
+  --slab-2:#171B21;
+  --rule:#222831;
+  --rule-hi:#333C48;
+  --bone:#E8E4DC;
+  --ash:#79818C;
+  --ash-2:#565E68;
+  --steel:#7C9CB8;
+  --pass:#5C8F6E;
+  --watch:#C39A4E;
+  --breach:#B25548;
+  --display:'Bebas Neue',Impact,sans-serif;
+  --body:'Crimson Pro',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink);
+  color:var(--bone);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
+
+/* ---------- masthead ---------- */
+.masthead{
+  border-bottom:1px solid var(--rule);
+  padding:18px 24px 14px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  background:linear-gradient(180deg,#0E1116 0%,var(--ink) 100%);
+}
+.mast-l h1{
+  font-family:var(--display);font-weight:400;font-size:34px;line-height:.95;margin:0;
+  letter-spacing:.14em;color:var(--bone);
+}
+.mast-l .sub{
+  font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--ash-2);
+  text-transform:uppercase;margin-top:6px;
+}
+.mast-r{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--ash-2);text-align:right;text-transform:uppercase}
+.mast-r b{color:var(--ash);font-weight:500}
+
+/* ---------- shell ---------- */
+.shell{display:flex;align-items:stretch;min-height:calc(100vh - 84px)}
+.rail{
+  width:168px;flex:0 0 168px;border-right:1px solid var(--rule);
+  padding:22px 0;display:flex;flex-direction:column;gap:2px;
+}
+.rail button{
+  background:none;border:0;border-left:2px solid transparent;
+  text-align:left;padding:9px 18px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ash-2);transition:color .15s,border-color .15s,background .15s;
+}
+.rail button:hover{color:var(--bone);background:rgba(124,156,184,.05)}
+.rail button[aria-selected="true"]{color:var(--bone);border-left-color:var(--steel);background:rgba(124,156,184,.07)}
+.rail .rail-gap{height:18px;border-bottom:1px solid var(--rule);margin:10px 18px 12px}
+.rail .rail-note{
+  margin-top:auto;padding:14px 18px 0;font-family:var(--mono);font-size:9px;
+  letter-spacing:.12em;color:#3E454E;line-height:1.7;text-transform:uppercase;
+}
+.stage{flex:1;min-width:0;padding:26px 30px 90px;max-width:1180px}
+
+/* ---------- generic blocks ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ash-2);margin:0 0 10px;
+}
+h2.sec{
+  font-family:var(--display);font-size:24px;letter-spacing:.12em;font-weight:400;
+  margin:0 0 4px;color:var(--bone);
+}
+.lede{color:var(--ash);font-size:15px;margin:0 0 22px;max-width:66ch}
+.panel{
+  background:var(--slab);border:1px solid var(--rule);padding:20px;margin-bottom:18px;
+}
+.panel-h{
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ash-2);margin:0 0 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+hr.rule{border:0;border-top:1px solid var(--rule);margin:18px 0}
+
+/* ---------- hero readouts ---------- */
+.readouts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--rule);background:var(--slab);margin-bottom:18px}
+.readout{padding:20px 20px 18px;border-right:1px solid var(--rule)}
+.readout:last-child{border-right:0}
+.readout .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash-2)}
+.readout .v{font-family:var(--mono);font-size:32px;font-weight:500;letter-spacing:-.02em;margin-top:8px;line-height:1;font-variant-numeric:tabular-nums}
+.readout .c{font-size:13.5px;color:var(--ash);margin-top:8px;line-height:1.45}
+.v.pass{color:var(--pass)} .v.watch{color:var(--watch)} .v.breach{color:var(--breach)}
+
+/* ---------- the bridge (signature) ---------- */
+.bridge-wrap{background:var(--slab);border:1px solid var(--rule);padding:20px 20px 12px;margin-bottom:18px}
+.bridge-wrap svg{width:100%;height:auto;display:block}
+.bridge-legend{
+  display:flex;gap:22px;flex-wrap:wrap;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ash-2);
+  border-top:1px solid var(--rule);margin-top:10px;padding-top:11px;
+}
+.bridge-legend i{display:inline-block;width:16px;height:2px;vertical-align:middle;margin-right:7px}
+
+/* ---------- covenant certificate ---------- */
+.cert{border:1px solid var(--rule-hi);background:var(--slab);position:relative;overflow:hidden;margin-bottom:18px}
+.cert-head{
+  padding:16px 20px 14px;border-bottom:1px solid var(--rule);
+  display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.cert-head .t{font-family:var(--display);font-size:20px;letter-spacing:.14em}
+.cert-head .d{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--ash-2);text-transform:uppercase}
+.stamp{
+  font-family:var(--display);font-size:26px;letter-spacing:.2em;padding:5px 18px 3px;
+  border:2px solid currentColor;transform:rotate(-3.5deg);opacity:.92;
+}
+.stamp.pass{color:var(--pass)} .stamp.watch{color:var(--watch)} .stamp.breach{color:var(--breach)}
+.cov{display:grid;grid-template-columns:1fr auto auto auto;gap:0;font-family:var(--mono);font-size:12px}
+.cov > div{padding:11px 20px;border-bottom:1px solid var(--rule);display:flex;align-items:center}
+.cov .hd{font-size:9.5px;letter-spacing:.18em;color:var(--ash-2);text-transform:uppercase;padding-top:12px;padding-bottom:10px;background:#0F1217}
+.cov .name{color:var(--bone);flex-direction:column;align-items:flex-start;gap:2px}
+.cov .name small{font-family:var(--body);font-size:12.5px;color:var(--ash-2);letter-spacing:0}
+.cov .val,.cov .thr{justify-content:flex-end;color:var(--ash);white-space:nowrap}
+.cov .flag{justify-content:flex-end;font-size:10px;letter-spacing:.16em;font-weight:700}
+.flag.pass{color:var(--pass)} .flag.watch{color:var(--watch)} .flag.breach{color:var(--breach)}
+.cov > div:nth-last-child(-n+4){border-bottom:0}
+
+/* ---------- waterfall ---------- */
+.tier{border:1px solid var(--rule);background:var(--slab);margin-bottom:10px;padding:14px 18px}
+.tier.starved{opacity:.45}
+.tier-top{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap}
+.tier-id{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--steel)}
+.tier-name{font-family:var(--display);font-size:19px;letter-spacing:.1em}
+.tier-amt{font-family:var(--mono);font-size:19px;font-weight:500;font-variant-numeric:tabular-nums}
+.tier-desc{color:var(--ash);font-size:13.5px;margin-top:5px;max-width:62ch}
+.bar{height:4px;background:#0C0F13;border:1px solid var(--rule);margin-top:11px;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--steel);display:block}
+.bar.full i{background:var(--pass)}
+.tier-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ash-2);margin-top:7px;text-transform:uppercase}
+
+/* ---------- tables / forms ---------- */
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px}
+th{
+  text-align:left;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ash-2);font-weight:400;padding:0 10px 9px 0;border-bottom:1px solid var(--rule);
+}
+td{padding:9px 10px 9px 0;border-bottom:1px solid #191E25;vertical-align:middle}
+td.r,th.r{text-align:right;padding-right:0}
+tr:last-child td{border-bottom:0}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  background:#0C0F13;border:1px solid var(--rule);color:var(--bone);
+  padding:7px 9px;font-family:var(--mono);font-size:12.5px;width:100%;border-radius:0;
+}
+input:hover,select:hover{border-color:var(--rule-hi)}
+textarea{font-family:var(--body);font-size:14.5px;line-height:1.5;resize:vertical;min-height:64px}
+label.fl{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ash-2);margin-bottom:5px}
+.field{margin-bottom:12px}
+.btn{
+  background:none;border:1px solid var(--rule-hi);color:var(--bone);cursor:pointer;
+  padding:8px 15px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  transition:background .15s,border-color .15s;
+}
+.btn:hover{background:rgba(124,156,184,.1);border-color:var(--steel)}
+.btn.primary{border-color:var(--steel);color:var(--steel)}
+.btn.primary:hover{background:var(--steel);color:var(--ink)}
+.btn.ghost{border-color:var(--rule);color:var(--ash-2);padding:5px 10px}
+.btn.ghost:hover{color:var(--breach);border-color:var(--breach);background:none}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+/* ---------- verdict / gate ---------- */
+.verdict{border:1px solid var(--rule-hi);background:var(--slab-2);padding:22px;margin-bottom:18px}
+.verdict .call{font-family:var(--display);font-size:44px;letter-spacing:.16em;line-height:1}
+.verdict .call.go{color:var(--pass)} .verdict .call.hold{color:var(--watch)} .verdict .call.no{color:var(--breach)}
+.verdict .why{font-family:var(--body);font-size:15.5px;color:var(--bone);margin-top:10px;max-width:64ch}
+.verdict ul{margin:12px 0 0;padding-left:18px;color:var(--ash);font-size:14px}
+.verdict li{margin-bottom:4px}
+
+/* ---------- banner ---------- */
+.banner{
+  border:1px solid var(--watch);background:rgba(195,154,78,.07);padding:13px 18px;margin-bottom:18px;
+  display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+}
+.banner p{margin:0;font-size:14.5px;color:var(--bone)}
+.banner .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--watch);text-transform:uppercase}
+
+.note{font-size:13.5px;color:var(--ash-2);max-width:64ch;margin:10px 0 0}
+.deficit{border-color:var(--breach);background:rgba(178,85,72,.07)}
+.deficit .tag{color:var(--breach)}
+.hide{display:none !important}
+
+/* ---------- horizon ---------- */
+.hz-row{display:grid;grid-template-columns:86px repeat(6,minmax(0,1fr));font-family:var(--mono);font-size:12px;border-bottom:1px solid #191E25}
+.hz-row > span{padding:8px 8px 8px 0;text-align:right}
+.hz-row > span:first-child{text-align:left;color:var(--ash-2);letter-spacing:.1em}
+.hz-row.hd > span{font-size:9px;letter-spacing:.16em;color:var(--ash-2);text-transform:uppercase;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.hz-row.mark{background:rgba(124,156,184,.06)}
+.hz-row.mark > span:first-child{color:var(--steel)}
+
+
+/* ---------- v2: stress, variance, calendar ---------- */
+.sk-row{display:grid;grid-template-columns:1fr auto auto auto;font-family:var(--mono);font-size:12px;border-bottom:1px solid #191E25;align-items:center}
+.sk-row > span{padding:10px 12px 10px 0}
+.sk-row > span:nth-child(n+2){text-align:right}
+.sk-row.hd > span{font-size:9px;letter-spacing:.16em;color:var(--ash-2);text-transform:uppercase;border-bottom:1px solid var(--rule);padding-bottom:9px}
+.sk-row .lab{color:var(--bone);font-family:var(--body);font-size:14px}
+.sk-row .lab small{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--ash-2);margin-top:2px}
+.sk-row.base{background:rgba(124,156,184,.06)}
+.vr-row{display:grid;grid-template-columns:1.4fr repeat(3,minmax(0,1fr));font-family:var(--mono);font-size:12px;border-bottom:1px solid #191E25}
+.vr-row > span{padding:9px 10px 9px 0}
+.vr-row > span:nth-child(n+2){text-align:right}
+.vr-row.hd > span{font-size:9px;letter-spacing:.16em;color:var(--ash-2);text-transform:uppercase;border-bottom:1px solid var(--rule);padding-bottom:9px}
+.vr-row > span:first-child{color:var(--bone)}
+.over{color:var(--breach)} .under{color:var(--pass)}
+.cr-row{display:grid;grid-template-columns:1.6fr repeat(4,minmax(0,1fr)) auto;font-family:var(--mono);font-size:12px;border-bottom:1px solid #191E25;align-items:center}
+.cr-row > span{padding:11px 10px 11px 0}
+.cr-row > span:nth-child(n+2){text-align:right}
+.cr-row.hd > span{font-size:9px;letter-spacing:.16em;color:var(--ash-2);text-transform:uppercase;border-bottom:1px solid var(--rule);padding-bottom:9px}
+.cr-row .lab{color:var(--bone);font-family:var(--body);font-size:14.5px}
+.cr-row .lab small{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--ash-2);margin-top:3px;line-height:1.6}
+.slots{display:flex;gap:6px;margin-top:10px}
+.slots i{width:34px;height:8px;border:1px solid var(--rule-hi);display:block}
+.slots i.used{background:var(--breach);border-color:var(--breach)}
+.slots i.free{background:var(--pass);border-color:var(--pass);opacity:.55}
+#intake{position:fixed;inset:0;background:rgba(6,7,9,.97);z-index:90;display:flex;align-items:center;justify-content:center;padding:24px}
+.ik-card{max-width:560px;width:100%;border:1px solid var(--rule-hi);background:var(--slab);padding:34px 32px 28px}
+.ik-step{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;color:var(--steel);text-transform:uppercase}
+.ik-q{font-family:var(--display);font-size:30px;letter-spacing:.09em;margin:12px 0 6px;line-height:1.05}
+.ik-sub{color:var(--ash);font-size:14.5px;margin:0 0 22px;line-height:1.55}
+.ik-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px}
+.ik-dots{display:flex;gap:5px}
+.ik-dots i{width:20px;height:3px;background:var(--rule-hi);display:block}
+.ik-dots i.on{background:var(--steel)}
+.cp-row{display:grid;grid-template-columns:1.7fr 1fr auto auto auto;font-family:var(--mono);font-size:12px;border-bottom:1px solid #191E25;align-items:center}
+.cp-row > span{padding:11px 10px 11px 0}
+.cp-row > span:nth-child(n+3){text-align:right}
+.cp-row.hd > span{font-size:9px;letter-spacing:.16em;color:var(--ash-2);text-transform:uppercase;border-bottom:1px solid var(--rule);padding-bottom:9px}
+.cp-row .lab{color:var(--bone);font-family:var(--body);font-size:14.5px;line-height:1.4}
+.cp-row .lab small{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--ash-2);margin-top:3px}
+.cp-row.urgent{background:rgba(195,154,78,.06)}
+.cp-row.late{background:rgba(178,85,72,.08)}
+.days{font-weight:700;letter-spacing:.06em}
+.st-bar{height:5px;background:#0C0F13;border:1px solid var(--rule);margin-top:9px;position:relative}
+.st-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--steel);display:block}
+.streak{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap}
+.streak i{width:13px;height:13px;border:1px solid var(--rule-hi);display:block}
+.streak i.on{background:var(--pass);border-color:var(--pass)}
+.my-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:3px;margin-top:4px}
+.my-col{text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--ash-2)}
+.my-bar{height:64px;display:flex;flex-direction:column;justify-content:flex-end;border-bottom:1px solid var(--rule);margin-bottom:5px}
+.my-bar i{display:block;width:100%}
+.my-bar i.pos{background:var(--pass);opacity:.7}
+.my-bar i.neg{background:var(--breach);opacity:.85}
+.my-col.brk{color:var(--watch)}
+.my-val{font-size:8.5px;margin-top:3px;color:var(--ash-2)}
+.solve{border:1px solid var(--steel);background:rgba(124,156,184,.05);padding:18px 20px;margin-bottom:18px}
+.solve .big{font-family:var(--mono);font-size:27px;font-weight:500;color:var(--steel);margin:8px 0 4px}
+.tag-est{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;color:var(--watch);border:1px solid var(--watch);padding:1px 5px;margin-left:8px;vertical-align:middle}
+
+@media(max-width:900px){
+  .readouts{grid-template-columns:1fr}
+  .readout{border-right:0;border-bottom:1px solid var(--rule)}
+  .readout:last-child{border-bottom:0}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .shell{flex-direction:column}
+  .rail{
+    width:auto;flex:0 0 auto;border-right:0;border-bottom:1px solid var(--rule);
+    flex-direction:row;overflow-x:auto;padding:0;gap:0;
+  }
+  .rail button{border-left:0;border-bottom:2px solid transparent;white-space:nowrap;padding:13px 15px}
+  .rail button[aria-selected="true"]{border-left-color:transparent;border-bottom-color:var(--steel)}
+  .rail .rail-gap,.rail .rail-note{display:none}
+  .stage{padding:20px 16px 70px}
+  .masthead{padding:14px 16px 12px}
+  .cov{grid-template-columns:1fr auto auto}
+  .cov .thr{display:none}
+  .hz-row{grid-template-columns:58px repeat(6,minmax(0,1fr));font-size:9.5px}
+  .sk-row{grid-template-columns:1fr auto auto auto;font-size:10.5px}
+  .cr-row{grid-template-columns:1fr auto auto;font-size:10.5px}
+  .cr-row > span:nth-child(2),.cr-row > span:nth-child(3){display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+
+
+<div id="intake" class="hide">
+  <div class="ik-card">
+    <div class="ik-step" id="ikStep">—</div>
+    <h2 class="ik-q" id="ikQ">—</h2>
+    <p class="ik-sub" id="ikSub">—</p>
+    <div id="ikFields"></div>
+    <div class="ik-nav">
+      <div class="ik-dots" id="ikDots"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn" id="ikBack">Back</button>
+        <button class="btn primary" id="ikNext">Next</button>
+      </div>
+    </div>
+    <p class="note" style="margin-top:18px;font-size:12.5px">Four minutes. Every figure is editable afterwards — an approximate real number beats an exact placeholder.</p>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="mast-l">
+    <h1>CAPITAL STRUCTURE</h1>
+    <div class="sub">Personal solvency console &middot; <span id="mHolder">S. Gebreyohannes</span></div>
+  </div>
+  <div class="mast-r">
+    <div>As of <b id="mDate">—</b></div>
+    <div>Horizon <b id="mHorizon">—</b> to graduation</div>
+    <div>Standard <b id="mStd">—</b></div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" role="tablist" aria-label="Console sections">
+    <button role="tab" data-tab="position" aria-selected="true">Position</button>
+    <button role="tab" data-tab="waterfall" aria-selected="false">Waterfall</button>
+    <button role="tab" data-tab="stress" aria-selected="false">Stress</button>
+    <button role="tab" data-tab="horizon" aria-selected="false">Horizon</button>
+    <button role="tab" data-tab="calendar" aria-selected="false">Calendar</button>
+    <div class="rail-gap"></div>
+    <button role="tab" data-tab="campaign" aria-selected="false">Campaign</button>
+    <button role="tab" data-tab="standard" aria-selected="false">The Standard</button>
+    <div class="rail-gap"></div>
+    <button role="tab" data-tab="credit" aria-selected="false">The Ascent</button>
+    <button role="tab" data-tab="gate" aria-selected="false">Spend gate</button>
+    <button role="tab" data-tab="ledger" aria-selected="false">Ledger</button>
+    <button role="tab" data-tab="inputs" aria-selected="false">Inputs</button>
+    <div class="rail-note">Every dollar has a<br>priority of claim.<br>Fund in order.<br>No exceptions<br>without a logged<br>verdict.</div>
+  </nav>
+
+  <main class="stage">
+
+    <!-- ============ POSITION ============ -->
+    <section id="tab-position">
+      <div id="setupBanner" class="banner hide">
+        <div><span class="tag">Estimates in use</span>
+          <p>Some figures are placeholders. Open <b>Inputs</b> and replace them with your real numbers — the console is only as honest as what you feed it.</p></div>
+        <button class="btn primary" id="startIntake">Start the four-minute intake</button>
+      </div>
+      <div id="deficitBanner" class="banner deficit hide">
+        <div><span class="tag">Going-concern flag</span>
+          <p id="deficitText">—</p></div>
+      </div>
+
+      <p class="eyebrow">Section I &middot; Liquidity</p>
+      <h2 class="sec">WHERE YOU ACTUALLY STAND</h2>
+      <p class="lede">Not what's in the account today — what's in it at the worst point over the next thirteen weeks, and whether that trough clears your obligations.</p>
+
+      <div class="readouts">
+        <div class="readout"><div class="k">Minimum cash · 13 weeks</div><div class="v" id="roTrough">—</div><div class="c" id="roTroughC">—</div></div>
+        <div class="readout"><div class="k">Headroom over floor</div><div class="v" id="roHead">—</div><div class="c" id="roHeadC">—</div></div>
+        <div class="readout"><div class="k">Runway if income stops</div><div class="v" id="roRun">—</div><div class="c" id="roRunC">—</div></div>
+      </div>
+
+      <div class="bridge-wrap">
+        <div class="panel-h"><span>Thirteen-week cash bridge</span><span id="bridgeRange">—</span></div>
+        <svg id="bridge" viewBox="0 0 1000 330" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Projected cash balance over the next thirteen weeks"></svg>
+        <div class="bridge-legend">
+          <span><i style="background:var(--steel)"></i>Projected cash</span>
+          <span><i style="background:var(--watch)"></i>Covenant floor (30-day obligations)</span>
+          <span><i style="background:var(--breach)"></i>Trough</span>
+        </div>
+      </div>
+
+      <div class="cert">
+        <div class="cert-head">
+          <div>
+            <div class="t">COVENANT CERTIFICATE</div>
+            <div class="d">Six tests &middot; any breach fails the certificate</div>
+          </div>
+          <div class="stamp" id="certStamp">—</div>
+        </div>
+        <div class="cov" id="covTable"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>The year ahead</span><span id="myLean">—</span></div>
+        <div id="myTable"></div>
+        <p class="note" id="myNote">—</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Net position</span><span id="npAsOf">—</span></div>
+        <div class="grid g4" id="npGrid"></div>
+        <p class="note" id="npNote">—</p>
+      </div>
+    </section>
+
+    <!-- ============ WATERFALL ============ -->
+    <section id="tab-waterfall" class="hide">
+      <p class="eyebrow">Section II &middot; Priority of claims</p>
+      <h2 class="sec">THE WATERFALL</h2>
+      <p class="lede">Income enters at the top and falls through six tiers in strict order. A tier only fills once everything above it is satisfied. This is the whole budget — there is no separate list of rules to remember.</p>
+      <div class="panel">
+        <div class="panel-h"><span>Monthly distribution</span><span id="wfIncome">—</span></div>
+        <div id="wfTiers"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>Why this order</span></div>
+        <p class="note" style="max-width:70ch">Obligations first because a missed rent payment is the only line item here that can end the plan outright. Reserve before career capital because an empty reserve turns every opportunity into a financing question. Career capital before retirement because you are sixteen months from a December 2027 graduation into a restructuring seat, and the return on a flight to an interview dwarfs the return on a marginal Roth dollar at your current balance. Risk capital last and capped, because your own trader self-assessment flagged overconfidence and revenge trading — the cap is the guardrail you built for yourself, compiled into the structure rather than left to willpower.</p>
+      </div>
+    </section>
+
+    <!-- ============ HORIZON ============ -->
+    <section id="tab-horizon" class="hide">
+      <p class="eyebrow">Section III &middot; Long plan</p>
+      <h2 class="sec">RUNWAY TO DECEMBER 2027</h2>
+      <p class="lede">The waterfall run forward month by month to graduation, with the two known structural breaks priced in: the lease ending June 2027, and whatever summer 2027 turns out to be.</p>
+
+      <div class="panel">
+        <div class="panel-h"><span>Scenario</span></div>
+        <div class="grid g3">
+          <div class="field"><label class="fl" for="hzSummer">Summer 2027</label>
+            <select id="hzSummer">
+              <option value="paid">Paid summer analyst</option>
+              <option value="unpaid">Unpaid / low-paid role</option>
+              <option value="none">No summer role — current income continues</option>
+            </select></div>
+          <div class="field"><label class="fl" for="hzSummerNet">Summer net income · total</label><input type="number" id="hzSummerNet"></div>
+          <div class="field"><label class="fl" for="hzPostRent">Housing cost from July 2027</label><input type="number" id="hzPostRent"></div>
+        </div>
+      </div>
+
+      <div class="readouts">
+        <div class="readout"><div class="k">Landing fund vs requirement</div><div class="v" id="hzEnd">—</div><div class="c" id="hzEndC">—</div></div>
+        <div class="readout"><div class="k">Runway at graduation</div><div class="v" id="hzRun">—</div><div class="c" id="hzRunC">—</div></div>
+        <div class="readout"><div class="k">Lowest point on the path</div><div class="v" id="hzMin">—</div><div class="c" id="hzMinC">—</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Month by month</span><span id="hzDisc">—</span></div>
+        <div id="hzTable"></div>
+      </div>
+    </section>
+
+
+    <!-- ============ STRESS ============ -->
+    <section id="tab-stress" class="hide">
+      <p class="eyebrow">Section III &middot; Downside</p>
+      <h2 class="sec">STRESS CASES</h2>
+      <p class="lede">The base case is the one case that never matters. Each row re-runs the full thirteen-week bridge with one thing broken, and reports where the trough lands.</p>
+      <div class="panel">
+        <div class="panel-h"><span>Shock parameters</span></div>
+        <div class="grid g4">
+          <div class="field"><label class="fl" for="skRepair">Unplanned repair or medical</label><input type="number" id="skRepair"></div>
+          <div class="field"><label class="fl" for="skWeek">Hits in week</label><input type="number" id="skWeek" min="1" max="13"></div>
+          <div class="field"><label class="fl" for="skDelay">Expected inflow delayed by (weeks)</label><input type="number" id="skDelay" min="0" max="12"></div>
+          <div class="field"><label class="fl" for="skRent">Housing cost rises by</label><input type="number" id="skRent"></div>
+          <div class="field"><label class="fl" for="skHours">Light week &middot; shifts come in at % of normal</label><input type="number" id="skHours" min="0" max="100"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>Results</span><span id="skFloor">—</span></div>
+        <div id="skTable"></div>
+        <p class="note">A scenario fails when its trough drops below the covenant floor — one month of obligations. Failing the combined case is expected and not alarming. Failing a single-shock case means one ordinary bad week ends the plan.</p>
+      </div>
+      <div id="solveBox"></div>
+    </section>
+
+    <!-- ============ CALENDAR ============ -->
+    <section id="tab-calendar" class="hide">
+      <p class="eyebrow">Section VI &middot; Dated cash</p>
+      <h2 class="sec">CALENDAR AND ACCRUALS</h2>
+      <p class="lede">The largest cash movements in a student year are not monthly. Tuition, aid refunds, insurance premiums and recruiting travel land on dates, and a level monthly model cannot see any of them.</p>
+      <div class="panel">
+        <div class="panel-h"><span>Dated events</span><span>Feed the bridge and the projection directly</span></div>
+        <div id="evTable"></div>
+        <div class="row-actions"><button class="btn" id="evAdd">Add event</button></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>Sinking funds</span><span id="skAccrual">—</span></div>
+        <div id="snTable"></div>
+        <div class="row-actions"><button class="btn" id="snAdd">Add sinking fund</button></div>
+        <p class="note">Each of these bills arrives whole but accrues monthly. The accrual is a Tier 1 claim — it sits above your reserve, because a known future bill is not a surprise and should never be funded out of one.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>Next ninety days</span></div>
+        <div id="calTable"></div>
+      </div>
+    </section>
+
+
+    <!-- ============ CREDIT / THE ASCENT ============ -->
+    <section id="tab-credit" class="hide">
+      <p class="eyebrow">Section VII &middot; Financing plan</p>
+      <h2 class="sec">THE ASCENT</h2>
+      <p class="lede">New accounts are a financing plan, not a shopping list. An undrawn line raises your limit and improves utilisation for free; a signup bonus with a minimum spend you cannot reach is a covenant breach with a welcome offer attached. Each planned account is tested before it opens.</p>
+
+      <div class="readouts">
+        <div class="readout"><div class="k">Chase 5/24 slots</div><div class="v" id="crSlots">—</div><div class="c" id="crSlotsC">—</div></div>
+        <div class="readout"><div class="k">Spend you can actually put on a card</div><div class="v" id="crNat">—</div><div class="c" id="crNatC">—</div></div>
+        <div class="readout"><div class="k">First-year value, net of fees</div><div class="v" id="crVal">—</div><div class="c" id="crValC">—</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Sequence</span><span id="crOrder">—</span></div>
+        <div id="crTable"></div>
+      </div>
+
+      <div id="crDetail"></div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Effect on the covenants</span></div>
+        <div class="grid g3" id="crEffect"></div>
+        <p class="note" id="crEffectNote">—</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>The roadmap</span><span>Mark an account open once it is approved</span></div>
+        <div id="crEdit"></div>
+        <div class="row-actions"><button class="btn" id="crAdd">Add planned account</button></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Credit file</span></div>
+        <div class="grid g4">
+          <div class="field"><label class="fl" for="crNew24">New accounts opened in last 24 months</label><input type="number" id="crNew24" min="0"></div>
+          <div class="field"><label class="fl" for="crCount">Total open accounts</label><input type="number" id="crCount" min="0"></div>
+          <div class="field"><label class="fl" for="crAge">Average age of accounts &middot; months</label><input type="number" id="crAge" min="0"></div>
+          <div class="field"><label class="fl" for="crSpendOv">Chargeable spend override &middot; monthly</label><input type="number" id="crSpendOv" min="0"></div>
+        </div>
+        <p class="note">Rent at Wallace St is paid by Venmo and cannot be charged, so it is excluded from chargeable spend automatically. Leave the override at zero to let the console compute it from your obligations and living costs.</p>
+      </div>
+    </section>
+
+
+    <!-- ============ CAMPAIGN ============ -->
+    <section id="tab-campaign" class="hide">
+      <p class="eyebrow">Section VIII &middot; The mission</p>
+      <h2 class="sec">THE CAMPAIGN</h2>
+      <p class="lede">Career capital stops being a line item here. Every dated obligation between you and a restructuring seat sits below, costed, and Tier 4 is sized by what this list actually needs — not by a number you picked once.</p>
+
+      <div class="readouts">
+        <div class="readout"><div class="k">Next deadline</div><div class="v" id="cpNext">—</div><div class="c" id="cpNextC">—</div></div>
+        <div class="readout"><div class="k">Cost due in 90 days</div><div class="v" id="cpCost">—</div><div class="c" id="cpCostC">—</div></div>
+        <div class="readout"><div class="k">Tier 4 requirement</div><div class="v" id="cpMo">—</div><div class="c" id="cpMoC">—</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Pipeline</span><span id="cpCount">—</span></div>
+        <div id="cpTable"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Edit the campaign</span></div>
+        <div id="cpEdit"></div>
+        <div class="row-actions"><button class="btn" id="cpAdd">Add objective</button></div>
+        <p class="note">The zero-cost rows are the ones that matter most. A Thursday morning in a public courtroom on East Broad costs nothing and cannot be bought by anyone with a better GPA than yours.</p>
+      </div>
+    </section>
+
+    <!-- ============ THE STANDARD ============ -->
+    <section id="tab-standard" class="hide">
+      <p class="eyebrow">Section IX &middot; Stated against done</p>
+      <h2 class="sec">THE STANDARD</h2>
+      <p class="lede">A model is a claim about the future. This is the only page that marks the claim. It measures one thing: the distance between what you said you would do and what the record shows you did.</p>
+
+      <div class="readouts">
+        <div class="readout"><div class="k">Standard held</div><div class="v" id="stScore">—</div><div class="c" id="stScoreC">—</div></div>
+        <div class="readout"><div class="k">Weekly close streak</div><div class="v" id="stStreak">—</div><div class="c" id="stStreakC">—</div></div>
+        <div class="readout"><div class="k">Forecast error</div><div class="v" id="stErr">—</div><div class="c" id="stErrC">—</div></div>
+      </div>
+
+      <div class="panel" id="closePanel">
+        <div class="panel-h"><span>The weekly close</span><span id="stDue">—</span></div>
+        <p class="note" id="stForecast" style="margin-top:0;margin-bottom:14px">—</p>
+        <div class="grid g2">
+          <div class="field"><label class="fl" for="clActual">Cash on hand right now &middot; every spendable account</label><input type="number" id="clActual" placeholder="0"></div>
+          <div class="field"><label class="fl" for="clDate">Week ending</label><input type="date" id="clDate"></div>
+        </div>
+        <div class="field"><label class="fl" for="clNote">One line. What moved, and what you are doing about it.</label><textarea id="clNote" placeholder="Not a summary. A decision."></textarea></div>
+        <div class="row-actions"><button class="btn primary" id="clSave">Close the week</button></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Components</span></div>
+        <div id="stParts"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Close history</span><span id="stCount">—</span></div>
+        <div id="stTable"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Gate follow-through</span></div>
+        <div id="stGates"></div>
+        <p class="note">A verdict you overrode is not a failure — overriding it and never marking it is. Mark them honestly; the number is only useful if it can go down.</p>
+      </div>
+    </section>
+
+    <!-- ============ GATE ============ -->
+    <section id="tab-gate" class="hide">
+      <p class="eyebrow">Section IV &middot; Decision</p>
+      <h2 class="sec">SPEND GATE</h2>
+      <p class="lede">Run anything discretionary over your threshold through this before buying it. It returns a verdict, not a consideration. Logging requires a written reason, which is the point.</p>
+
+      <div class="panel">
+        <div class="grid g3">
+          <div class="field"><label class="fl" for="gtItem">What it is</label><input type="text" id="gtItem" placeholder="e.g. flight to a superday"></div>
+          <div class="field"><label class="fl" for="gtCost">Cost</label><input type="number" id="gtCost" placeholder="0"></div>
+          <div class="field"><label class="fl" for="gtTier">Funded from which tier</label>
+            <select id="gtTier">
+              <option value="2">T2 — Career capital</option>
+              <option value="5" selected>T5 — Discretionary</option>
+              <option value="4">T4 — Risk capital</option>
+              <option value="1">T1 — Reserve (drawdown)</option>
+            </select></div>
+        </div>
+        <div class="field"><label class="fl" for="gtWhy">One line: what does this buy you that you don't already have?</label><textarea id="gtWhy" placeholder="No jargon. If you can't finish this sentence cleanly, that is the answer."></textarea></div>
+        <div class="row-actions">
+          <button class="btn primary" id="gtRun">Run the gate</button>
+          <button class="btn" id="gtLog">Log this decision</button>
+        </div>
+      </div>
+
+      <div id="gtOut"></div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Decision log</span><span id="gtCount">—</span></div>
+        <div id="gtLogTable"></div>
+      </div>
+    </section>
+
+    <!-- ============ LEDGER ============ -->
+    <section id="tab-ledger" class="hide">
+      <p class="eyebrow">Section V &middot; Record</p>
+      <h2 class="sec">LEDGER</h2>
+      <p class="lede">Actuals. The bridge and covenants above run on your configured numbers; this is where you record what really happened, so the variance is visible instead of imagined.</p>
+
+      <div class="panel">
+        <div class="panel-h"><span>Record a movement</span></div>
+        <div class="grid g4">
+          <div class="field"><label class="fl" for="txDate">Date</label><input type="date" id="txDate"></div>
+          <div class="field"><label class="fl" for="txDesc">Description</label><input type="text" id="txDesc"></div>
+          <div class="field"><label class="fl" for="txAmt">Amount</label><input type="number" id="txAmt" placeholder="0"></div>
+          <div class="field"><label class="fl" for="txCat">Bucket</label>
+            <select id="txCat">
+              <option value="income">Income in</option>
+              <option value="fixed">Obligation</option>
+              <option value="food">Food</option>
+              <option value="career">Career capital</option>
+              <option value="roth">Roth</option>
+              <option value="risk">Risk capital</option>
+              <option value="disc" selected>Discretionary</option>
+            </select></div>
+        </div>
+        <div class="row-actions"><button class="btn primary" id="txAdd">Record it</button></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Plan against actual &middot; last 30 days</span><span id="vrNet">—</span></div>
+        <div id="vrTable"></div>
+        <p class="note">The forecast is a claim about the future. This is the only place it gets marked against what happened, which is the entire point of running a thirteen-week model rather than a budget.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>Trailing 30 days</span><span id="txSummary">—</span></div>
+        <div id="txTable"></div>
+      </div>
+    </section>
+
+    <!-- ============ INPUTS ============ -->
+    <section id="tab-inputs" class="hide">
+      <p class="eyebrow">Section VI &middot; Configuration</p>
+      <h2 class="sec">INPUTS</h2>
+      <p class="lede">Replace every estimate with a real figure. Rent is already your actual number; income is a placeholder until you enter your confirmed rate and hours.</p>
+
+      <div class="panel">
+        <div class="panel-h"><span>Balances</span><span>Enter what is actually there today</span></div>
+        <div id="acctTable"></div>
+        <div class="row-actions"><button class="btn" id="acctAdd">Add account</button></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Revolving credit</span><span>Minimum payments become a Tier 0 claim</span></div>
+        <div id="cardTable"></div>
+        <div class="row-actions"><button class="btn" id="cardAdd">Add card</button></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Term debt</span><span>Student loans and anything amortising</span></div>
+        <div id="loanTable"></div>
+        <div class="row-actions"><button class="btn" id="loanAdd">Add loan</button></div>
+        <p class="note">Leave this empty if you carry none. Loans in deferment still accrue if unsubsidised — enter the balance and rate even when nothing is due yet, so the projection is honest about what is growing.</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Income</span><span>Net of tax — what lands in the account</span></div>
+        <div id="incTable"></div>
+        <div class="row-actions"><button class="btn" id="incAdd">Add income stream</button></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Fixed obligations</span><span>Tier 0 — non-negotiable</span></div>
+        <div id="fixTable"></div>
+        <div class="row-actions"><button class="btn" id="fixAdd">Add obligation</button></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Living and discretionary</span></div>
+        <div class="grid g2">
+          <div>
+            <div class="eyebrow" style="margin-bottom:12px">In term &middot; living in Richmond</div>
+            <div class="field"><label class="fl" for="vFood">Food floor</label><input type="number" id="vFood"></div>
+            <div class="field"><label class="fl" for="vSocial">Social</label><input type="number" id="vSocial"></div>
+            <div class="field"><label class="fl" for="vOther">Everything else</label><input type="number" id="vOther"></div>
+          </div>
+          <div>
+            <div class="eyebrow" style="margin-bottom:12px">On break &middot; home, or not in session</div>
+            <div class="field"><label class="fl" for="bFood">Food floor</label><input type="number" id="bFood"></div>
+            <div class="field"><label class="fl" for="bSocial">Social</label><input type="number" id="bSocial"></div>
+            <div class="field"><label class="fl" for="bOther">Everything else</label><input type="number" id="bOther"></div>
+          </div>
+        </div>
+        <div class="field" style="margin-top:6px"><label class="fl" for="brkMonths">Which months count as break</label>
+          <select id="brkMonths">
+            <option value="5,6">Summer · Jun–Jul</option>
+            <option value="5,6,7">Summer · Jun–Aug</option>
+            <option value="5,6,11">Summer and December</option>
+            <option value="5,6,7,0">Summer, August and January</option>
+            <option value="">None — costs are level all year</option>
+          </select></div>
+        <p class="note">Rent does not change when you go home, so it stays in the obligations table. What changes is food, fuel and social. Food sits in Tier 0 in both profiles because it is not optional; social and everything else sit in Tier 8, funded only from what survives the fall.</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>Targets and caps</span></div>
+        <div class="grid g3">
+          <div class="field"><label class="fl" for="tRes">Reserve target · months of fixed cost</label><input type="number" id="tRes" step="0.5"></div>
+          <div class="field"><label class="fl" for="tFill">Share of surplus to reserve until full</label><input type="number" id="tFill" step="5"></div>
+          <div class="field"><label class="fl" for="tCareer">Career capital · monthly</label><input type="number" id="tCareer"></div>
+          <div class="field"><label class="fl" for="tRoth">Roth · monthly</label><input type="number" id="tRoth"></div>
+          <div class="field"><label class="fl" for="tRisk">Risk capital · monthly</label><input type="number" id="tRisk"></div>
+          <div class="field"><label class="fl" for="tRiskCap">Risk capital ceiling · % of liquid net worth</label><input type="number" id="tRiskCap" step="0.5"></div>
+          <div class="field"><label class="fl" for="tUtil">Utilisation target · %</label><input type="number" id="tUtil"></div>
+          <div class="field"><label class="fl" for="tGate">Gate threshold · run anything above this</label><input type="number" id="tGate"></div>
+          <div class="field"><label class="fl" for="tLanding">Landing fund · cash needed at graduation</label><input type="number" id="tLanding"></div>
+          <div class="field"><label class="fl" for="tRothAnn">Roth · annual contribution limit</label><input type="number" id="tRothAnn"></div>
+          <div class="field"><label class="fl" for="tDebtApr">Accelerate debt above this rate · %</label><input type="number" id="tDebtApr" step="0.5"></div>
+          <div class="field"><label class="fl" for="tDebtEx">Extra debt paydown · monthly</label><input type="number" id="tDebtEx"></div>
+          <div class="field"><label class="fl" for="tRate">Your hourly rate · for the income solver</label><input type="number" id="tRate" step="0.25"></div>
+          <div class="field"><label class="fl" for="tGrad">Graduation date</label><input type="date" id="tGrad"></div>
+        </div>
+        <p class="note">Risk capital defaults to zero per month until the reserve is at target. That is not a suggestion the console makes and you override casually — it is the structure. Raise it once the reserve is full.</p>
+        <div class="row-actions">
+          <button class="btn primary" id="confirmBtn">Mark these as confirmed</button>
+          <button class="btn" id="exportBtn">Export a backup</button>
+          <button class="btn ghost" id="resetBtn">Reset everything</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+<script>
+/* ============================================================
+   CAPITAL STRUCTURE v2 — personal solvency console
+   ============================================================ */
+
+/* ---------- storage ---------- */
+const KEY='capstack:v2';
+async function load(){
+  try{ const r=await window.storage.get(KEY); if(r&&r.value) return JSON.parse(r.value); }catch(e){}
+  return null;
+}
+let saveTimer=null;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{ await window.storage.set(KEY, JSON.stringify(S)); }catch(e){ console.warn('persist failed',e); }
+  },400);
+}
+
+/* ---------- helpers ---------- */
+const uid=()=>Math.random().toString(36).slice(2,9);
+const $=id=>document.getElementById(id);
+const money=n=>(n<0?'-':'')+'$'+Math.abs(Math.round(n)).toLocaleString('en-US');
+const pct=n=>(Math.round(n*10)/10)+'%';
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function parseD(s){if(!s)return null;const p=String(s).split('-');return new Date(+p[0],+p[1]-1,+p[2],12,0,0);}
+function isoD(d){const m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return d.getFullYear()+'-'+m+'-'+dd;}
+function addDays(d,n){const c=new Date(d);c.setDate(c.getDate()+n);return c;}
+function addMonths(d,n){const c=new Date(d);c.setMonth(c.getMonth()+n);return c;}
+function daysInMonth(y,m){return new Date(y,m+1,0).getDate();}
+function today(){const d=new Date();d.setHours(12,0,0,0);return d;}
+function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function monthsBetween(a,b){return (b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth());}
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+/* ---------- defaults ---------- */
+function defaults(){
+  return {
+    meta:{holder:'S. Gebreyohannes',confirmed:false},
+    accounts:[
+      {id:uid(),label:'Operating — checking',type:'operating',bal:0},
+      {id:uid(),label:'Liquidity reserve',type:'reserve',bal:0},
+      {id:uid(),label:'Accrual account — known future bills',type:'accrual',bal:0},
+      {id:uid(),label:'Landing fund — graduation bridge',type:'landing',bal:0},
+      {id:uid(),label:'Roth IRA',type:'roth',bal:0},
+      {id:uid(),label:'Risk capital — futures / prop',type:'risk',bal:0,updated:''},
+      {id:uid(),label:'Operator bankroll',type:'risk',bal:0,updated:''},
+      {id:uid(),label:'Security deposit — 1417 Wallace St',type:'receivable',bal:862,due:'2027-07-15'}
+    ],
+    cards:[{id:uid(),label:'Primary card',limit:1000,bal:0,apr:24.9,minPay:35}],
+    loans:[],
+    income:[
+      {id:uid(),label:'VCU Technology Services internship',net:520,cadence:'biweekly',anchor:'2026-08-21',
+       start:'2026-08-21',end:'2027-05-15',kind:'w2',months:[0,1,2,3,4,7,8,9,10,11],est:true}
+    ],
+    fixed:[
+      {id:uid(),label:'Rent — 1417 Wallace St',amt:680,day:1,housing:true},
+      {id:uid(),label:'Utilities',amt:60,day:10},
+      {id:uid(),label:'Phone',amt:45,day:15},
+      {id:uid(),label:'Fuel',amt:70,day:5}
+    ],
+    sinking:[
+      {id:uid(),label:'Car insurance',amt:700,every:6,next:'2026-12-01',est:true},
+      {id:uid(),label:'Car repair and maintenance',amt:900,every:12,next:'2027-03-01',est:true},
+      {id:uid(),label:'Textbooks and course materials',amt:400,every:6,next:'2027-01-10',est:true},
+      {id:uid(),label:'Trips home to Temple Hills',amt:120,every:3,next:'2026-11-20',est:true}
+    ],
+    events:[
+      {id:uid(),label:'Tuition and fees — Fall',date:'2026-08-25',amt:0,dir:'out'},
+      {id:uid(),label:'Financial aid disbursement — Fall',date:'2026-08-25',amt:0,dir:'in'},
+      {id:uid(),label:'Harris Williams Boot Camp — travel',date:'2026-10-15',amt:350,dir:'out'},
+      {id:uid(),label:'Tuition and fees — Spring',date:'2027-01-12',amt:0,dir:'out'},
+      {id:uid(),label:'Financial aid disbursement — Spring',date:'2027-01-12',amt:0,dir:'in'},
+      {id:uid(),label:'Tax refund',date:'2027-03-01',amt:0,dir:'in'},
+      {id:uid(),label:'Move-out and new deposit',date:'2027-06-25',amt:1200,dir:'out'}
+    ],
+    variable:{term:{food:280,social:120,other:80},
+              brk:{food:150,social:80,other:60},
+              breakMonths:[5,6]},
+    targets:{reserveMonths:3,reserveFill:60,career:120,landing:4000,roth:0,rothAnnual:7000,
+             risk:0,riskCapPct:5,utilTarget:9,gate:75,grad:'2027-12-17',
+             debtApr:10,debtExtra:0,rate:16},
+    horizon:{summer:'paid',summerNet:9000,postRent:750},
+    stress:{repair:1200,week:6,delay:4,rent:200,hours:60},
+    credit:[
+      {id:uid(),label:'Chase Total Checking',kind:'bank',status:'planned',target:'2026-09-15',
+       af:0,afMonth:0,msr:0,msrMonths:3,ddReq:500,bonus:300,limitEst:0,est:true},
+      {id:uid(),label:'Chase Freedom Unlimited',kind:'card',status:'planned',target:'2027-01-15',
+       af:0,afMonth:0,msr:500,msrMonths:3,ddReq:0,bonus:200,limitEst:1000,est:true},
+      {id:uid(),label:'Chase Freedom Flex',kind:'card',status:'planned',target:'2027-08-15',
+       af:0,afMonth:0,msr:500,msrMonths:3,ddReq:0,bonus:200,limitEst:1500,est:true},
+      {id:uid(),label:'Chase Sapphire Preferred',kind:'card',status:'planned',target:'2028-03-15',
+       af:95,afMonth:3,msr:4000,msrMonths:3,ddReq:0,bonus:750,limitEst:5000,est:true}
+    ],
+    creditCfg:{new24:0,accounts:1,avgAge:12,spendOverride:0},
+    campaign:[
+      {id:uid(),label:'M&A Boot Camp — application',org:'Harris Williams',kind:'application',deadline:'2026-10-15',cost:0,status:'planned',note:'Highest expected value in the pipeline. GPA band aligns with the major GPA, not the cumulative.'},
+      {id:uid(),label:'Boot camp travel and lodging',org:'Harris Williams',kind:'event',deadline:'2026-11-01',cost:350,status:'planned',note:''},
+      {id:uid(),label:'Interview suit, shirt, shoes',org:'—',kind:'credential',deadline:'2026-09-30',cost:600,status:'planned',note:'One good suit that fits. Nothing here is replaceable by a better spreadsheet.'},
+      {id:uid(),label:'Chapter 11 hearings — 701 E Broad',org:'EDVA Bankruptcy Court',kind:'event',deadline:'2026-09-08',cost:0,status:'planned',note:'Public, free, weekly. The highest-leverage relationship move available outside any credentialing system.'},
+      {id:uid(),label:'Model Intern Program — application',org:'EDVA Bankruptcy Court',kind:'application',deadline:'2026-11-15',cost:0,status:'planned',note:'Pedigree-agnostic and local.'},
+      {id:uid(),label:'Turnaround & Restructuring — application',org:'BDO',kind:'application',deadline:'2026-12-01',cost:0,status:'planned',note:'Direct match to the BBBY capital structure work.'},
+      {id:uid(),label:'Richmond boutique outreach — four firms',org:'Transact, Brook Run, Dickinson, Boxwood',kind:'application',deadline:'2026-10-01',cost:0,status:'planned',note:'The realistic near-term access layer.'},
+      {id:uid(),label:'Coffee and travel for outreach meetings',org:'—',kind:'event',deadline:'2026-12-31',cost:180,status:'planned',note:''}
+    ],
+    closes:[],
+    txns:[],gates:[]
+  };
+}
+let S=defaults();
+
+/* ---------- schedules ---------- */
+const ALLM=[0,1,2,3,4,5,6,7,8,9,10,11];
+const MONTHSETS={
+  all:{label:'All year',m:ALLM},
+  academic:{label:'Academic year · Aug–May',m:[0,1,2,3,4,7,8,9,10,11]},
+  terms:{label:'Terms only · Sep–Dec, Jan–May',m:[0,1,2,3,4,8,9,10,11]},
+  fall:{label:'Fall term · Sep–Dec',m:[8,9,10,11]},
+  spring:{label:'Spring term · Jan–May',m:[0,1,2,3,4]},
+  summer:{label:'Summer only · Jun–Aug',m:[5,6,7]}
+};
+function activeMonths(x){return (x&&x.months&&x.months.length)?x.months:ALLM;}
+function inMonths(x,d){return activeMonths(x).indexOf(d.getMonth())>=0;}
+function setKey(months){
+  const j=(months||ALLM).slice().sort((a,b)=>a-b).join(',');
+  for(const k in MONTHSETS){ if(MONTHSETS[k].m.slice().sort((a,b)=>a-b).join(',')===j) return k; }
+  return 'custom';
+}
+function monthsLabel(x){
+  const k=setKey(activeMonths(x));
+  return k==='custom'?activeMonths(x).map(i=>MON[i]).join(' '):MONTHSETS[k].label;
+}
+/* term profile in term months, break profile in break months */
+function vprof(d){
+  d=d||today();
+  const bm=(S.variable&&S.variable.breakMonths)||[];
+  return bm.indexOf(d.getMonth())>=0 ? (S.variable.brk||S.variable.term) : S.variable.term;
+}
+const foodAt=d=>+(vprof(d).food)||0;
+const isBreak=d=>((S.variable&&S.variable.breakMonths)||[]).indexOf((d||today()).getMonth())>=0;
+
+/* ---------- aggregates ---------- */
+const balOf=t=>S.accounts.filter(a=>a.type===t).reduce((s,a)=>s+(+a.bal||0),0);
+const cashTotal=()=>balOf('operating')+balOf('reserve')+balOf('accrual')+balOf('landing');
+const spendable=()=>balOf('operating')+balOf('reserve');
+const riskTotal=()=>balOf('risk');
+const liquidNet=()=>cashTotal()+riskTotal();
+const fixedMonthly=d=>{d=d||today();return S.fixed.filter(f=>inMonths(f,d)).reduce((s,f)=>s+(+f.amt||0),0);};
+const varMonthly=d=>{const p=vprof(d);return (+p.food||0)+(+p.social||0)+(+p.other||0);};
+const debtMin=()=>S.cards.reduce((s,c)=>s+(+c.minPay||0),0)+S.loans.reduce((s,l)=>s+(+l.pay||0),0);
+const debtTotal=()=>S.cards.reduce((s,c)=>s+(+c.bal||0),0)+S.loans.reduce((s,l)=>s+(+l.bal||0),0);
+const accrualMonthly=()=>S.sinking.reduce((s,k)=>s+((+k.amt||0)/Math.max(1,+k.every||1)),0)+annualFeeMonthly();
+const floorAmt=d=>fixedMonthly(d)+foodAt(d)+debtMin();
+const cardBal=()=>S.cards.reduce((s,c)=>s+(+c.bal||0),0);
+const cardLimit=()=>S.cards.reduce((s,c)=>s+(+c.limit||0),0);
+
+function streamMonthly(i){
+  const n=+i.net||0;
+  if(i.cadence==='weekly')return n*52/12;
+  if(i.cadence==='biweekly')return n*26/12;
+  if(i.cadence==='semimonthly')return n*2;
+  return n;
+}
+/* average monthly value across the whole year, so a nine-month job is not
+   mistaken for a twelve-month one when sizing long-run targets */
+function streamAnnualised(i){ return streamMonthly(i)*activeMonths(i).length/12; }
+function annualisedIncome(){
+  return S.income.reduce((s,i)=>s+(streamPlanned(i)?streamAnnualised(i):0),0);
+}
+function streamPlanned(i){
+  const t=today(), grace=addDays(t,60);
+  const en=parseD(i.end); if(en&&en<t) return false;
+  const st=parseD(i.start||i.anchor); if(st&&st>grace) return false;
+  return true;
+}
+/* With a date, income actually active then. Without one, the planning basis:
+   a stream that starts within 60 days counts, so a job beginning next week
+   does not read as zero income today. */
+function monthlyIncome(atDate){
+  if(atDate) return S.income.reduce((s,i)=>s+(streamActive(i,atDate)?streamMonthly(i):0),0);
+  return S.income.reduce((s,i)=>s+(streamPlanned(i)?streamMonthly(i):0),0);
+}
+function streamActive(i,d){
+  const st=parseD(i.start||i.anchor), en=parseD(i.end);
+  if(st&&d<st)return false;
+  if(en&&d>en)return false;
+  if(!inMonths(i,d))return false;
+  return true;
+}
+
+/* ---------- dated cash logic ---------- */
+function paysOn(stream,d){
+  if(!stream.anchor)return false;
+  if(!streamActive(stream,d))return false;
+  const a=parseD(stream.anchor);
+  if(d<a)return false;
+  const diff=Math.round((d-a)/86400000);
+  if(stream.cadence==='weekly')return diff%7===0;
+  if(stream.cadence==='biweekly')return diff%14===0;
+  if(stream.cadence==='semimonthly')return d.getDate()===15||d.getDate()===daysInMonth(d.getFullYear(),d.getMonth());
+  return d.getDate()===Math.min(a.getDate(),daysInMonth(d.getFullYear(),d.getMonth()));
+}
+function fixedDueOn(f,d){
+  if(!inMonths(f,d))return false;
+  const day=Math.min(+f.day||1,daysInMonth(d.getFullYear(),d.getMonth()));
+  return d.getDate()===day;
+}
+function sinkingHits(k,from,to){
+  const out=[]; let n=parseD(k.next); if(!n)return out;
+  let guard=0;
+  while(n<from&&guard++<200) n=addMonths(n,Math.max(1,+k.every||1));
+  guard=0;
+  while(n<=to&&guard++<200){ out.push(new Date(n)); n=addMonths(n,Math.max(1,+k.every||1)); }
+  return out;
+}
+/* every dated movement in a window, merged and sorted */
+function datedFlows(from,to){
+  const out=[];
+  S.events.forEach(e=>{
+    const d=parseD(e.date); if(!d||d<from||d>to)return;
+    out.push({date:d,label:e.label,amt:(+e.amt||0)*(e.dir==='in'?1:-1),kind:'event'});
+  });
+  S.sinking.forEach(k=>{
+    sinkingHits(k,from,to).forEach(d=>out.push({date:d,label:k.label,amt:-(+k.amt||0),kind:'sinking'}));
+  });
+  (S.campaign||[]).filter(c=>c.status==='planned'&&(+c.cost||0)>0).forEach(c=>{
+    const d=parseD(c.deadline); if(!d||d<from||d>to)return;
+    out.push({date:d,label:c.label,amt:-(+c.cost||0),kind:'campaign'});
+  });
+  (S.credit||[]).filter(c=>c.status==='open'&&(+c.af||0)>0).forEach(c=>{
+    let d=new Date(from.getFullYear(),Math.max(0,(+c.afMonth||1)-1),15,12);
+    let guard=0;
+    while(d<from&&guard++<5) d=new Date(d.getFullYear()+1,d.getMonth(),15,12);
+    if(d>=from&&d<=to) out.push({date:d,label:c.label+' annual fee',amt:-(+c.af||0),kind:'sinking'});
+  });
+  S.accounts.filter(a=>a.type==='receivable').forEach(a=>{
+    const d=parseD(a.due); if(!d||d<from||d>to)return;
+    out.push({date:d,label:a.label+' returned',amt:(+a.bal||0),kind:'receivable'});
+  });
+  return out.sort((x,y)=>x.date-y.date);
+}
+
+/* ---------- 13-week bridge ---------- */
+function bridge(mod){
+  mod=mod||{};
+  const start=today();
+  const end=addDays(start,91);
+  let bal=cashTotal()+(mod.cashDelta||0);
+  const scale=mod.incomeScale!=null?mod.incomeScale:1;
+  const flows=datedFlows(start,end);
+  const rentBump=(mod.rentUp||0)/30.44;
+  const weeks=[{w:0,bal:bal,date:new Date(start)}];
+  let trough={bal:bal,date:new Date(start),day:0};
+
+  for(let i=1;i<=91;i++){
+    const d=addDays(start,i);
+    if(!(mod.incomeStopsWeek&&i>=mod.incomeStopsWeek*7)){
+      S.income.forEach(s=>{ if(paysOn(s,d)) bal+=(+s.net||0)*scale; });
+    }
+    S.fixed.forEach(f=>{ if(fixedDueOn(f,d)) bal-=(+f.amt||0); });
+    if(d.getDate()===1) bal-=debtMin();
+    flows.forEach(fl=>{
+      let fd=fl.date;
+      if(mod.delayInflowWeeks&&fl.amt>0) fd=addDays(fl.date,mod.delayInflowWeeks*7);
+      if(sameDay(fd,d)) bal+=fl.amt;
+    });
+    bal-=varMonthly(d)*12/365;
+    if(mod.rentUp) bal-=rentBump;
+    if(mod.shockAmt&&i===Math.round((mod.shockWeek||1)*7)) bal-=mod.shockAmt;
+    if(bal<trough.bal) trough={bal:bal,date:new Date(d),day:i};
+    if(i%7===0) weeks.push({w:i/7,bal:bal,date:new Date(d)});
+  }
+  return {weeks,trough,end:bal,start:cashTotal()+(mod.cashDelta||0),flows};
+}
+
+/* ---------- accrued liability to date ---------- */
+function accruedLiability(){
+  const t=today();
+  return S.sinking.reduce((s,k)=>{
+    const every=Math.max(1,+k.every||1), amt=+k.amt||0;
+    const nx=parseD(k.next); if(!nx)return s;
+    const monthsOut=Math.max(0,Math.min(every,monthsBetween(t,nx)));
+    return s+amt*(every-monthsOut)/every;
+  },0);
+}
+
+/* ---------- trailing actuals ---------- */
+function trailing30(cats){
+  const cut=addDays(today(),-30);
+  return S.txns.filter(t=>cats.indexOf(t.cat)>=0&&parseD(t.date)>=cut).reduce((s,t)=>s+(+t.amt||0),0);
+}
+
+/* ---------- the ascent: financing plan ---------- */
+function naturalCardSpend(){
+  if(+S.creditCfg.spendOverride>0) return +S.creditCfg.spendOverride;
+  const chargeableFixed=S.fixed.filter(f=>!f.housing&&!/rent|housing|lease/i.test(f.label))
+                                .reduce((s,f)=>s+(+f.amt||0),0);
+  /* averaged over the next three months — the length of a typical minimum-spend
+     window — so the verdict does not flip depending on the month you open this */
+  const t=today(); let acc=0;
+  for(let k=0;k<3;k++){
+    const p=vprof(new Date(t.getFullYear(),t.getMonth()+k,15,12));
+    acc+=(+p.food||0)+(+p.social||0)+(+p.other||0);
+  }
+  return chargeableFixed+acc/3;
+}
+function annualFeeMonthly(){
+  return S.credit.filter(c=>c.status==='open').reduce((s,c)=>s+(+c.af||0)/12,0);
+}
+function ascentEval(){
+  const cv=covenants(), nat=naturalCardSpend(), fl=cv.floor;
+  let used=+S.creditCfg.new24||0;
+  let age=+S.creditCfg.avgAge||0, n=Math.max(1,+S.creditCfg.accounts||1);
+  let limit=cardLimit();
+  const planned=S.credit.filter(c=>c.status==='planned')
+    .slice().sort((a,b)=>String(a.target).localeCompare(String(b.target)));
+  const rows=planned.map(c=>{
+    const isCard=c.kind==='card';
+    const months=Math.max(1,+c.msrMonths||3);
+    const need=(+c.msr||0)/months;
+    const shortfall=Math.max(0,need-nat);
+    const manufactured=shortfall*months;
+    const slotsLeft=5-used;
+    const net=(+c.bonus||0)-(+c.af||0);
+    const why=[]; let v='proceed';
+
+    if(cv.overall==='breach'&&(+c.msr||0)>0){
+      v='decline'; why.push('The certificate is in breach and this account carries a '+money(+c.msr||0)+' minimum spend. Opening it converts a liquidity problem into a debt problem.');
+    }
+    if(manufactured>0){
+      v='decline'; why.push('The minimum spend needs '+money(need)+' a month on the card. You can chargeably spend about '+money(nat)+'. The '+money(manufactured)+' gap would have to be spending you invent — that is how a bonus becomes a balance.');
+    } else if((+c.msr||0)>0){
+      why.push('Minimum spend of '+money(+c.msr||0)+' over '+months+' months is '+money(need)+' a month, inside your '+money(nat)+' of chargeable spend. No invented spending required.');
+    }
+    if(isCard&&slotsLeft<=0){
+      v='decline'; why.push('Chase declines applicants with five or more new accounts in 24 months. You would be at '+used+'.');
+    } else if(isCard&&slotsLeft<=1){
+      if(v==='proceed')v='wait';
+      why.push('This is your last 5/24 slot. Spending it on a '+money(net)+' net account forecloses anything better for two years — sequence deliberately.');
+    }
+    if(c.kind==='bank'&&(+c.ddReq||0)>0){
+      const inc=monthlyIncome();
+      if(inc>=(+c.ddReq||0)) why.push('Direct deposit requirement of '+money(+c.ddReq||0)+' is covered by your '+money(inc)+' of monthly income. This is the cleanest money on the page — no spend requirement, no hard pull on a card file.');
+      else { if(v==='proceed')v='wait'; why.push('Requires '+money(+c.ddReq||0)+' in direct deposits against '+money(inc)+' of income.'); }
+    }
+    if((+c.af||0)>0){
+      const afm=(+c.af||0)/12;
+      why.push('The '+money(+c.af||0)+' annual fee is a standing obligation of '+money(afm)+' a month, forever, against a one-time '+money(+c.bonus||0)+' bonus. It pays for itself in year one and costs you every year after.');
+      if(net<=0){v='decline';why.push('First-year value is '+money(net)+'. Negative before you have spent a dollar.');}
+    }
+    if(cv.overall==='watch'&&v==='proceed'&&(+c.msr||0)>0){
+      v='wait'; why.push('The certificate is on watch. Clear the failing test, then open this.');
+    }
+    /* the sequence advances whether or not this row clears today — the plan is
+       what he intends to do, and the verdict says when, not whether it counts */
+    if(isCard){ used++; limit+=(+c.limitEst||0); }
+    age=(age*n)/(n+1); n++;
+    return {c,verdict:v,why,net,need,nat,manufactured,slotsAfter:Math.max(0,5-used),limitAfter:limit,ageAfter:age};
+  });
+  const proceed=rows.filter(r=>r.verdict==='proceed');
+  /* projected against the whole roadmap, so the upside is visible even when
+     every row is blocked today — otherwise the panel reads as no effect */
+  const projLimit=cardLimit()+rows.filter(r=>r.c.kind==='card').reduce((s,r)=>s+(+r.c.limitEst||0),0);
+  return {rows,nat,used:+S.creditCfg.new24||0,slots:Math.max(0,5-(+S.creditCfg.new24||0)),
+    projLimit,projUtil:projLimit>0?cardBal()/projLimit*100:0,
+    curUtil:cardLimit()>0?cardBal()/cardLimit()*100:0,
+    netValue:proceed.reduce((s,r)=>s+r.net,0),
+    afBurden:S.credit.filter(c=>c.status==='open').reduce((s,c)=>s+(+c.af||0),0),
+    ageAfter:rows.length?rows[rows.length-1].ageAfter:(+S.creditCfg.avgAge||0),
+    cert:cv.overall};
+}
+
+/* ---------- covenants ---------- */
+function covenants(){
+  const fl=floorAmt(), br=bridge(), c=[];
+  const rank=(v,p,w,inv)=>inv?(v<=p?'pass':v<=w?'watch':'breach'):(v>=p?'pass':v>=w?'watch':'breach');
+
+  const r1=fl>0?spendable()/fl:99;
+  c.push({name:'Liquidity',sub:'Spendable cash against one month of obligations',val:fl>0?r1.toFixed(2)+'x':'n/a',thr:'≥ 1.50x',flag:rank(r1,1.5,1.0)});
+
+  const r2=fl>0?br.trough.bal/fl:99;
+  c.push({name:'Trough',sub:'Worst point in the next 13 weeks, dated events included',val:money(br.trough.bal),thr:'≥ '+money(fl),flag:rank(r2,1.0,0.5)});
+
+  const rt=(+S.targets.reserveMonths||0)*fl;
+  const r3=rt>0?balOf('reserve')/rt:1;
+  c.push({name:'Reserve',sub:S.targets.reserveMonths+' months of obligations held aside',val:money(balOf('reserve'))+' of '+money(rt),thr:'100%',flag:rank(r3,1.0,0.5)});
+
+  const al=accruedLiability();
+  const r4=al>0?balOf('accrual')/al:1;
+  c.push({name:'Accrual funding',sub:'Known future bills already accrued for',val:money(balOf('accrual'))+' of '+money(al),thr:'100%',flag:al>0?rank(r4,1.0,0.6):'nodata'});
+
+  const inc=monthlyIncome();
+  const top=S.income.reduce((m,i)=>Math.max(m,streamPlanned(i)?streamMonthly(i):0),0);
+  const r5=inc>0?top/inc*100:0;
+  c.push({name:'Income concentration',sub:'Largest single stream as a share of all income',val:inc>0?pct(r5):'no income',thr:'≤ 60%',flag:inc>0?rank(r5,60,85,true):'nodata'});
+
+  const r6=inc>0?debtMin()/inc*100:0;
+  c.push({name:'Debt service',sub:'Required debt payments against monthly income',val:inc>0?pct(r6):'n/a',thr:'≤ 10%',flag:inc>0?rank(r6,10,20,true):'nodata'});
+
+  const ln=liquidNet();
+  const r7=ln>0?riskTotal()/ln*100:0;
+  c.push({name:'Risk capital ceiling',sub:'Trading and bankroll as a share of liquid net worth',val:pct(r7),thr:'≤ '+S.targets.riskCapPct+'%',flag:rank(r7,+S.targets.riskCapPct,+S.targets.riskCapPct*2,true)});
+
+  const cl=cardLimit();
+  const r8=cl>0?cardBal()/cl*100:0;
+  c.push({name:'Utilisation',sub:'Revolving balance against limit — this is your credit file',val:cl>0?pct(r8):'no limit set',thr:'≤ '+S.targets.utilTarget+'%',flag:cl>0?rank(r8,+S.targets.utilTarget,29,true):'nodata'});
+
+  const spent=trailing30(['disc','risk']);
+  const budget=(+vprof().social||0)+(+vprof().other||0);
+  const hasData=S.txns.some(t=>['disc','risk'].indexOf(t.cat)>=0);
+  const r9=budget>0?spent/budget*100:0;
+  c.push({name:'Discretionary burn',sub:'Last 30 days recorded against the residual tier',val:hasData?money(spent)+' of '+money(budget):'nothing recorded',thr:'≤ 100%',flag:hasData?rank(r9,100,120,true):'nodata'});
+
+  const lean=leanMonth();
+  c.push({name:'Lean month',sub:'Worst month in the next year — income against that month\u2019s own costs',
+    val:lean?lean.label+' · '+money(lean.gap):'n/a',thr:'≥ $0',
+    flag:lean?(lean.gap>=0?'pass':lean.gap>=-200?'watch':'breach'):'nodata'});
+
+  const live=c.filter(x=>x.flag!=='nodata');
+  const overall=live.some(x=>x.flag==='breach')?'breach':live.some(x=>x.flag==='watch')?'watch':'pass';
+  return {list:c,overall,bridge:br,floor:fl,lean:lean};
+}
+
+/* ---------- the worst month in the next twelve ---------- */
+function leanMonth(){
+  const t=today(); let worst=null;
+  for(let k=0;k<12;k++){
+    const d=new Date(t.getFullYear(),t.getMonth()+k,15,12);
+    const inc=monthlyIncome(d), fl=floorAmt(d);
+    const gap=inc-fl;
+    if(!worst||gap<worst.gap) worst={label:MON[d.getMonth()]+' '+String(d.getFullYear()).slice(2),gap:gap,inc:inc,floor:fl,date:d};
+  }
+  return worst;
+}
+function monthGrid(){
+  const t=today(), out=[];
+  for(let k=0;k<12;k++){
+    const d=new Date(t.getFullYear(),t.getMonth()+k,15,12);
+    const inc=monthlyIncome(d), fl=floorAmt(d), v=varMonthly(d);
+    out.push({label:MON[d.getMonth()],year:String(d.getFullYear()).slice(2),date:d,
+      inc:inc,floor:fl,burn:fixedMonthly(d)+v+debtMin(),gap:inc-fl,brk:isBreak(d)});
+  }
+  return out;
+}
+
+/* ---------- landing requirement ---------- */
+function landingMonthly(){
+  const t=today(), g=parseD(S.targets.grad||'2027-12-17');
+  const n=Math.max(1,monthsBetween(t,g));
+  return Math.max(0,((+S.targets.landing||0)-balOf('landing'))/n);
+}
+
+/* ---------- waterfall ---------- */
+function waterfall(income,o){
+  o=o||{};
+  const at=o.date||today();
+  const fixedM=o.fixedM!=null?o.fixedM:fixedMonthly(at);
+  const food=o.food!=null?o.food:foodAt(at);
+  const dm=o.debtMin!=null?o.debtMin:debtMin();
+  const fl=fixedM+food+dm;
+  const resBal=o.resBal!=null?o.resBal:balOf('reserve');
+  const accBal=o.accBal!=null?o.accBal:balOf('accrual');
+  const riskBal=o.riskBal!=null?o.riskBal:riskTotal();
+  const landBal=o.landBal!=null?o.landBal:balOf('landing');
+  const ln=o.liqNet!=null?o.liqNet:liquidNet();
+  const landMo=o.landMo!=null?o.landMo:landingMonthly();
+  let rem=income; const T=[];
+
+  const a0=Math.min(rem,fl); rem-=a0;
+  T.push({id:'T0',name:'OBLIGATIONS',amt:a0,need:fl,
+    desc:'Rent, utilities, phone, fuel, food, and the minimum on every debt. The only tier that can end the plan if it goes unpaid.'});
+
+  const acc=o.accMonthly!=null?o.accMonthly:accrualMonthly();
+  const a1=Math.min(rem,acc); rem-=a1;
+  T.push({id:'T1',name:'ACCRUALS',amt:a1,need:acc,
+    desc:'Insurance, textbooks, repairs, trips home. These bills are already owed, you just have not been billed yet. Funding them out of the reserve is how a known cost becomes an emergency.'});
+
+  const rt=(+S.targets.reserveMonths||0)*fl;
+  const gap=Math.max(0,rt-resBal);
+  const a2=Math.max(0,Math.min(rem,rem*(+S.targets.reserveFill||0)/100,gap)); rem-=a2;
+  T.push({id:'T2',name:'LIQUIDITY RESERVE',amt:a2,need:gap,
+    desc:gap>0?'Filling to '+money(rt)+'. Until this is full, every opportunity that costs money becomes a financing question.':'At target. Surplus falls through.'});
+
+  const hot=S.cards.concat(S.loans).some(d=>(+d.apr||0)>=(+S.targets.debtApr||10))&&debtTotal()>0;
+  const a3=hot?Math.min(rem,+S.targets.debtExtra||0):0; rem-=a3;
+  T.push({id:'T3',name:'DEBT ACCELERATION',amt:a3,need:hot?(+S.targets.debtExtra||0):0,gated:!hot,
+    desc:hot?'You hold debt above '+S.targets.debtApr+'%. Paying it down is a guaranteed, tax-free return at that rate — there is no investment on this page that beats it.':'No balance above the acceleration rate. Nothing to do here.'});
+
+  const cneed=o.career!=null?o.career:careerNeed();
+  const a4=Math.min(rem,cneed); rem-=a4;
+  T.push({id:'T4',name:'CAREER CAPITAL',amt:a4,need:cneed,
+    desc:'Sized by the campaign, not by a guess: '+money(campaignMonthly())+' a month is what the dated items on your recruiting calendar actually require to be paid for by their own deadlines.'});
+
+  const a5=Math.min(rem,landMo); rem-=a5;
+  T.push({id:'T5',name:'LANDING FUND',amt:a5,need:landMo,
+    desc:'Relocation, a deposit in a new city, and living cost between your last student paycheck and your first analyst one. '+money(+S.targets.landing||0)+' by graduation means '+money(landMo)+' a month from here.'});
+
+  const rothCap=Math.min(+S.targets.roth||0,(+S.targets.rothAnnual||7000)/12,Math.max(0,income));
+  const a6=Math.min(rem,rothCap); rem-=a6;
+  T.push({id:'T6',name:'ROTH IRA',amt:a6,need:rothCap,
+    desc:'Capped at the annual limit and at earned income, whichever binds first. Real, but it loses to career capital while the recruiting clock is running.'});
+
+  const headroom=Math.max(0,ln*(+S.targets.riskCapPct||0)/100-riskBal);
+  const gated=gap>0||accBal<accruedLiability()*0.6;
+  const a7=gated?0:Math.max(0,Math.min(rem,+S.targets.risk||0,headroom)); rem-=a7;
+  T.push({id:'T7',name:'RISK CAPITAL',amt:a7,need:+S.targets.risk||0,gated:gated,
+    desc:gated?'Starved. The reserve or the accrual account is short, so this tier does not fund. This is the guardrail, not a suggestion.'
+      :'Futures, prop evaluations, Operator bankroll. Capped at '+S.targets.riskCapPct+'% of liquid net worth — headroom '+money(headroom)+'.'});
+
+  const a8=Math.max(0,rem);
+  T.push({id:'T8',name:'DISCRETIONARY',amt:a8,need:(+vprof(at).social||0)+(+vprof(at).other||0),
+    desc:'Social, clothing, fragrance, the car fund. What survives the fall — the reward for everything above it clearing, not a failure of discipline.'});
+
+  return {tiers:T,deficit:Math.max(0,fl-income),floor:fl,surplus:a8,accrual:a1,landing:a5};
+}
+
+/* ---------- the campaign: recruiting as a costed, dated plan ---------- */
+function campaignSorted(){
+  return (S.campaign||[]).slice().sort((a,b)=>String(a.deadline).localeCompare(String(b.deadline)));
+}
+function daysTo(d){ const x=parseD(d); return x?Math.round((x-today())/86400000):null; }
+function campaignMonthly(){
+  /* what the campaign actually needs per month to be funded by its own deadlines */
+  return (S.campaign||[]).filter(c=>c.status==='planned'&&(+c.cost||0)>0).reduce((s,c)=>{
+    const d=daysTo(c.deadline);
+    const months=Math.max(1,(d==null?6:d)/30.44);
+    return s+(+c.cost||0)/months;
+  },0);
+}
+function careerNeed(){ return Math.max(+S.targets.career||0, campaignMonthly()); }
+function campaignState(){
+  const all=campaignSorted();
+  const open=all.filter(c=>c.status==='planned');
+  const overdue=open.filter(c=>daysTo(c.deadline)!=null&&daysTo(c.deadline)<0);
+  const next=open.filter(c=>daysTo(c.deadline)>=0)[0]||null;
+  const done=all.filter(c=>c.status==='done').length;
+  const missed=all.filter(c=>c.status==='missed').length;
+  const cost90=open.filter(c=>daysTo(c.deadline)!=null&&daysTo(c.deadline)<=90).reduce((s,c)=>s+(+c.cost||0),0);
+  return {all,open,overdue,next,done,missed,cost90,monthly:campaignMonthly(),
+          funded:balOf('landing')*0+trailing30(['career'])};
+}
+
+/* ---------- the weekly close ---------- */
+function lastClose(){ const c=S.closes||[]; return c.length?c[c.length-1]:null; }
+function closeDue(){
+  const l=lastClose(); if(!l)return true;
+  return (today()-parseD(l.date))/86400000>=7;
+}
+function closeStreak(){
+  const c=(S.closes||[]).slice().reverse(); let n=0, cursor=today();
+  for(const x of c){
+    const gap=(cursor-parseD(x.date))/86400000;
+    if(gap<=10){ n++; cursor=parseD(x.date); } else break;
+  }
+  return n;
+}
+function forecastError(){
+  const c=(S.closes||[]).filter(x=>x.forecast!=null&&x.forecast!==0);
+  if(c.length<2)return null;
+  const errs=c.slice(1).map((x,i)=>{
+    const prior=c[i].forecast;
+    return prior?Math.abs(x.actual-prior)/Math.max(1,Math.abs(prior))*100:null;
+  }).filter(x=>x!=null);
+  if(!errs.length)return null;
+  return errs.reduce((s,x)=>s+x,0)/errs.length;
+}
+
+/* ---------- the standard: stated against done ---------- */
+function standard(){
+  const parts=[];
+  const start=(S.closes||[]).length?parseD(S.closes[0].date):null;
+  const weeks=start?Math.max(1,Math.round((today()-start)/86400000/7)+1):0;
+  const closes=(S.closes||[]).length;
+  parts.push({k:'Weekly close kept',v:weeks?Math.min(100,closes/weeks*100):null,
+    d:weeks?closes+' of '+weeks+' weeks':'not started'});
+
+  const decided=(S.gates||[]).filter(g=>g.followed===true||g.followed===false);
+  parts.push({k:'Gate verdicts honoured',v:decided.length?decided.filter(g=>g.followed).length/decided.length*100:null,
+    d:decided.length?decided.filter(g=>g.followed).length+' of '+decided.length+' logged decisions':'nothing marked yet'});
+
+  const cs=campaignState();
+  const past=cs.all.filter(c=>daysTo(c.deadline)!=null&&daysTo(c.deadline)<0);
+  const met=past.filter(c=>c.status==='done').length;
+  parts.push({k:'Deadlines met',v:past.length?met/past.length*100:null,
+    d:past.length?met+' of '+past.length+' past deadlines':'none passed yet'});
+
+  const cv=covenants();
+  parts.push({k:'Certificate',v:cv.overall==='pass'?100:cv.overall==='watch'?50:0,
+    d:cv.overall==='pass'?'in compliance':cv.overall==='watch'?'on watch':'in breach'});
+
+  const live=parts.filter(p=>p.v!=null);
+  const score=live.length?live.reduce((s,p)=>s+p.v,0)/live.length:null;
+  return {parts,score,weeks,closes,streak:closeStreak(),err:forecastError()};
+}
+
+/* ---------- income solver ---------- */
+function solveIncome(){
+  const fl=floorAmt(), acc=accrualMonthly(), land=landingMonthly(), car=careerNeed();
+  const breakeven=fl+acc;
+  const plan=breakeven+Math.max(car,campaignMonthly())+land;
+  const covered=plan*1.0;
+  const rate=+S.targets.rate||16;
+  const hrs=r=>rate>0?(r/(rate*52/12)):0;
+  return {breakeven,plan,covered,rate,
+    hrsBreak:hrs(breakeven),hrsPlan:hrs(plan),
+    now:monthlyIncome(),shortfall:Math.max(0,plan-monthlyIncome())};
+}
+
+/* ---------- horizon projection ---------- */
+function project(){
+  const grad=parseD(S.targets.grad||'2027-12-17');
+  const t=today();
+  let cur=new Date(t.getFullYear(),t.getMonth(),15,12);
+  const rows=[];
+  let op=balOf('operating'),res=balOf('reserve'),acc=balOf('accrual'),land=balOf('landing'),
+      roth=balOf('roth'),risk=riskTotal(),discCum=0;
+  let cards=S.cards.map(c=>({bal:+c.bal||0,apr:+c.apr||0,pay:+c.minPay||0}));
+  let loans=S.loans.map(l=>({bal:+l.bal||0,apr:+l.apr||0,pay:+l.pay||0}));
+  const housing=S.fixed.find(f=>f.housing)||S.fixed.find(f=>/rent|housing|lease/i.test(f.label));
+  const housingAmt=housing?(+housing.amt||0):0;
+  const baseFixed=fixedMonthly();
+  const landTarget=+S.targets.landing||0;
+  const monthsLeft=Math.max(1,monthsBetween(t,grad));
+  const landMo=Math.max(0,(landTarget-land)/monthsLeft);
+  let guard=0,minTotal=Infinity,minLabel='';
+
+  while(cur<=grad&&guard++<40){
+    const y=cur.getFullYear(),m=cur.getMonth();
+    let fixedM=fixedMonthly(cur),inc=monthlyIncome(cur),mark='',note='';
+    if(y>2027||(y===2027&&m>=6)) fixedM=fixedM-(inMonths(housing||{},cur)?housingAmt:0)+(+S.horizon.postRent||0);
+    if(y===2027&&m===6){mark='mark';note='lease ends';}
+    /* the summer scenario only fills a gap — it never overwrites a real stream */
+    if(y===2027&&m>=5&&m<=7&&inc<=0){
+      if(S.horizon.summer==='paid'){inc=(+S.horizon.summerNet||0)/3;if(m===5){mark='mark';note='summer analyst';}}
+      else if(S.horizon.summer==='unpaid'){inc=0;if(m===5){mark='mark';note='summer, unpaid';}}
+    }
+    if(isBreak(cur)&&!note) note='break';
+    /* dated events and sinking hits inside this month */
+    const mStart=new Date(y,m,1,12),mEnd=new Date(y,m,daysInMonth(y,m),12);
+    let dated=0;
+    datedFlows(mStart,mEnd).forEach(f=>{dated+=f.amt;});
+    if(dated!==0&&!note) note=(dated>0?'+':'')+money(dated)+' dated';
+
+    /* debt interest and payment */
+    let dm=0;
+    [cards,loans].forEach(set=>set.forEach(d=>{
+      if(d.bal<=0)return;
+      d.bal+=d.bal*(d.apr/100/12);
+      const p=Math.min(d.bal,d.pay); d.bal-=p; dm+=p;
+    }));
+
+    const w=waterfall(inc,{date:cur,fixedM:fixedM,debtMin:dm,resBal:res,accBal:acc,riskBal:risk,landBal:land,
+                           liqNet:op+res+acc+land+risk,landMo:landMo});
+    acc+=w.tiers[1].amt; res+=w.tiers[2].amt; land+=w.tiers[5].amt;
+    roth+=w.tiers[6].amt; risk+=w.tiers[7].amt; discCum+=w.tiers[8].amt;
+    /* sinking outflows are paid from the accrual account */
+    const sinkOut=datedFlows(mStart,mEnd).filter(f=>f.kind==='sinking').reduce((s,f)=>s+f.amt,0);
+    acc+=sinkOut; if(acc<0){op+=acc;acc=0;}
+    const nonSink=dated-sinkOut;
+    op+=nonSink-w.deficit;
+    if(op<0&&res>0){const pull=Math.min(res,-op);res-=pull;op+=pull;note=note||'reserve drawn';mark=mark||'mark';}
+
+    const cash=op+res+acc+land;
+    const runway=fixedM+varMonthly(cur)>0?cash/(fixedM+varMonthly(cur)):0;
+    if(cash<minTotal){minTotal=cash;minLabel=MON[m]+' '+String(y).slice(2);}
+    rows.push({label:MON[m]+' '+String(y).slice(2),inc:inc,res:res,acc:acc,land:land,
+               roth:roth,risk:risk,cash:cash,runway:runway,disc:discCum,mark:mark,note:note});
+    cur=new Date(y,m+1,15,12);
+  }
+  const end=rows.length?rows[rows.length-1]:null;
+  const postCost=(baseFixed-housingAmt+(+S.horizon.postRent||0))+varMonthly(grad);
+  return {rows,minTotal,minLabel,end,landTarget,
+          runwayEnd:end&&postCost>0?end.cash/postCost:0,discCum:discCum};
+}
+
+/* ---------- stress cases ---------- */
+function stressCases(){
+  const fl=floorAmt(), base=bridge().trough.bal;
+  const st=S.stress;
+  const defs=[
+    {label:'Base case',sub:'Nothing goes wrong',mod:{}},
+    {label:'Unplanned repair',sub:money(+st.repair||0)+' in week '+(+st.week||1),mod:{shockAmt:+st.repair||0,shockWeek:+st.week||1}},
+    {label:'Hours cut',sub:'Every shift comes in '+(100-(+st.hours||60))+'% light',mod:{incomeScale:(+st.hours||60)/100}},
+    {label:'Income stops',sub:'Primary income ends in week '+(+st.week||1),mod:{incomeStopsWeek:+st.week||1}},
+    {label:'Inflow delayed',sub:'Every expected inflow arrives '+(+st.delay||0)+' weeks late',mod:{delayInflowWeeks:+st.delay||0}},
+    {label:'Housing cost rises',sub:'+'+money(+st.rent||0)+' a month',mod:{rentUp:+st.rent||0}},
+    {label:'Combined',sub:'Light hours, a repair and a delay together',mod:{incomeScale:(+st.hours||60)/100,shockAmt:+st.repair||0,shockWeek:+st.week||1,delayInflowWeeks:+st.delay||0}}
+  ];
+  return defs.map(d=>{
+    const b=bridge(d.mod);
+    return {label:d.label,sub:d.sub,trough:b.trough.bal,delta:b.trough.bal-base,
+            flag:b.trough.bal>=fl?'pass':b.trough.bal>=fl*0.5?'watch':'breach',
+            date:b.trough.date};
+  });
+}
+
+/* ---------- plan versus actual ---------- */
+function variance(){
+  const days=30, f=days/30.44;
+  const plan={
+    income:monthlyIncome()*f,
+    fixed:fixedMonthly()*f+debtMin()*f,
+    food:foodAt()*f,
+    career:(+S.targets.career||0)*f,
+    disc:((+vprof().social||0)+(+vprof().other||0))*f
+  };
+  const act={
+    income:trailing30(['income']),fixed:trailing30(['fixed']),food:trailing30(['food']),
+    career:trailing30(['career']),disc:trailing30(['disc'])
+  };
+  const rows=[
+    {k:'Income in',p:plan.income,a:act.income,good:'over'},
+    {k:'Obligations',p:plan.fixed,a:act.fixed,good:'under'},
+    {k:'Food',p:plan.food,a:act.food,good:'under'},
+    {k:'Career capital',p:plan.career,a:act.career,good:'over'},
+    {k:'Discretionary',p:plan.disc,a:act.disc,good:'under'}
+  ].map(r=>({...r,v:r.a-r.p,pctv:r.p>0?(r.a-r.p)/r.p*100:0}));
+  const netPlan=plan.income-plan.fixed-plan.food-plan.career-plan.disc;
+  const netAct=act.income-act.fixed-act.food-act.career-act.disc;
+  return {rows,netPlan,netAct,any:S.txns.length>0};
+}
+
+</script>
+<script>
+/* ============================================================
+   RENDER
+   ============================================================ */
+
+function drawBridge(cv){
+  const b=cv.bridge, fl=cv.floor, svg=$('bridge');
+  const W=1000,H=330,L=76,R=22,T=22,B=44, pw=W-L-R, ph=H-T-B;
+  const vals=b.weeks.map(w=>w.bal).concat([fl,b.trough.bal,0]);
+  let hi=Math.max.apply(null,vals), lo=Math.min.apply(null,vals);
+  const pad=Math.max((hi-lo)*0.15,120); hi+=pad; lo-=pad*0.5;
+  const X=i=>L+pw*(i/13), Y=v=>T+ph*(hi-v)/(hi-lo);
+  let g='';
+  for(let k=0;k<=4;k++){
+    const v=lo+(hi-lo)*k/4, y=Y(v);
+    g+='<line x1="'+L+'" y1="'+y.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y.toFixed(1)+'" style="stroke:#1A1F26;stroke-width:1"/>'
+     +'<text x="'+(L-10)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" style="fill:#565E68;font-family:var(--mono);font-size:11px">'+money(v)+'</text>';
+  }
+  const pts=b.weeks.map((w,i)=>X(i).toFixed(1)+','+Y(w.bal).toFixed(1)).join(' ');
+  const area='M '+X(0).toFixed(1)+','+Y(lo).toFixed(1)+' L '+b.weeks.map((w,i)=>X(i).toFixed(1)+','+Y(w.bal).toFixed(1)).join(' L ')+' L '+X(13).toFixed(1)+','+Y(lo).toFixed(1)+' Z';
+  const fy=Y(fl);
+  g+='<defs><clipPath id="belowFloor"><rect x="'+L+'" y="'+fy.toFixed(1)+'" width="'+pw+'" height="'+Math.max(0,(T+ph)-fy).toFixed(1)+'"/></clipPath></defs>'
+   +'<path d="'+area+'" style="fill:#7C9CB8;opacity:.10"/>'
+   +'<path d="'+area+'" clip-path="url(#belowFloor)" style="fill:#B25548;opacity:.20"/>'
+   +'<line x1="'+L+'" y1="'+fy.toFixed(1)+'" x2="'+(W-R)+'" y2="'+fy.toFixed(1)+'" style="stroke:var(--watch);stroke-width:1.5;stroke-dasharray:6 5"/>'
+   +'<text x="'+(W-R)+'" y="'+(fy-9).toFixed(1)+'" text-anchor="end" style="fill:var(--watch);font-family:var(--mono);font-size:10px;letter-spacing:.18em">COVENANT FLOOR '+money(fl)+'</text>';
+
+  /* dated events marked on the axis — the v2 addition */
+  b.flows.forEach(f=>{
+    if(!f.amt)return;
+    const dayIdx=Math.round((f.date-today())/86400000)/7;
+    if(dayIdx<0||dayIdx>13)return;
+    const x=X(dayIdx), col=f.amt>0?'var(--pass)':'var(--breach)';
+    g+='<line x1="'+x.toFixed(1)+'" y1="'+T+'" x2="'+x.toFixed(1)+'" y2="'+(T+ph)+'" style="stroke:'+col+';stroke-width:1;opacity:.28;stroke-dasharray:3 4"/>'
+     +'<circle cx="'+x.toFixed(1)+'" cy="'+(T+6)+'" r="3" style="fill:'+col+';opacity:.8"/>';
+  });
+
+  g+='<polyline points="'+pts+'" style="fill:none;stroke:var(--steel);stroke-width:2;stroke-linejoin:round"/>';
+  b.weeks.forEach((w,i)=>{
+    if(i%2)return;
+    g+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(w.bal).toFixed(1)+'" r="2.5" style="fill:var(--steel)"/>'
+     +'<text x="'+X(i).toFixed(1)+'" y="'+(T+ph+20)+'" text-anchor="middle" style="fill:#565E68;font-family:var(--mono);font-size:10px">W'+i+'</text>'
+     +'<text x="'+X(i).toFixed(1)+'" y="'+(T+ph+34)+'" text-anchor="middle" style="fill:#3E454E;font-family:var(--mono);font-size:9px">'+MON[w.date.getMonth()]+' '+w.date.getDate()+'</text>';
+  });
+  const ti=Math.min(13,Math.round(b.trough.day/7)), tx=X(ti), ty=Y(b.trough.bal);
+  const anchor=tx>W*0.72?'end':'start', dx=tx>W*0.72?-12:12;
+  g+='<circle cx="'+tx.toFixed(1)+'" cy="'+ty.toFixed(1)+'" r="5" style="fill:none;stroke:var(--breach);stroke-width:2"/>'
+   +'<text x="'+(tx+dx).toFixed(1)+'" y="'+(ty+4).toFixed(1)+'" text-anchor="'+anchor+'" style="fill:var(--breach);font-family:var(--mono);font-size:11px;letter-spacing:.1em">TROUGH '+money(b.trough.bal)+'</text>';
+  svg.innerHTML=g;
+  $('bridgeRange').textContent=MON[b.weeks[0].date.getMonth()]+' '+b.weeks[0].date.getDate()+' — '+MON[b.weeks[13].date.getMonth()]+' '+b.weeks[13].date.getDate();
+}
+
+function renderPosition(){
+  const cv=covenants(), b=cv.bridge, fl=cv.floor, head=b.trough.bal-fl;
+  $('roTrough').textContent=money(b.trough.bal);
+  $('roTrough').className='v '+(b.trough.bal>=fl?'pass':b.trough.bal>=fl*.5?'watch':'breach');
+  $('roTroughC').textContent='Lowest projected balance, '+MON[b.trough.date.getMonth()]+' '+b.trough.date.getDate()+'. Starting from '+money(b.start)+' in cash today, with '+b.flows.filter(f=>f.amt).length+' dated items in the window.';
+  $('roHead').textContent=money(head);
+  $('roHead').className='v '+(head>=0?'pass':'breach');
+  $('roHeadC').textContent=head>=0?'Clears one month of obligations at the worst point with '+money(head)+' to spare.'
+    :'At the trough you are '+money(-head)+' short of a single month of obligations.';
+  const burn=fixedMonthly()+varMonthly()+debtMin();
+  const run=burn>0?spendable()/burn:0;
+  $('roRun').textContent=(Math.round(run*10)/10)+' mo';
+  $('roRun').className='v '+(run>=3?'pass':run>=1.5?'watch':'breach');
+  $('roRunC').textContent='At '+money(burn)+' a month, spendable cash covers '+(Math.round(run*10)/10)+' months with nothing coming in.';
+  drawBridge(cv);
+
+  const st=$('certStamp');
+  st.className='stamp '+cv.overall;
+  st.textContent=cv.overall==='pass'?'IN COMPLIANCE':cv.overall==='watch'?'WATCH':'IN BREACH';
+  let h='<div class="hd">Test</div><div class="hd" style="justify-content:flex-end">Actual</div><div class="hd thr" style="justify-content:flex-end">Threshold</div><div class="hd" style="justify-content:flex-end">Status</div>';
+  cv.list.forEach(c=>{
+    const nod=c.flag==='nodata';
+    h+='<div class="name"><span>'+esc(c.name)+'</span><small>'+esc(c.sub)+'</small></div>'
+      +'<div class="val">'+esc(c.val)+'</div><div class="thr">'+esc(c.thr)+'</div>'
+      +'<div class="flag'+(nod?'':' '+c.flag)+'"'+(nod?' style="color:#3E454E"':'')+'>'+(nod?'NO DATA':c.flag.toUpperCase())+'</div>';
+  });
+  $('covTable').innerHTML=h;
+
+  /* the year ahead — one bar per month, income less that month's own costs */
+  const g=monthGrid(), mx=Math.max.apply(null,g.map(x=>Math.abs(x.gap)).concat([1]));
+  let mh='<div class="my-row">'+g.map(x=>{
+    const hgt=Math.max(2,Math.abs(x.gap)/mx*56);
+    return '<div><div class="my-bar"><i class="'+(x.gap>=0?'pos':'neg')+'" style="height:'+hgt.toFixed(0)+'px"></i></div>'
+      +'<div class="my-col'+(x.brk?' brk':'')+'">'+x.label+'</div>'
+      +'<div class="my-col my-val" style="color:'+(x.gap>=0?'var(--pass)':'var(--breach)')+'">'+(x.gap>=0?'+':'')+Math.round(x.gap/100)/10+'k</div></div>';
+  }).join('')+'</div>';
+  $('myTable').innerHTML=mh;
+  const lean=cv.lean, neg=g.filter(x=>x.gap<0);
+  $('myLean').textContent=neg.length?neg.length+' of 12 months run short':'every month clears';
+  $('myNote').textContent=lean?('Worst month is '+lean.label+': '+money(lean.inc)+' of income against '+money(lean.floor)+' of that month\u2019s own obligations, a gap of '+money(lean.gap)+'. '
+    +(neg.length?'Months in the red have to be pre-funded from the ones in the black — that is what the reserve is actually for, and it is why an average monthly figure hides the problem entirely.'
+      :'Every month stands on its own, which is the position you want before adding anything.')):'—';
+
+  const cells=[['Spendable',spendable()],['Accrual',balOf('accrual')],['Landing',balOf('landing')],['Roth + risk',balOf('roth')+riskTotal()]];
+  $('npGrid').innerHTML=cells.map(c=>'<div><div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--ash-2);text-transform:uppercase">'+c[0]+'</div><div class="num" style="font-size:22px;margin-top:6px">'+money(c[1])+'</div></div>').join('');
+  const recv=balOf('receivable');
+  $('npAsOf').textContent='Total '+money(cashTotal()+balOf('roth')+riskTotal()+recv);
+  $('npNote').textContent='Liquid net worth '+money(liquidNet())+', plus '+money(recv)+' held as a returnable deposit. Debt outstanding '+money(debtTotal())+' with '+money(debtMin())+' a month required. Risk capital is '+(liquidNet()>0?pct(riskTotal()/liquidNet()*100):'0%')+' of liquid net worth against a '+S.targets.riskCapPct+'% ceiling.';
+
+  const w=waterfall(monthlyIncome());
+  $('deficitBanner').classList.toggle('hide',w.deficit<=0);
+  if(w.deficit>0){
+    const s=solveIncome();
+    $('deficitText').textContent='Monthly income of '+money(monthlyIncome())+' does not cover '+money(w.floor)+' of obligations. The gap is '+money(w.deficit)+' a month. At '+money(s.rate)+' an hour you need '+Math.ceil(s.hrsBreak)+' hours a week just to break even, and '+Math.ceil(s.hrsPlan)+' to fund the plan. This is a revenue problem, not a budgeting one.';
+  }
+  $('setupBanner').classList.toggle('hide',!!S.meta.confirmed);
+}
+
+function renderWaterfall(){
+  const inc=monthlyIncome(), w=waterfall(inc);
+  $('wfIncome').textContent=money(inc)+' net in';
+  $('wfTiers').innerHTML=w.tiers.map(t=>{
+    const fp=t.need>0?Math.min(100,t.amt/t.need*100):(t.amt>0?100:0);
+    const full=t.need>0&&t.amt>=t.need-0.5;
+    return '<div class="tier'+((t.amt===0&&t.need>0)||t.gated?' starved':'')+'">'
+      +'<div class="tier-top"><div><span class="tier-id">'+t.id+'</span> <span class="tier-name">'+t.name+'</span></div>'
+      +'<div class="tier-amt">'+money(t.amt)+'</div></div>'
+      +'<div class="tier-desc">'+esc(t.desc)+'</div>'
+      +'<div class="bar'+(full?' full':'')+'"><i style="width:'+fp.toFixed(1)+'%"></i></div>'
+      +'<div class="tier-meta">'+(t.need>0?money(t.amt)+' of '+money(t.need)+' — '+Math.round(fp)+'% filled':'residual')+'</div></div>';
+  }).join('');
+}
+
+function renderStress(){
+  $('skRepair').value=S.stress.repair; $('skWeek').value=S.stress.week;
+  $('skDelay').value=S.stress.delay; $('skRent').value=S.stress.rent; $('skHours').value=S.stress.hours;
+  const fl=floorAmt();
+  $('skFloor').textContent='Floor '+money(fl);
+  const cases=stressCases();
+  let h='<div class="sk-row hd"><span>Scenario</span><span>Trough</span><span>Change</span><span>Status</span></div>';
+  cases.forEach((c,i)=>{
+    h+='<div class="sk-row'+(i===0?' base':'')+'"><span class="lab">'+esc(c.label)+'<small>'+esc(c.sub)+'</small></span>'
+     +'<span>'+money(c.trough)+'</span>'
+     +'<span style="color:'+(c.delta<0?'var(--breach)':'var(--ash-2)')+'">'+(i===0?'—':money(c.delta))+'</span>'
+     +'<span class="flag '+c.flag+'" style="font-weight:700;letter-spacing:.14em;font-size:10px">'+c.flag.toUpperCase()+'</span></div>';
+  });
+  $('skTable').innerHTML=h;
+
+  const s=solveIncome();
+  $('solveBox').innerHTML='<div class="solve"><div class="panel-h" style="margin-bottom:4px"><span>What income would actually clear this</span></div>'
+    +'<div class="big">'+money(s.plan)+' a month</div>'
+    +'<p class="note" style="color:var(--bone);margin-top:2px">Obligations and accruals come to '+money(s.breakeven)+'. Adding career capital and the landing fund brings the requirement to '+money(s.plan)+'. You are currently at '+money(s.now)+(s.shortfall>0?', short by '+money(s.shortfall)+'.':', which clears it.')+'</p>'
+    +'<p class="note">At '+money(s.rate)+' an hour that is <b style="color:var(--bone)">'+Math.ceil(s.hrsBreak)+' hours a week to survive</b> and <b style="color:var(--bone)">'+Math.ceil(s.hrsPlan)+' hours a week to fund the plan</b>. Campus roles cap near 20 without approval, so anything above that is a second stream, a higher rate, or a smaller plan — and the third option is the one worth resisting.</p></div>';
+}
+
+function renderCalendar(){
+  let h='<table><tr><th>Event</th><th>Date</th><th>Direction</th><th class="r">Amount</th><th class="r"></th></tr>';
+  S.events.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))).forEach(e=>{
+    h+='<tr><td><input type="text" data-f="events.label" data-id="'+e.id+'" value="'+esc(e.label)+'"></td>'
+     +'<td><input type="date" data-f="events.date" data-id="'+e.id+'" value="'+esc(e.date)+'"></td>'
+     +'<td><select data-f="events.dir" data-id="'+e.id+'"><option value="out"'+(e.dir==='out'?' selected':'')+'>Out</option><option value="in"'+(e.dir==='in'?' selected':'')+'>In</option></select></td>'
+     +'<td class="r"><input type="number" data-f="events.amt" data-id="'+e.id+'" value="'+(+e.amt||0)+'"></td>'
+     +'<td class="r"><button class="btn ghost" data-del="events:'+e.id+'">Remove</button></td></tr>';
+  });
+  $('evTable').innerHTML=h+'</table>';
+
+  h='<table><tr><th>Recurring bill</th><th class="r">Amount</th><th class="r">Every (months)</th><th>Next due</th><th class="r">Monthly accrual</th><th class="r"></th></tr>';
+  S.sinking.forEach(k=>{
+    h+='<tr><td><input type="text" data-f="sinking.label" data-id="'+k.id+'" value="'+esc(k.label)+'"></td>'
+     +'<td class="r"><input type="number" data-f="sinking.amt" data-id="'+k.id+'" value="'+(+k.amt||0)+'"></td>'
+     +'<td class="r"><input type="number" data-f="sinking.every" data-id="'+k.id+'" min="1" value="'+(+k.every||1)+'"></td>'
+     +'<td><input type="date" data-f="sinking.next" data-id="'+k.id+'" value="'+esc(k.next)+'"></td>'
+     +'<td class="r" style="color:var(--steel)">'+money((+k.amt||0)/Math.max(1,+k.every||1))+'</td>'
+     +'<td class="r"><button class="btn ghost" data-del="sinking:'+k.id+'">Remove</button></td></tr>';
+  });
+  $('snTable').innerHTML=h+'</table>';
+  $('skAccrual').textContent=money(accrualMonthly())+' a month · '+money(accruedLiability())+' owed to date';
+
+  const t=today(), flows=datedFlows(t,addDays(t,90));
+  if(!flows.length){$('calTable').innerHTML='<p class="note">Nothing dated in the next ninety days. If that is true, good. If tuition or an aid refund falls in this window, it belongs above.</p>';}
+  else{
+    let running=cashTotal(); let c='<table><tr><th>Date</th><th>Item</th><th class="r">Amount</th><th class="r">Cash after</th></tr>';
+    flows.forEach(f=>{ running+=f.amt;
+      c+='<tr><td>'+MON[f.date.getMonth()]+' '+f.date.getDate()+'</td><td style="font-family:var(--body);font-size:14px">'+esc(f.label)+'</td>'
+       +'<td class="r" style="color:'+(f.amt>0?'var(--pass)':'var(--breach)')+'">'+(f.amt>0?'+':'')+money(f.amt)+'</td>'
+       +'<td class="r" style="color:var(--ash)">'+money(running)+'</td></tr>';
+    });
+    $('calTable').innerHTML=c+'</table>';
+  }
+}
+
+function renderHorizon(){
+  $('hzSummer').value=S.horizon.summer;
+  $('hzSummerNet').value=S.horizon.summerNet;
+  $('hzPostRent').value=S.horizon.postRent;
+  const p=project();
+  if(!p.end){$('hzTable').innerHTML='<p class="note">Set a graduation date in Inputs.</p>';return;}
+  const ratio=p.landTarget>0?p.end.land/p.landTarget*100:100;
+  $('hzEnd').textContent=money(p.end.land)+' / '+money(p.landTarget);
+  $('hzEnd').className='v '+(ratio>=100?'pass':ratio>=60?'watch':'breach');
+  $('hzEndC').textContent=ratio>=100?'Funded. You can take a seat that starts before your first paycheck without borrowing.'
+    :'At '+Math.round(ratio)+'% of what you need to relocate, put down a deposit and live until the first analyst paycheck clears.';
+  $('hzRun').textContent=(Math.round(p.runwayEnd*10)/10)+' mo';
+  $('hzRun').className='v '+(p.runwayEnd>=4?'pass':p.runwayEnd>=2?'watch':'breach');
+  $('hzRunC').textContent='Months of living cost held in cash the day you graduate. This is the number that falls when your costs rise — unlike a raw balance, it cannot be gamed by a bigger target.';
+  $('hzMin').textContent=money(p.minTotal);
+  $('hzMin').className='v '+(p.minTotal>=floorAmt()?'pass':p.minTotal>=0?'watch':'breach');
+  $('hzMinC').textContent='Reached in '+p.minLabel+'. If this goes negative the plan does not survive contact with the calendar.';
+  $('hzDisc').textContent=money(p.discCum)+' discretionary over the whole path';
+
+  let h='<div class="hz-row hd"><span>Month</span><span>Income</span><span>Accrual</span><span>Reserve</span><span>Landing</span><span>Cash</span><span>Runway</span></div>';
+  p.rows.forEach(r=>{
+    h+='<div class="hz-row '+(r.mark||'')+'"><span>'+r.label+(r.note?' · '+r.note:'')+'</span><span>'+money(r.inc)+'</span><span>'+money(r.acc)+'</span><span>'+money(r.res)+'</span><span>'+money(r.land)+'</span><span>'+money(r.cash)+'</span><span>'+(Math.round(r.runway*10)/10)+'</span></div>';
+  });
+  $('hzTable').innerHTML=h;
+}
+
+/* ---------- the ascent ---------- */
+function renderCredit(){
+  const a=ascentEval();
+  $('crSlots').textContent=a.slots+' of 5';
+  $('crSlots').className='v '+(a.slots>=3?'pass':a.slots>=1?'watch':'breach');
+  $('crSlotsC').textContent=a.slots>0?'Chase declines applicants with five or more new accounts in 24 months. You have '+a.slots+' openings before that door shuts for two years.'
+    :'You are at 5/24. Chase will decline any card application until an old opening rolls off.';
+
+  $('crNat').textContent=money(a.nat);
+  $('crNat').className='v '+(a.nat>=1000?'pass':a.nat>=500?'watch':'breach');
+  $('crNatC').textContent='Obligations and living costs you can put on a card each month. Rent is excluded — it goes by Venmo and cannot be charged. This number is the ceiling on any minimum spend you can honestly meet.';
+
+  $('crVal').textContent=money(a.netValue);
+  $('crVal').className='v '+(a.netValue>0?'pass':'watch');
+  $('crValC').textContent=a.netValue>0?'Bonuses net of annual fees across every account currently cleared to open.'
+    :'Nothing is cleared to open yet, so there is no value to collect.';
+
+  let h='<div class="cr-row hd"><span>Account</span><span>Bonus</span><span>Min spend</span><span>Fee</span><span>Net yr 1</span><span>Verdict</span></div>';
+  a.rows.forEach(r=>{
+    h+='<div class="cr-row"><span class="lab">'+esc(r.c.label)+'<small>'+esc(r.c.kind==='bank'?'Deposit account':'Credit card')+' · target '+esc(r.c.target)+'</small></span>'
+     +'<span>'+money(+r.c.bonus||0)+'</span>'
+     +'<span>'+((+r.c.msr||0)?money(+r.c.msr||0)+' / '+(+r.c.msrMonths||3)+'mo':'none')+'</span>'
+     +'<span>'+((+r.c.af||0)?money(+r.c.af||0):'none')+'</span>'
+     +'<span style="color:'+(r.net>0?'var(--pass)':'var(--ash-2)')+'">'+money(r.net)+'</span>'
+     +'<span class="flag '+(r.verdict==='proceed'?'pass':r.verdict==='wait'?'watch':'breach')+'" style="font-weight:700;letter-spacing:.14em;font-size:10px">'
+     +(r.verdict==='proceed'?'OPEN':r.verdict==='wait'?'WAIT':'DECLINE')+'</span></div>';
+  });
+  $('crTable').innerHTML=h;
+  const nOpen=a.rows.filter(r=>r.verdict==='proceed').length;
+  $('crOrder').textContent=nOpen+' cleared · '+a.rows.filter(r=>r.verdict==='wait').length+' waiting · '+a.rows.filter(r=>r.verdict==='decline').length+' declined';
+
+  $('crDetail').innerHTML=a.rows.map(r=>{
+    const cls=r.verdict==='proceed'?'go':r.verdict==='wait'?'hold':'no';
+    const lbl=r.verdict==='proceed'?'OPEN IT':r.verdict==='wait'?'WAIT':'DO NOT OPEN';
+    return '<div class="verdict"><div class="panel-h" style="margin-bottom:6px"><span>'+esc(r.c.label)+'</span><span>'+esc(r.c.target)+'</span></div>'
+      +'<div class="call '+cls+'" style="font-size:32px">'+lbl+'</div>'
+      +'<ul>'+r.why.map(w=>'<li>'+esc(w)+'</li>').join('')+'</ul></div>';
+  }).join('');
+
+  const eff=[['Utilisation now',pct(a.curUtil)],['Utilisation after openings',pct(a.projUtil)],
+             ['Average account age after',Math.round(a.ageAfter)+' mo']];
+  $('crEffect').innerHTML=eff.map(e=>'<div><div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--ash-2);text-transform:uppercase">'+e[0]+'</div><div class="num" style="font-size:22px;margin-top:6px">'+e[1]+'</div></div>').join('');
+  $('crEffectNote').textContent='Opening a line you do not draw on raises the denominator: total limit goes from '+money(cardLimit())+' to '+money(a.projLimit)+', pulling utilisation from '+pct(a.curUtil)+' to '+pct(a.projUtil)+'. That is the one unambiguous gift in this section. The cost is average account age, which falls to about '+Math.round(a.ageAfter)+' months and takes years to rebuild — so open early and then stop, rather than opening steadily.';
+
+  let e='<table><tr><th>Account</th><th>Type</th><th>Target</th><th class="r">Bonus</th><th class="r">Min spend</th><th class="r">Fee</th><th class="r">Est. limit</th><th>Status</th><th class="r"></th></tr>';
+  S.credit.forEach(c=>{
+    e+='<tr><td><input type="text" data-f="credit.label" data-id="'+c.id+'" value="'+esc(c.label)+'"></td>'
+     +'<td><select data-f="credit.kind" data-id="'+c.id+'"><option value="card"'+(c.kind==='card'?' selected':'')+'>Card</option><option value="bank"'+(c.kind==='bank'?' selected':'')+'>Bank</option></select></td>'
+     +'<td><input type="date" data-f="credit.target" data-id="'+c.id+'" value="'+esc(c.target)+'"></td>'
+     +'<td class="r"><input type="number" data-f="credit.bonus" data-id="'+c.id+'" value="'+(+c.bonus||0)+'"></td>'
+     +'<td class="r"><input type="number" data-f="credit.msr" data-id="'+c.id+'" value="'+(+c.msr||0)+'"></td>'
+     +'<td class="r"><input type="number" data-f="credit.af" data-id="'+c.id+'" value="'+(+c.af||0)+'"></td>'
+     +'<td class="r"><input type="number" data-f="credit.limitEst" data-id="'+c.id+'" value="'+(+c.limitEst||0)+'"></td>'
+     +'<td><select data-f="credit.status" data-id="'+c.id+'"><option value="planned"'+(c.status==='planned'?' selected':'')+'>Planned</option><option value="open"'+(c.status==='open'?' selected':'')+'>Open</option><option value="held"'+(c.status==='held'?' selected':'')+'>Shelved</option></select></td>'
+     +'<td class="r"><button class="btn ghost" data-del="credit:'+c.id+'">Remove</button></td></tr>';
+  });
+  $('crEdit').innerHTML=e+'</table>';
+  $('crNew24').value=S.creditCfg.new24; $('crCount').value=S.creditCfg.accounts;
+  $('crAge').value=S.creditCfg.avgAge; $('crSpendOv').value=S.creditCfg.spendOverride;
+}
+
+/* ---------- campaign ---------- */
+const KINDS={application:'Application',event:'Event',interview:'Interview',credential:'Credential'};
+function renderCampaign(){
+  const c=campaignState();
+  const d=c.next?daysTo(c.next.deadline):null;
+  $('cpNext').textContent=c.next?(d===0?'today':d+'d'):'—';
+  $('cpNext').className='v '+(d==null?'':d<=7?'breach':d<=21?'watch':'pass');
+  $('cpNextC').textContent=c.next?c.next.label+' · '+c.next.org+' · '+c.next.deadline:'Nothing scheduled. That is the finding.';
+  $('cpCost').textContent=money(c.cost90);
+  $('cpCost').className='v';
+  $('cpCostC').textContent='Dated recruiting cost inside the next ninety days. It is on the cash calendar and inside the 13-week bridge, not sitting outside the model as good intentions.';
+  $('cpMo').textContent=money(c.monthly);
+  $('cpMo').className='v '+(c.monthly<=(+S.targets.career||0)?'pass':'watch');
+  $('cpMoC').textContent='What Tier 4 must carry each month for every costed item to be funded by its own deadline. Your standing target is '+money(+S.targets.career||0)+'.';
+
+  let h='<div class="cp-row hd"><span>Objective</span><span>Deadline</span><span>Days</span><span>Cost</span><span>Status</span></div>';
+  c.all.forEach(x=>{
+    const dd=daysTo(x.deadline), open=x.status==='planned';
+    const cls=!open?'':dd<0?'late':dd<=14?'urgent':'';
+    const col=!open?'var(--ash-2)':dd<0?'var(--breach)':dd<=14?'var(--watch)':'var(--ash)';
+    h+='<div class="cp-row '+cls+'"><span class="lab">'+esc(x.label)+'<small>'+esc(x.org)+' · '+esc(KINDS[x.kind]||x.kind)+'</small></span>'
+     +'<span style="color:var(--ash-2)">'+esc(x.deadline)+'</span>'
+     +'<span class="days" style="color:'+col+'">'+(!open?'—':dd<0?Math.abs(dd)+'d late':dd+'d')+'</span>'
+     +'<span>'+((+x.cost||0)?money(+x.cost||0):'—')+'</span>'
+     +'<span class="flag '+(x.status==='done'?'pass':x.status==='missed'?'breach':dd!=null&&dd<0?'breach':'watch')+'" style="font-size:10px;font-weight:700;letter-spacing:.12em">'+x.status.toUpperCase()+'</span></div>';
+  });
+  $('cpTable').innerHTML=h;
+  $('cpCount').textContent=c.open.length+' open · '+c.done+' done · '+c.overdue.length+' overdue';
+
+  let e='<table><tr><th>Objective</th><th>Org</th><th>Kind</th><th>Deadline</th><th class="r">Cost</th><th>Status</th><th class="r"></th></tr>';
+  campaignSorted().forEach(x=>{
+    e+='<tr><td><input type="text" data-f="campaign.label" data-id="'+x.id+'" value="'+esc(x.label)+'"></td>'
+     +'<td><input type="text" data-f="campaign.org" data-id="'+x.id+'" value="'+esc(x.org)+'"></td>'
+     +'<td><select data-f="campaign.kind" data-id="'+x.id+'">'+Object.keys(KINDS).map(k=>'<option value="'+k+'"'+(x.kind===k?' selected':'')+'>'+KINDS[k]+'</option>').join('')+'</select></td>'
+     +'<td><input type="date" data-f="campaign.deadline" data-id="'+x.id+'" value="'+esc(x.deadline)+'"></td>'
+     +'<td class="r"><input type="number" data-f="campaign.cost" data-id="'+x.id+'" value="'+(+x.cost||0)+'"></td>'
+     +'<td><select data-f="campaign.status" data-id="'+x.id+'">'+['planned','done','missed'].map(s=>'<option value="'+s+'"'+(x.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select></td>'
+     +'<td class="r"><button class="btn ghost" data-del="campaign:'+x.id+'">Remove</button></td></tr>';
+  });
+  $('cpEdit').innerHTML=e+'</table>';
+}
+
+/* ---------- the standard ---------- */
+function renderStandard(){
+  const st=standard(), due=closeDue();
+  $('stScore').textContent=st.score==null?'—':Math.round(st.score)+'%';
+  $('stScore').className='v '+(st.score==null?'':st.score>=80?'pass':st.score>=55?'watch':'breach');
+  $('stScoreC').textContent=st.score==null?'Nothing measurable yet. Close one week and this starts reading.'
+    :'The composite of every commitment this console can verify. It is designed to be able to fall.';
+  $('stStreak').textContent=st.streak+(st.streak===1?' wk':' wks');
+  $('stStreak').className='v '+(st.streak>=4?'pass':st.streak>=1?'watch':'breach');
+  const dots=Array.from({length:12},(_,i)=>'<i class="'+(i<st.streak?'on':'')+'"></i>').join('');
+  $('stStreakC').innerHTML='Consecutive weeks closed. Restructuring runs on a weekly cash cycle for a reason — the forecast is wrong before the cash is.<div class="streak">'+dots+'</div>';
+  $('stErr').textContent=st.err==null?'—':pct(st.err);
+  $('stErr').className='v '+(st.err==null?'':st.err<=10?'pass':st.err<=25?'watch':'breach');
+  $('stErrC').textContent=st.err==null?'Needs two closes before your forecasting can be scored.'
+    :'Mean absolute error between what you projected a week out and what was actually there. This is calibration, applied to your own cash instead of a betting line.';
+
+  const br=bridge();
+  const wk1=br.weeks[1];
+  $('stDue').textContent=due?'DUE NOW':'next close in '+(7-Math.round((today()-parseD(lastClose().date))/86400000))+' days';
+  $('stForecast').textContent='The bridge projects '+money(wk1.bal)+' at the end of week one ('+MON[wk1.date.getMonth()]+' '+wk1.date.getDate()+'). Enter what is actually there and the gap gets recorded, whichever direction it goes.';
+  $('closePanel').style.borderColor=due?'var(--watch)':'var(--rule)';
+
+  $('stParts').innerHTML=st.parts.map(p=>
+    '<div style="margin-bottom:15px"><div style="display:flex;justify-content:space-between;align-items:baseline">'
+    +'<span style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--bone)">'+esc(p.k)+'</span>'
+    +'<span class="num" style="font-size:15px;color:'+(p.v==null?'var(--ash-2)':p.v>=80?'var(--pass)':p.v>=50?'var(--watch)':'var(--breach)')+'">'+(p.v==null?'no data':Math.round(p.v)+'%')+'</span></div>'
+    +'<div class="st-bar"><i style="width:'+(p.v==null?0:p.v)+'%;background:'+(p.v==null?'var(--rule-hi)':p.v>=80?'var(--pass)':p.v>=50?'var(--watch)':'var(--breach)')+'"></i></div>'
+    +'<div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--ash-2);margin-top:6px;text-transform:uppercase">'+esc(p.d)+'</div></div>').join('');
+
+  const cl=(S.closes||[]).slice().reverse();
+  $('stCount').textContent=cl.length+' recorded';
+  if(!cl.length){$('stTable').innerHTML='<p class="note">No closes yet. The first one takes ninety seconds and is the only thing on this page that cannot be automated.</p>';}
+  else{
+    let t='<table><tr><th>Week ending</th><th class="r">Forecast</th><th class="r">Actual</th><th class="r">Variance</th><th>Note</th></tr>';
+    cl.forEach((x,i)=>{
+      const prior=cl[i+1]?cl[i+1].forecast:null;
+      const v=prior!=null?x.actual-prior:null;
+      t+='<tr><td>'+esc(x.date)+'</td><td class="r" style="color:var(--ash-2)">'+(prior!=null?money(prior):'—')+'</td>'
+       +'<td class="r">'+money(x.actual)+'</td>'
+       +'<td class="r" style="color:'+(v==null?'var(--ash-2)':v>=0?'var(--pass)':'var(--breach)')+'">'+(v==null?'—':(v>0?'+':'')+money(v))+'</td>'
+       +'<td style="font-family:var(--body);font-size:14px;color:var(--ash)">'+esc(x.note||'—')+'</td></tr>';
+    });
+    $('stTable').innerHTML=t+'</table>';
+  }
+
+  const g=(S.gates||[]).slice().reverse();
+  if(!g.length){$('stGates').innerHTML='<p class="note">No gate decisions logged yet.</p>';}
+  else{
+    let t='<table><tr><th>Item</th><th class="r">Cost</th><th class="r">Verdict</th><th class="r">Did you follow it?</th></tr>';
+    g.forEach(x=>{
+      t+='<tr><td style="font-family:var(--body);font-size:14px">'+esc(x.item)+'</td><td class="r">'+money(x.cost)+'</td>'
+       +'<td class="r"><span class="flag '+x.verdict+'" style="font-weight:700;letter-spacing:.12em">'+x.verdict.toUpperCase()+'</span></td>'
+       +'<td class="r"><button class="btn ghost" data-fol="'+x.id+':1" style="'+(x.followed===true?'color:var(--pass);border-color:var(--pass)':'')+'">Yes</button> '
+       +'<button class="btn ghost" data-fol="'+x.id+':0" style="'+(x.followed===false?'color:var(--breach);border-color:var(--breach)':'')+'">No</button></td></tr>';
+    });
+    $('stGates').innerHTML=t+'</table>';
+  }
+}
+
+/* ---------- intake ---------- */
+const IK=[
+ {q:'What is actually in the accounts',s:'Checking, savings, anything you could spend this week. Round to the nearest ten.',
+  f:[['Checking / operating','ik0','number'],['Savings / reserve','ik1','number']]},
+ {q:'What you get paid, and when',s:'Net — what lands, not what you earn. If hours vary, use a normal week rather than your best one.',
+  f:[['Net per paycheck','ik2','number'],['First or next payday','ik3','date']]},
+ {q:'What leaves every month without asking',s:'Rent is already loaded at 680. Correct anything that is wrong.',
+  f:[['Rent','ik4','number'],['Utilities','ik5','number'],['Phone','ik6','number'],['Fuel and transport','ik7','number']]},
+ {q:'What you spend living',s:'In term, in Richmond. Break months get their own lower numbers automatically.',
+  f:[['Food','ik8','number'],['Social','ik9','number'],['Everything else','ik10','number']]},
+ {q:'What you owe',s:'Card balance and limit. Leave at zero if you carry nothing — that is the better answer.',
+  f:[['Card balance','ik11','number'],['Card limit','ik12','number']]},
+ {q:'What landing costs',s:'Cash you need at graduation: relocation, a deposit in a new city, and living cost before the first analyst paycheck clears.',
+  f:[['Landing fund target','ik13','number'],['Graduation date','ik14','date']]}
+];
+let ikAt=0;
+function renderIntake(){
+  const st=IK[ikAt];
+  $('ikStep').textContent='Step '+(ikAt+1)+' of '+IK.length;
+  $('ikQ').textContent=st.q; $('ikSub').textContent=st.s;
+  const cur=ikVals();
+  $('ikFields').innerHTML=st.f.map(f=>'<div class="field"><label class="fl" for="'+f[1]+'">'+f[0]+'</label><input type="'+f[2]+'" id="'+f[1]+'" value="'+esc(cur[f[1]]!=null?cur[f[1]]:'')+'"></div>').join('');
+  $('ikDots').innerHTML=IK.map((_,i)=>'<i class="'+(i<=ikAt?'on':'')+'"></i>').join('');
+  $('ikBack').style.visibility=ikAt?'visible':'hidden';
+  $('ikNext').textContent=ikAt===IK.length-1?'Finish':'Next';
+  const first=$(st.f[0][1]); if(first)first.focus();
+}
+function ikVals(){
+  return {ik0:balOf('operating'),ik1:balOf('reserve'),ik2:+S.income[0].net||0,ik3:S.income[0].anchor,
+    ik4:(S.fixed[0]||{}).amt,ik5:(S.fixed[1]||{}).amt,ik6:(S.fixed[2]||{}).amt,ik7:(S.fixed[3]||{}).amt,
+    ik8:S.variable.term.food,ik9:S.variable.term.social,ik10:S.variable.term.other,
+    ik11:(S.cards[0]||{}).bal,ik12:(S.cards[0]||{}).limit,
+    ik13:S.targets.landing,ik14:S.targets.grad};
+}
+function ikCommit(){
+  const g=id=>{const el=$(id);return el?el.value:null;};
+  const n=id=>{const v=g(id);return v==null||v===''?null:(+v||0);};
+  const setAcc=(t,v)=>{const a=S.accounts.find(x=>x.type===t); if(a&&v!=null)a.bal=v;};
+  setAcc('operating',n('ik0')); setAcc('reserve',n('ik1'));
+  if(n('ik2')!=null){S.income[0].net=n('ik2');S.income[0].est=false;}
+  if(g('ik3')){S.income[0].anchor=g('ik3');S.income[0].start=g('ik3');}
+  [['ik4',0],['ik5',1],['ik6',2],['ik7',3]].forEach(x=>{const v=n(x[0]); if(v!=null&&S.fixed[x[1]])S.fixed[x[1]].amt=v;});
+  if(n('ik8')!=null)S.variable.term.food=n('ik8');
+  if(n('ik9')!=null)S.variable.term.social=n('ik9');
+  if(n('ik10')!=null)S.variable.term.other=n('ik10');
+  if(n('ik8')!=null){S.variable.brk.food=Math.round(n('ik8')*0.55);S.variable.brk.social=Math.round((n('ik9')||0)*0.65);S.variable.brk.other=Math.round((n('ik10')||0)*0.75);}
+  if(S.cards[0]){ if(n('ik11')!=null)S.cards[0].bal=n('ik11'); if(n('ik12')!=null)S.cards[0].limit=n('ik12'); }
+  if(n('ik13')!=null)S.targets.landing=n('ik13');
+  if(g('ik14'))S.targets.grad=g('ik14');
+}
+
+/* ---------- gate ---------- */
+let lastGate=null;
+function runGate(){
+  const cost=+$('gtCost').value||0, tier=$('gtTier').value, item=$('gtItem').value.trim(), why=$('gtWhy').value.trim();
+  if(cost<=0){$('gtOut').innerHTML='<div class="panel"><p class="note">Enter a cost and run it again.</p></div>';return;}
+  const cv=covenants(), fl=cv.floor, reasons=[]; let verdict='go';
+  const ta=cv.bridge.trough.bal-cost;
+  if(ta<fl){verdict='no';reasons.push('The 13-week trough drops to '+money(ta)+', below the '+money(fl)+' floor. This purchase is funded by next month\u2019s rent.');}
+  else if(ta<fl*1.25){verdict='hold';reasons.push('The trough falls to '+money(ta)+' — clears the floor, but with under 25% headroom left.');}
+  else reasons.push('The trough holds at '+money(ta)+', still '+money(ta-fl)+' clear of the floor.');
+  if(cv.overall==='breach'){verdict='no';reasons.push('The certificate is already in breach. Nothing discretionary funds while a covenant is failing.');}
+  else if(cv.overall==='watch'&&verdict==='go'){verdict='hold';reasons.push('The certificate is on watch. Fix the failing test first, then re-run this.');}
+  const worst=stressCases().filter(c=>c.label!=='Base case').reduce((m,c)=>Math.min(m,c.trough),Infinity);
+  if(isFinite(worst)&&worst-cost<0){reasons.push('Under the worst single stress case the trough is already '+money(worst)+'. Spending this leaves no absorption for one ordinary bad week.');if(verdict==='go')verdict='hold';}
+  if(tier==='4'){
+    const head=Math.max(0,liquidNet()*(+S.targets.riskCapPct||0)/100-riskTotal());
+    if(cost>head){verdict='no';reasons.push('Risk capital headroom is '+money(head)+'. This exceeds your own ceiling — the ceiling is the whole point of having one.');}
+  }
+  if(tier==='1'){
+    const rt=(+S.targets.reserveMonths||0)*fl;
+    if(balOf('reserve')-cost<rt){verdict=verdict==='no'?'no':'hold';reasons.push('This draws the reserve to '+money(balOf('reserve')-cost)+', under the '+money(rt)+' target. You name the emergency out loud, or it is not one.');}
+  }
+  if(tier==='2'&&verdict!=='no')reasons.push('Tier 2 spend. Between now and December 2027 this is the tier with the highest return per dollar — a bias toward yes is correct here.');
+  const sur=waterfall(monthlyIncome()).surplus;
+  if(tier==='5'&&cost>sur)reasons.push('Monthly residual is '+money(sur)+'. At '+money(cost)+' this consumes '+(sur>0?Math.round(cost/sur*10)/10:'every available')+' months of it.');
+  if(!why)reasons.push('No reason written. Until that sentence exists, this is a purchase looking for a justification.');
+  lastGate={item:item||'Unnamed',cost:cost,tier:tier,why:why,verdict:verdict,date:isoD(today())};
+  const label={go:'GO',hold:'HOLD',no:'NO'}[verdict];
+  const line={go:'It clears. Buy it and move on — no second-guessing after a passed gate.',
+    hold:'Not a no. A not-yet, with a named condition attached.',
+    no:'Don\u2019t. The structure says no, and the structure is you from a calmer moment.'}[verdict];
+  $('gtOut').innerHTML='<div class="verdict"><div class="call '+verdict+'">'+label+'</div><div class="why">'+esc(line)+'</div><ul>'+reasons.map(r=>'<li>'+esc(r)+'</li>').join('')+'</ul></div>';
+}
+function renderGateLog(){
+  $('gtCount').textContent=S.gates.length+' logged';
+  if(!S.gates.length){$('gtLogTable').innerHTML='<p class="note">Nothing logged yet. The log matters more than any single verdict — it is the only record of whether you follow your own structure.</p>';return;}
+  let h='<table><tr><th>Date</th><th>Item</th><th class="r">Cost</th><th>Tier</th><th class="r">Verdict</th></tr>';
+  S.gates.slice().reverse().forEach(g=>{
+    h+='<tr><td>'+esc(g.date)+'</td><td style="font-family:var(--body);font-size:14px">'+esc(g.item)+'</td><td class="r">'+money(g.cost)+'</td><td>T'+esc(g.tier)+'</td><td class="r"><span class="flag '+g.verdict+'" style="font-weight:700;letter-spacing:.14em">'+g.verdict.toUpperCase()+'</span></td></tr>';
+  });
+  $('gtLogTable').innerHTML=h+'</table>';
+}
+
+/* ---------- ledger and variance ---------- */
+function renderVariance(){
+  const v=variance();
+  if(!v.any){$('vrTable').innerHTML='<p class="note">No movements recorded yet. Until the ledger has data this comparison is empty, and the forecast below is unmarked homework.</p>';$('vrNet').textContent='—';return;}
+  let h='<div class="vr-row hd"><span>Line</span><span>Plan</span><span>Actual</span><span>Variance</span></div>';
+  v.rows.forEach(r=>{
+    const bad=(r.good==='under'&&r.v>0)||(r.good==='over'&&r.v<0);
+    h+='<div class="vr-row"><span>'+esc(r.k)+'</span><span>'+money(r.p)+'</span><span>'+money(r.a)+'</span>'
+     +'<span class="'+(Math.abs(r.v)<1?'':bad?'over':'under')+'">'+(r.v>0?'+':'')+money(r.v)+'</span></div>';
+  });
+  $('vrTable').innerHTML=h;
+  $('vrNet').textContent='Net planned '+money(v.netPlan)+' · actual '+money(v.netAct);
+}
+function renderTxns(){
+  const cut=addDays(today(),-30);
+  const recent=S.txns.filter(t=>parseD(t.date)>=cut).sort((a,b)=>b.date.localeCompare(a.date));
+  const inf=recent.filter(t=>t.cat==='income').reduce((s,t)=>s+(+t.amt||0),0);
+  const out=recent.filter(t=>t.cat!=='income').reduce((s,t)=>s+(+t.amt||0),0);
+  $('txSummary').textContent=money(inf)+' in · '+money(out)+' out · net '+money(inf-out);
+  if(!recent.length){$('txTable').innerHTML='<p class="note">Nothing recorded in the last 30 days.</p>';return;}
+  let h='<table><tr><th>Date</th><th>Description</th><th>Bucket</th><th class="r">Amount</th><th class="r"></th></tr>';
+  recent.forEach(t=>{
+    h+='<tr><td>'+esc(t.date)+'</td><td style="font-family:var(--body);font-size:14px">'+esc(t.desc||'—')+'</td><td style="color:var(--ash-2)">'+esc(t.cat)+'</td><td class="r" style="color:'+(t.cat==='income'?'var(--pass)':'var(--bone)')+'">'+(t.cat==='income'?'+':'−')+money(t.amt)+'</td><td class="r"><button class="btn ghost" data-deltx="'+t.id+'">Delete</button></td></tr>';
+  });
+  $('txTable').innerHTML=h+'</table>';
+}
+
+/* ---------- inputs ---------- */
+function schedSelect(coll,id,months){
+  const k=setKey(months);
+  let o=Object.keys(MONTHSETS).map(x=>'<option value="'+x+'"'+(k===x?' selected':'')+'>'+MONTHSETS[x].label+'</option>').join('');
+  if(k==='custom') o='<option value="custom" selected>Custom</option>'+o;
+  return '<select data-sched="'+coll+'" data-id="'+id+'">'+o+'</select>';
+}
+
+function renderInputs(){
+  const types=[['operating','operating'],['reserve','reserve'],['accrual','accrual'],['landing','landing'],['roth','roth'],['risk','risk'],['receivable','receivable']];
+  let h='<table><tr><th>Account</th><th>Role</th><th class="r">Balance</th><th class="r"></th></tr>';
+  S.accounts.forEach(a=>{
+    h+='<tr><td><input type="text" data-f="accounts.label" data-id="'+a.id+'" value="'+esc(a.label)+'"></td>'
+     +'<td><select data-f="accounts.type" data-id="'+a.id+'">'+types.map(t=>'<option value="'+t[0]+'"'+(a.type===t[0]?' selected':'')+'>'+t[1]+'</option>').join('')+'</select></td>'
+     +'<td class="r"><input type="number" data-f="accounts.bal" data-id="'+a.id+'" value="'+(+a.bal||0)+'"></td>'
+     +'<td class="r"><button class="btn ghost" data-del="accounts:'+a.id+'">Remove</button></td></tr>';
+  });
+  $('acctTable').innerHTML=h+'</table>';
+
+  h='<table><tr><th>Card</th><th class="r">Limit</th><th class="r">Balance</th><th class="r">APR %</th><th class="r">Minimum</th><th class="r"></th></tr>';
+  S.cards.forEach(c=>{
+    h+='<tr><td><input type="text" data-f="cards.label" data-id="'+c.id+'" value="'+esc(c.label)+'"></td>'
+     +'<td class="r"><input type="number" data-f="cards.limit" data-id="'+c.id+'" value="'+(+c.limit||0)+'"></td>'
+     +'<td class="r"><input type="number" data-f="cards.bal" data-id="'+c.id+'" value="'+(+c.bal||0)+'"></td>'
+     +'<td class="r"><input type="number" step="0.1" data-f="cards.apr" data-id="'+c.id+'" value="'+(+c.apr||0)+'"></td>'
+     +'<td class="r"><input type="number" data-f="cards.minPay" data-id="'+c.id+'" value="'+(+c.minPay||0)+'"></td>'
+     +'<td class="r"><button class="btn ghost" data-del="cards:'+c.id+'">Remove</button></td></tr>';
+  });
+  $('cardTable').innerHTML=h+'</table>';
+
+  h='<table><tr><th>Loan</th><th class="r">Balance</th><th class="r">APR %</th><th class="r">Monthly payment</th><th class="r"></th></tr>';
+  if(!S.loans.length) h+='<tr><td colspan="5" style="color:var(--ash-2);font-family:var(--body)">None recorded.</td></tr>';
+  S.loans.forEach(l=>{
+    h+='<tr><td><input type="text" data-f="loans.label" data-id="'+l.id+'" value="'+esc(l.label)+'"></td>'
+     +'<td class="r"><input type="number" data-f="loans.bal" data-id="'+l.id+'" value="'+(+l.bal||0)+'"></td>'
+     +'<td class="r"><input type="number" step="0.1" data-f="loans.apr" data-id="'+l.id+'" value="'+(+l.apr||0)+'"></td>'
+     +'<td class="r"><input type="number" data-f="loans.pay" data-id="'+l.id+'" value="'+(+l.pay||0)+'"></td>'
+     +'<td class="r"><button class="btn ghost" data-del="loans:'+l.id+'">Remove</button></td></tr>';
+  });
+  $('loanTable').innerHTML=h+'</table>';
+
+  h='<table><tr><th>Source</th><th class="r">Net per payment</th><th>Cadence</th><th>Runs in</th><th>First payment</th><th>Ends</th><th class="r"></th></tr>';
+  S.income.forEach(i=>{
+    h+='<tr><td><input type="text" data-f="income.label" data-id="'+i.id+'" value="'+esc(i.label)+'"></td>'
+     +'<td class="r"><input type="number" data-f="income.net" data-id="'+i.id+'" value="'+(+i.net||0)+'"></td>'
+     +'<td><select data-f="income.cadence" data-id="'+i.id+'">'
+     +[['weekly','Weekly'],['biweekly','Every two weeks'],['semimonthly','Twice monthly'],['monthly','Monthly']].map(c=>'<option value="'+c[0]+'"'+(i.cadence===c[0]?' selected':'')+'>'+c[1]+'</option>').join('')+'</select></td>'
+     +'<td>'+schedSelect('income',i.id,i.months)+'</td>'
+     +'<td><input type="date" data-f="income.anchor" data-id="'+i.id+'" value="'+esc(i.anchor)+'"></td>'
+     +'<td><input type="date" data-f="income.end" data-id="'+i.id+'" value="'+esc(i.end||'')+'"></td>'
+     +'<td class="r"><button class="btn ghost" data-del="income:'+i.id+'">Remove</button></td></tr>';
+  });
+  $('incTable').innerHTML=h+'</table>';
+
+  h='<table><tr><th>Obligation</th><th class="r">Monthly</th><th class="r">Due day</th><th>Charged in</th><th class="r"></th></tr>';
+  S.fixed.forEach(f=>{
+    h+='<tr><td><input type="text" data-f="fixed.label" data-id="'+f.id+'" value="'+esc(f.label)+'"></td>'
+     +'<td class="r"><input type="number" data-f="fixed.amt" data-id="'+f.id+'" value="'+(+f.amt||0)+'"></td>'
+     +'<td class="r"><input type="number" data-f="fixed.day" data-id="'+f.id+'" min="1" max="31" value="'+(+f.day||1)+'"></td>'
+     +'<td>'+schedSelect('fixed',f.id,f.months)+'</td>'
+     +'<td class="r"><button class="btn ghost" data-del="fixed:'+f.id+'">Remove</button></td></tr>';
+  });
+  $('fixTable').innerHTML=h+'</table>';
+
+  ['vFood','food'],['vSocial','social'],['vOther','other']; 
+  $('vFood').value=S.variable.term.food; $('vSocial').value=S.variable.term.social; $('vOther').value=S.variable.term.other;
+  $('bFood').value=S.variable.brk.food;  $('bSocial').value=S.variable.brk.social;  $('bOther').value=S.variable.brk.other;
+  $('brkMonths').value=(S.variable.breakMonths||[]).join(',');
+  const m={tRes:['targets','reserveMonths'],tFill:['targets','reserveFill'],tCareer:['targets','career'],
+    tRoth:['targets','roth'],tRothAnn:['targets','rothAnnual'],tRisk:['targets','risk'],
+    tRiskCap:['targets','riskCapPct'],tUtil:['targets','utilTarget'],tGate:['targets','gate'],
+    tLanding:['targets','landing'],tDebtApr:['targets','debtApr'],tDebtEx:['targets','debtExtra'],
+    tRate:['targets','rate']};
+  Object.keys(m).forEach(k=>{ if($(k)) $(k).value=S[m[k][0]][m[k][1]]; });
+  $('tGrad').value=S.targets.grad;
+}
+
+/* ---------- master ---------- */
+function renderAll(skipInputs){
+  const t=today();
+  $('mDate').textContent=MON[t.getMonth()]+' '+t.getDate()+', '+t.getFullYear();
+  const g=parseD(S.targets.grad||'2027-12-17');
+  $('mHorizon').textContent=Math.max(0,Math.round((g-t)/86400000/30.44))+' months';
+  $('mHolder').textContent=S.meta.holder;
+  const _st=standard();
+  $('mStd').textContent=_st.score==null?'unmarked':Math.round(_st.score)+'%';
+  renderPosition(); renderWaterfall(); renderStress(); renderHorizon();
+  renderCalendar(); renderCredit(); renderCampaign(); renderStandard(); renderGateLog(); renderVariance(); renderTxns();
+  if(!skipInputs) renderInputs();
+  save();
+}
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+const TABS=['position','waterfall','stress','horizon','calendar','campaign','standard','credit','gate','ledger','inputs'];
+function show(tab){
+  document.querySelectorAll('.rail button[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));
+  TABS.forEach(t=>{const el=$('tab-'+t); if(el) el.classList.toggle('hide',t!==tab);});
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.rail button[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-goto]'); if(g){show(g.dataset.goto);return;}
+  const d=e.target.closest('[data-del]');
+  if(d){const p=d.dataset.del.split(':');S[p[0]]=S[p[0]].filter(x=>x.id!==p[1]);renderAll();return;}
+  const fo=e.target.closest('[data-fol]');
+  if(fo){const p=fo.dataset.fol.split(':');const g=S.gates.find(x=>x.id===p[0]);if(g)g.followed=(p[1]==='1');renderAll(true);return;}
+  const dt=e.target.closest('[data-deltx]');
+  if(dt){S.txns=S.txns.filter(x=>x.id!==dt.dataset.deltx);renderAll();return;}
+});
+document.addEventListener('change',e=>{
+  const sc=e.target.dataset.sched;
+  if(sc){
+    const row=S[sc].find(x=>x.id===e.target.dataset.id);
+    if(row&&MONTHSETS[e.target.value]) row.months=MONTHSETS[e.target.value].m.slice();
+    renderAll(true); return;
+  }
+  const f=e.target.dataset.f; if(!f)return;
+  const p=f.split('.'), row=S[p[0]].find(x=>x.id===e.target.dataset.id); if(!row)return;
+  row[p[1]]=e.target.type==='number'?(+e.target.value||0):e.target.value;
+  if(p[0]==='income'){row.est=false; if(p[1]==='anchor')row.start=e.target.value;}
+  if(p[0]==='sinking'||p[0]==='events')row.est=false;
+  renderAll(true);
+});
+$('acctAdd').onclick=()=>{S.accounts.push({id:uid(),label:'New account',type:'operating',bal:0});renderAll();};
+$('cardAdd').onclick=()=>{S.cards.push({id:uid(),label:'New card',limit:0,bal:0,apr:24.9,minPay:0});renderAll();};
+$('loanAdd').onclick=()=>{S.loans.push({id:uid(),label:'New loan',bal:0,apr:6.5,pay:0});renderAll();};
+$('incAdd').onclick=()=>{S.income.push({id:uid(),label:'New income',net:0,cadence:'biweekly',anchor:isoD(today()),start:isoD(today()),end:''});renderAll();};
+$('fixAdd').onclick=()=>{S.fixed.push({id:uid(),label:'New obligation',amt:0,day:1});renderAll();};
+$('evAdd').onclick=()=>{S.events.push({id:uid(),label:'New event',date:isoD(today()),amt:0,dir:'out'});renderAll();};
+$('cpAdd').onclick=()=>{S.campaign.push({id:uid(),label:'New objective',org:'',kind:'application',deadline:isoD(addMonths(today(),1)),cost:0,status:'planned',note:''});renderAll();};
+$('clSave').onclick=()=>{
+  const a=+$('clActual').value;
+  if(!$('clActual').value){alert('Enter what is actually in the accounts. An unmarked week is the one thing this page cannot absorb.');return;}
+  if(!$('clNote').value.trim()){alert('One line. What moved, and what you are doing about it.');return;}
+  const br=bridge();
+  S.closes.push({id:uid(),date:$('clDate').value||isoD(today()),actual:a,
+                 forecast:br.weeks[1].bal,note:$('clNote').value.trim()});
+  const op=S.accounts.find(x=>x.type==='operating');
+  if(op) op.bal=Math.max(0,a-balOf('reserve')-balOf('accrual')-balOf('landing'));
+  $('clActual').value='';$('clNote').value='';
+  renderAll();
+};
+$('ikNext').onclick=()=>{
+  ikCommit();
+  if(ikAt===IK.length-1){ S.meta.confirmed=true; $('intake').classList.add('hide'); renderAll(); show('position'); return; }
+  ikAt++; renderIntake();
+};
+$('ikBack').onclick=()=>{ ikCommit(); if(ikAt>0){ikAt--;renderIntake();} };
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!$('intake').classList.contains('hide')){e.preventDefault();$('ikNext').click();}
+});
+$('crAdd').onclick=()=>{S.credit.push({id:uid(),label:'New account',kind:'card',status:'planned',target:isoD(addMonths(today(),3)),af:0,afMonth:0,msr:0,msrMonths:3,ddReq:0,bonus:0,limitEst:0});renderAll();};
+['crNew24','crCount','crAge','crSpendOv'].forEach(id=>$(id).addEventListener('change',()=>{
+  S.creditCfg={new24:+$('crNew24').value||0,accounts:+$('crCount').value||0,avgAge:+$('crAge').value||0,spendOverride:+$('crSpendOv').value||0};
+  renderAll(true);
+}));
+$('snAdd').onclick=()=>{S.sinking.push({id:uid(),label:'New recurring bill',amt:0,every:6,next:isoD(addMonths(today(),1))});renderAll();};
+
+[['vFood','term','food'],['vSocial','term','social'],['vOther','term','other'],
+ ['bFood','brk','food'],['bSocial','brk','social'],['bOther','brk','other']].forEach(x=>{
+  const el=$(x[0]); if(!el)return;
+  el.addEventListener('change',()=>{S.variable[x[1]][x[2]]=+el.value||0;renderAll(true);});
+});
+$('brkMonths').addEventListener('change',()=>{
+  const v=$('brkMonths').value;
+  S.variable.breakMonths=v?v.split(',').map(Number):[];
+  renderAll(true);
+});
+const SIMPLE={tRes:['targets','reserveMonths'],tFill:['targets','reserveFill'],tCareer:['targets','career'],
+  tRoth:['targets','roth'],tRothAnn:['targets','rothAnnual'],tRisk:['targets','risk'],
+  tRiskCap:['targets','riskCapPct'],tUtil:['targets','utilTarget'],tGate:['targets','gate'],
+  tLanding:['targets','landing'],tDebtApr:['targets','debtApr'],tDebtEx:['targets','debtExtra'],
+  tRate:['targets','rate']};
+Object.keys(SIMPLE).forEach(k=>{
+  const el=$(k); if(!el)return;
+  el.addEventListener('change',()=>{S[SIMPLE[k][0]][SIMPLE[k][1]]=+el.value||0;renderAll(true);});
+});
+$('tGrad').addEventListener('change',()=>{S.targets.grad=$('tGrad').value;renderAll(true);});
+['hzSummer','hzSummerNet','hzPostRent'].forEach(id=>$(id).addEventListener('change',()=>{
+  S.horizon.summer=$('hzSummer').value;S.horizon.summerNet=+$('hzSummerNet').value||0;S.horizon.postRent=+$('hzPostRent').value||0;
+  renderHorizon();save();
+}));
+['skRepair','skWeek','skDelay','skRent','skHours'].forEach(id=>$(id).addEventListener('change',()=>{
+  S.stress={repair:+$('skRepair').value||0,week:+$('skWeek').value||1,delay:+$('skDelay').value||0,
+            rent:+$('skRent').value||0,hours:+$('skHours').value||60};
+  renderStress();save();
+}));
+$('startIntake').onclick=()=>{ikAt=0;$('intake').classList.remove('hide');renderIntake();};
+$('confirmBtn').onclick=()=>{S.meta.confirmed=true;renderAll();show('position');};
+$('resetBtn').onclick=()=>{if(confirm('This clears every number, transaction and logged decision. Continue?')){S=defaults();renderAll();}};
+$('exportBtn').onclick=()=>{
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));
+  a.download='capital-structure-backup.json';a.click();
+};
+$('gtRun').onclick=runGate;
+$('gtLog').onclick=()=>{
+  if(!lastGate)runGate();
+  if(!lastGate)return;
+  if(!lastGate.why){alert('Write the one-line reason first. That sentence is the log.');return;}
+  S.gates.push(Object.assign({id:uid()},lastGate));
+  lastGate=null;$('gtItem').value='';$('gtCost').value='';$('gtWhy').value='';$('gtOut').innerHTML='';
+  renderAll();
+};
+$('txAdd').onclick=()=>{
+  const amt=+$('txAmt').value||0; if(amt<=0){alert('Enter an amount.');return;}
+  S.txns.push({id:uid(),date:$('txDate').value||isoD(today()),desc:$('txDesc').value,amt:amt,cat:$('txCat').value});
+  $('txDesc').value='';$('txAmt').value='';renderAll();
+};
+
+(async()=>{
+  const saved=await load();
+  if(saved){
+    S=Object.assign(defaults(),saved);
+    /* older files stored one flat spend profile — lift it into the term profile */
+    if(S.variable&&S.variable.food!==undefined&&!S.variable.term){
+      S.variable={term:{food:+S.variable.food||0,social:+S.variable.social||0,other:+S.variable.other||0},
+                  brk:{food:Math.round((+S.variable.food||0)*0.55),social:Math.round((+S.variable.social||0)*0.65),other:Math.round((+S.variable.other||0)*0.75)},
+                  breakMonths:[5,6]};
+    }
+    if(!S.variable.brk) S.variable.brk=Object.assign({},S.variable.term);
+    if(!S.variable.breakMonths) S.variable.breakMonths=[5,6];
+  }
+  $('txDate').value=isoD(today());
+  $('clDate').value=isoD(today());
+  renderAll();
+  if(!S.meta.confirmed){ ikAt=0; $('intake').classList.remove('hide'); renderIntake(); }
+})();
+
+</script>
+</body>
+</html>
