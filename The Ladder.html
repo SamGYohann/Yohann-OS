@@ -1,0 +1,1395 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The Ladder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a bottom-up ladder. Six rungs stack from Foundations (bottom) to Principal, capped by the Apex slab.
+   Seven lanes run as columns; prerequisite curves sit behind the cards and climb upward; a detail drawer opens
+   on the right (a bottom sheet on phones). Below 1024px the ladder collapses into a list with no curves. */
+:root{
+  --bg:#EDF0EF;
+  --surface:#FAFBFA;
+  --band:#E0E6E4;
+  --ink:#121A1C;
+  --muted:#55646A;
+  --rule:#C8D1D2;
+  --edge:#6E8086;
+  --accent:#1D6A58;
+  --accent-ink:#165445;
+  --trace:#B07800;
+  --trace-ink:#744F00;
+  --apex:#13211F;
+  --apex-ink:#ECF2F0;
+  --apex-muted:#9FB2AE;
+  --apex-rule:#2E413E;
+  --apex-trace:#E5B04A;
+  --apex-accent:#72D1B2;
+  --focus:#121A1C;
+  --font-display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",sans-serif;
+  --font-body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1214; --surface:#151D20; --band:#111A1C; --ink:#E3EAEA; --muted:#93A3A7; --rule:#29363A;
+    --edge:#62757B; --accent:#55BD9D; --accent-ink:#7FD3B8; --trace:#E0A93A; --trace-ink:#F0C66C;
+    --apex:#0F2823; --apex-ink:#E6F1EC; --apex-muted:#8FAAA3; --apex-rule:#24453D; --apex-trace:#F0BE5A;
+    --apex-accent:#7FD9BC; --focus:#E3EAEA; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1214; --surface:#151D20; --band:#111A1C; --ink:#E3EAEA; --muted:#93A3A7; --rule:#29363A;
+  --edge:#62757B; --accent:#55BD9D; --accent-ink:#7FD3B8; --trace:#E0A93A; --trace-ink:#F0C66C;
+  --apex:#0F2823; --apex-ink:#E6F1EC; --apex-muted:#8FAAA3; --apex-rule:#24453D; --apex-trace:#F0BE5A;
+  --apex-accent:#7FD9BC; --focus:#E3EAEA; color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;
+  padding-inline:20px;padding-block:28px 72px;-webkit-font-smoothing:antialiased}
+@media (max-width:480px){body{padding-inline:16px}}
+.page{max-width:1560px;margin-inline:auto}
+button{font:inherit;color:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.k{font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+
+/* Header */
+.top{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:24px 44px;align-items:end;
+  padding-bottom:24px;border-bottom:1px solid var(--rule);margin-bottom:18px}
+@media (max-width:900px){.top{grid-template-columns:1fr}}
+h1{font-family:var(--font-display);font-weight:800;font-size:clamp(56px,8.5vw,112px);line-height:.84;
+  letter-spacing:.004em;margin:8px 0 14px;text-transform:uppercase}
+.dek{max-width:56ch;margin:0;font-size:16px;text-wrap:pretty}
+.dek em{font-style:normal;font-weight:600}
+.here{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:16px 18px;display:grid;gap:12px;min-width:0}
+.here-row{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
+.here-pos{font-family:var(--font-display);font-weight:700;font-size:28px;line-height:1;text-transform:uppercase;margin-top:4px}
+.here-active{margin:0;font-size:14px;color:var(--ink);max-width:62ch}
+.here-active b{font-weight:600}
+.here-meta{margin:0;font-size:12.5px;color:var(--muted)}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.btn:hover{opacity:.88}
+.btn:focus-visible,.chip:focus-visible,.trait:focus-visible,.d-close:focus-visible,.linkish:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.bar{display:flex;height:10px;border-radius:3px;overflow:hidden;background:var(--rule)}
+.bar span{display:block;height:100%}
+.lv-0{background:var(--rule)}
+.lv-1{background:color-mix(in srgb,var(--accent) 38%,var(--surface))}
+.lv-2{background:color-mix(in srgb,var(--accent) 62%,var(--surface))}
+.lv-3{background:color-mix(in srgb,var(--accent) 82%,var(--surface))}
+.lv-4{background:var(--accent)}
+.legend{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}
+.legend li{display:flex;align-items:center;gap:7px}
+.legend b{font-family:var(--font-mono);font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.legend .meter{margin-top:0}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-between;align-items:center;margin:0 0 14px}
+.howto{margin:0;font-size:13.5px;color:var(--muted);max-width:92ch}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer;white-space:nowrap}
+.toggle input{accent-color:var(--accent);width:16px;height:16px}
+
+/* Ladder grid */
+.ladder{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(7,minmax(124px,1fr));column-gap:10px}
+.edges{position:absolute;left:0;top:0;z-index:1;pointer-events:none;overflow:visible}
+.edges path{fill:none;stroke:var(--edge);stroke-width:1.1;opacity:.22;transition:opacity .15s}
+.ladder.web-off .edges path{opacity:0}
+.ladder.has-focus .edges path{opacity:0}
+.ladder.has-focus .edges path.e-anc{opacity:.95;stroke:var(--trace);stroke-width:1.8;marker-end:url(#mA)}
+.ladder.has-focus .edges path.e-desc{opacity:.9;stroke:var(--accent);stroke-width:1.6;marker-end:url(#mD)}
+.mk-a{fill:var(--trace)} .mk-d{fill:var(--accent)}
+
+.lane-h{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--bg);padding:10px 2px 8px;
+  border-bottom:2px solid var(--ink);margin-bottom:12px}
+.lane-n{font-family:var(--font-display);font-weight:800;font-size:17px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.lane-s{font-size:11.5px;color:var(--muted);line-height:1.3;margin-top:3px}
+
+.apex{grid-column:1/-1;position:relative;z-index:0;background:var(--apex);color:var(--apex-ink);border-radius:10px;
+  padding:22px 22px 20px;display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:18px 28px;margin-bottom:26px}
+.apex .k{color:var(--apex-muted)}
+.apex h2{font-family:var(--font-display);font-weight:800;font-size:40px;line-height:.9;text-transform:uppercase;margin:6px 0 10px;text-wrap:balance}
+.apex p{margin:0;font-size:14px;color:var(--apex-ink);opacity:.9}
+.apex-traits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;position:relative;z-index:3}
+.trait{display:flex;flex-direction:column;gap:6px;text-align:left;background:transparent;color:var(--apex-ink);
+  border:1px solid var(--apex-rule);border-radius:8px;padding:12px 13px;cursor:pointer;transition:border-color .15s,opacity .15s}
+.trait:hover{border-color:var(--apex-muted)}
+.trait-n{font-family:var(--font-display);font-weight:700;font-size:20px;line-height:1;text-transform:uppercase;letter-spacing:.01em}
+.trait-l{font-size:12.5px;line-height:1.4;color:var(--apex-ink);opacity:.82}
+.trait-c{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--apex-muted);margin-top:auto}
+.ladder.has-focus .trait{opacity:.42}
+.ladder.has-focus .trait.is-on,.ladder.has-focus .trait.is-fed{opacity:1}
+.trait.is-on{border-color:var(--apex-trace);box-shadow:inset 0 0 0 1px var(--apex-trace)}
+.trait.is-on .trait-n{color:var(--apex-trace)}
+.trait.is-fed{border-color:var(--apex-accent);box-shadow:inset 0 0 0 1px var(--apex-accent)}
+
+.band{grid-column:1/-1;position:relative;z-index:2;display:grid;grid-template-columns:minmax(220px,auto) minmax(0,1fr) auto;
+  gap:6px 22px;align-items:center;padding:11px 14px;margin:22px 0 12px;border-radius:6px;
+  background:color-mix(in srgb,var(--band) 90%,transparent)}
+.band-id{display:flex;align-items:center;gap:12px}
+.band-num{font-family:var(--font-display);font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;
+  line-height:1;padding:6px 8px;border:1.5px solid var(--ink);border-radius:4px;white-space:nowrap}
+.band-name{font-family:var(--font-display);font-weight:800;font-size:24px;line-height:1;text-transform:uppercase}
+.band-meta{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:3px}
+.band-gate{font-size:13px;line-height:1.4;min-width:0}
+.band-gate .k{margin-right:8px}
+.band-prog{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.band.is-here{box-shadow:inset 3px 0 0 var(--accent)}
+.band.is-here .band-num{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+
+.cell{min-width:0}
+.cell-lane{display:none}
+.stack{display:flex;flex-direction:column;gap:9px}
+
+.card{position:relative;z-index:2;display:flex;gap:8px;align-items:flex-start;justify-content:space-between;width:100%;
+  text-align:left;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:6px;
+  padding:8px 9px 9px 10px;font-size:12.5px;line-height:1.3;font-weight:600;cursor:pointer;
+  transition:opacity .15s,border-color .15s,box-shadow .15s}
+.card:hover{border-color:var(--edge)}
+.card:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.card .t{min-width:0;overflow-wrap:anywhere}
+.tag{display:block;font-family:var(--font-mono);font-size:9.5px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.card.fork{border-style:dashed;background:color-mix(in srgb,var(--surface) 60%,transparent)}
+.card.fork .tag{color:var(--trace-ink)}
+.dia{flex:none;width:9px;height:9px;margin:4px 3px 0 0;transform:rotate(45deg);border:1.5px solid var(--trace)}
+.card.is-decided .dia{background:var(--trace)}
+.meter{display:flex;gap:2px;flex:none;margin-top:2px}
+.meter i{display:block;width:5px;height:11px;border-radius:1px;background:var(--rule)}
+[data-lv="1"] .meter i:nth-child(-n+1),
+[data-lv="2"] .meter i:nth-child(-n+2),
+[data-lv="3"] .meter i:nth-child(-n+3),
+[data-lv="4"] .meter i:nth-child(-n+4){background:var(--accent)}
+[data-lv="pending"] .meter i{background:transparent;box-shadow:inset 0 0 0 1px var(--rule)}
+.card.is-now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.card.is-now::before{content:"Now";position:absolute;top:-8px;left:9px;font-family:var(--font-mono);font-size:9px;
+  font-weight:500;letter-spacing:.1em;text-transform:uppercase;background:var(--accent);color:var(--surface);padding:1px 6px;border-radius:3px}
+
+.ladder.has-focus .card{opacity:.26}
+.ladder.has-focus .card.is-anc,.ladder.has-focus .card.is-desc,.ladder.has-focus .card.is-focus{opacity:1}
+.card.is-anc{border-color:var(--trace);box-shadow:0 0 0 1px var(--trace)}
+.card.is-desc{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.card.is-focus{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+
+.start{grid-column:1/-1;position:relative;z-index:2;margin-top:18px;padding-top:12px;border-top:2px solid var(--ink);
+  display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline}
+.start-n{font-family:var(--font-display);font-weight:800;font-size:26px;text-transform:uppercase;line-height:1}
+.start p{margin:0;font-size:13px;color:var(--muted)}
+
+/* Below the ladder */
+.below{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:32px 48px;margin-top:56px;padding-top:24px;border-top:1px solid var(--rule)}
+@media (max-width:900px){.below{grid-template-columns:1fr}}
+.below h2{font-family:var(--font-display);font-weight:800;font-size:28px;text-transform:uppercase;line-height:1;margin:0 0 6px}
+.below .sub{margin:0 0 14px;font-size:13px;color:var(--muted)}
+.logwrap{overflow-x:auto}
+table.log{width:100%;border-collapse:collapse;font-size:13px}
+.log th{font-family:var(--font-mono);font-size:10.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--rule)}
+.log td{padding:9px 10px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.log td.d{font-family:var(--font-mono);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--muted)}
+.log td.c{white-space:nowrap}
+.linkish{background:none;border:0;padding:0;cursor:pointer;text-align:left;font-weight:600;text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:3px}
+.linkish:hover{text-decoration-color:var(--ink)}
+.empty{font-size:13.5px;color:var(--muted);margin:0}
+.changes{margin:0;padding-left:18px;display:grid;gap:8px;font-size:13.5px}
+.changes li::marker{color:var(--muted)}
+.fine{margin:18px 0 0;font-size:12.5px;color:var(--muted)}
+
+/* Drawer */
+.drawer{position:fixed;z-index:20;top:0;right:0;bottom:0;width:min(440px,94vw);background:var(--surface);color:var(--ink);
+  border-left:1px solid var(--rule);box-shadow:-18px 0 40px -24px rgba(0,0,0,.35);
+  padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 28px);overflow-y:auto;
+  transform:translateX(104%);visibility:hidden;transition:transform .22s ease,visibility 0s linear .22s}
+.drawer.open{transform:none;visibility:visible;transition:transform .22s ease}
+.d-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.d-close{flex:none;background:transparent;border:1px solid var(--rule);border-radius:6px;width:32px;height:32px;font-size:18px;line-height:1;cursor:pointer;color:var(--ink)}
+.drawer h2{font-family:var(--font-display);font-weight:800;font-size:32px;line-height:.95;text-transform:uppercase;margin:8px 0 14px;text-wrap:balance}
+.drawer h2:focus{outline:none}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:6px}
+.scale span{font-size:10.5px;line-height:1.2;text-align:center;padding:6px 2px;border-radius:3px;background:var(--bg);color:var(--muted)}
+.scale span.on{background:var(--accent);color:var(--surface);font-weight:600}
+.scale-note{margin:0 0 16px;font-size:12px;color:var(--muted)}
+.dsec{margin-top:16px}
+.dsec h3{font-family:var(--font-mono);font-size:10.5px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 5px}
+.dsec p{margin:0;font-size:14.5px;line-height:1.55}
+.dsec.q p{font-size:17px;line-height:1.45;font-weight:600;text-wrap:pretty}
+.callout{margin-top:14px;padding:10px 12px;border-radius:6px;border:1px solid var(--accent);font-size:13.5px}
+.callout b{color:var(--accent-ink)}
+.callout.fork{border-color:var(--trace)}
+.callout.fork b{color:var(--trace-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--bg);border:1px solid var(--rule);border-radius:999px;padding:4px 10px;font-size:12.5px;cursor:pointer;text-align:left}
+.chip:hover{border-color:var(--edge)}
+.chip.anc{border-color:var(--trace)} .chip.desc{border-color:var(--accent)}
+.statline{font-family:var(--font-mono);font-size:12px;color:var(--muted);margin:0}
+
+/* List mode below 1024px */
+@media (max-width:1023.98px){
+  .ladder{display:block}
+  .lane-h,.edges,.toggle{display:none}
+  .apex{grid-template-columns:1fr;margin-bottom:8px}
+  .apex-traits{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  .band{grid-template-columns:1fr;margin:30px 0 10px}
+  .band-prog{text-align:left}
+  .cell{margin:12px 0}
+  .cell.is-empty{display:none}
+  .cell-lane{display:block;font-family:var(--font-display);font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 6px;color:var(--muted)}
+  .stack{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+  .drawer{top:auto;left:0;right:0;width:auto;max-height:82vh;border-left:0;border-top:1px solid var(--rule);
+    border-radius:12px 12px 0 0;transform:translateY(104%);box-shadow:0 -18px 40px -24px rgba(0,0,0,.4)}
+  .drawer.open{transform:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .drawer,.drawer.open,.card,.trait,.edges path{transition:none}
+}
+</style>
+
+<div class="page">
+  <header class="top">
+    <div>
+      <div class="k">Dream Work &middot; Knowledge Map</div>
+      <h1>The Ladder</h1>
+      <p class="dek">Every skill between zero and the apex, in the order it has to be built. <em>Climb from the bottom.</em> Read from the top to reason backward from where you are going.</p>
+    </div>
+    <section class="here" aria-label="Where you are">
+      <div class="here-row">
+        <div>
+          <div class="k">You are here</div>
+          <div class="here-pos" id="herePos">Rung 0 &middot; Foundations</div>
+        </div>
+        <button class="btn" id="jumpBtn" type="button">Go to your rung</button>
+      </div>
+      <p class="here-active" id="hereActive">Loading your current work.</p>
+      <div class="bar" id="bar" aria-hidden="true"></div>
+      <ul class="legend" id="legend"></ul>
+      <p class="here-meta" id="hereMeta">Loading ratings.</p>
+    </section>
+  </header>
+
+  <div class="toolbar">
+    <p class="howto">Each card is one skill. Lines climb from what a skill builds on to what it unlocks. Open a card for the question you will have to answer cold, why it matters, how you prove it, and what to study. Open a trait in the apex to trace it all the way down to today.</p>
+    <label class="toggle"><input type="checkbox" id="webToggle" checked> Show every connection</label>
+  </div>
+
+  <div class="ladder" id="ladder">
+    <svg class="edges" id="edges" aria-hidden="true"></svg>
+  </div>
+
+  <section class="below">
+    <div>
+      <h2>Ratings log</h2>
+      <p class="sub">Every change to a rating, with the evidence behind it. Ratings rise only on graded, cold performance. Never on say-so, never for having been taught.</p>
+      <div class="logwrap" id="logwrap"><p class="empty">Loading the log.</p></div>
+    </div>
+    <div>
+      <h2>What this map changes</h2>
+      <p class="sub">Where the ladder departs from The Stack and The Canvas, based on your research doc (October 2026).</p>
+      <ol class="changes">
+        <li>Adds Rung 0. The Stack starts at Tier 1, and you are starting from zero.</li>
+        <li>Drops the "two to four year window." Your research doc found no evidence for it. Distress expertise pays when the first wave of failures arrives, and nobody can date that.</li>
+        <li>Aims the first seat at RX consulting, Big 4 restructuring, middle-market banks and bank special assets. Those are the realistic doors for a non-target December graduate.</li>
+        <li>Adds private credit workouts, the research doc's highest-confidence growth area.</li>
+        <li>Pairs Moyer with law-firm memos on liability management, which came after his book.</li>
+        <li>Scales the first proof down to one plain presale read by spring 2027. Two full proofs by then assumed a baseline you don't have yet.</li>
+        <li>Treats fund versus holdco as a decision to make later on evidence, since The Canvas is still a proposal.</li>
+      </ol>
+      <p class="fine">Dates for Rungs 0 to 2 are estimates at 8 to 10 focused hours a week. Later rungs follow The Canvas. Sources: The Stack v1.2, The Canvas v1.4, and the research doc's competency matrix, recruiting notes and audit.</p>
+    </div>
+  </section>
+</div>
+
+<aside class="drawer" id="drawer" aria-labelledby="dTitle" aria-hidden="true" inert>
+  <div class="d-head">
+    <div class="k" id="dEyebrow"></div>
+    <button class="d-close" id="dClose" type="button" aria-label="Close">&times;</button>
+  </div>
+  <h2 id="dTitle" tabindex="-1"></h2>
+  <div id="dBody"></div>
+</aside>
+
+<script id="ladder-data">
+const LANES = [
+  {id:"numbers", name:"Numbers", sub:"Accounting, valuation, credit math"},
+  {id:"paper",   name:"Paper",   sub:"Documents, bankruptcy, LMEs"},
+  {id:"pocket",  name:"The Pocket", sub:"AI-infrastructure capital structures"},
+  {id:"markets", name:"Markets", sub:"Rates, spreads, the credit cycle"},
+  {id:"game",    name:"The Game", sub:"Game theory and negotiation"},
+  {id:"voice",   name:"Voice",   sub:"Writing and proof of work"},
+  {id:"room",    name:"The Room", sub:"Contact, recruiting, seats"}
+];
+
+const RUNGS = [
+  {name:"Foundations", tier:"Tier 0", when:"Oct – Dec 2026", basis:"est.", gate:"Every Rung 0 skill at Explains or better on a closed-book checkpoint."},
+  {name:"Table stakes", tier:"Tier 1", when:"Dec 2026 – Jun 2027", basis:"est.", gate:"Three statements cold in ten seconds. DCF and LBO from a blank sheet in 60–90 minutes. A recovery waterfall and a 13-week cash flow from a data pack. A mock technical interview passed."},
+  {name:"The door", tier:"Last semester", when:"Jul – Dec 2027", basis:"est.", gate:"First seat signed. Teardown #1 published and defended with no AI. DCF and BBBY rebuilt solo. Ledger at 25 or more."},
+  {name:"The craft", tier:"Tier 2, on the job", when:"2028 – 2031", basis:"analyst years 0–3", gate:"Any credit agreement read cold and an LME mapped from it. Senior people ask for you by name. Publishing on a schedule."},
+  {name:"Specialize", tier:"One credit niche", when:"2031 – 2035", basis:"associate / VP", gate:"Specialist standing in one credit niche, plus deployable capital or committed backers."},
+  {name:"Principal", tier:"Owner of capital", when:"2035 +", basis:"per The Canvas, still a proposal", gate:"An attributable record, an anchor relationship, and a vehicle chosen on the evidence of the day."}
+];
+
+const APEX = [
+  {id:"a_paper", name:"Reads the paper", line:"You read credit documents at lawyer-grade precision and predict how a capital structure breaks before it does.", feeds:["n5_norms"]},
+  {id:"a_fulcrum", name:"Calls where value breaks", line:"You find the fulcrum across scenarios and you are right when the consensus is wrong.", feeds:["n4_judgment"]},
+  {id:"a_pocket", name:"Owns the pocket", line:"You know AI-infrastructure capital structures cold: what each asset is worth when it impairs, and who eats the loss.", feeds:["n5_buyer"]},
+  {id:"a_trust", name:"Keeps his word", line:"Creditor groups ask you to lead because your word holds across every deal in a small, repeated game.", feeds:["n5_trust"]},
+  {id:"a_voice", name:"Writes what gets quoted", line:"Your memos and teardowns are read, quoted and passed around by people outside your firm.", feeds:["n5_memos"]},
+  {id:"a_capital", name:"Owns the record and the capital", line:"An attributable track record, capital behind you, and the nerve to deploy it while others are forced to sell.", feeds:["n5_panic","fork_vehicle"]}
+];
+
+const NODES = [
+/* ---------- RUNG 0 · Foundations ---------- */
+{id:"n0_business", r:0, l:"numbers", t:"How a business makes money",
+ q:"Pick any business. Where does each dollar come from, where does it go, and what is left at the end?",
+ why:"Every capital structure sits on a business that either produces cash or doesn't. Every restructuring starts with that question.",
+ test:"Explain the economics of three businesses near you (a parking operation, a restaurant, a data center) in 60 seconds each, cold.",
+ src:"Item 1 (“Business”) of a 10-K on EDGAR. Start with Equinix's.", req:[]},
+{id:"n0_equation", r:0, l:"numbers", t:"The accounting equation",
+ q:"What do you own, what do you owe, what is actually yours, and who absorbs a loss first when values fall?",
+ why:"The skeleton of every balance sheet and every capital structure you will ever read. Restructuring is what happens when this equation stops working for the owners.",
+ test:"State the rule without the word “sell.” Then work three house and company cases cold, including one where values fall below what is owed.",
+ src:"Piper, Accounting Made Simple, ch. 1–3", req:["n0_business"]},
+{id:"n0_rpc", r:0, l:"numbers", t:"Revenue vs. profit vs. cash",
+ q:"How can a company be profitable and still run out of cash, and how can the reverse happen?",
+ why:"This gap is where restructuring work begins. The 13-week cash flow exists because of it.",
+ test:"Given a one-year story of a small business, compute revenue, profit and cash separately and explain every difference between them.",
+ src:"Piper, Accounting Made Simple (income statement and cash flow chapters)", req:["n0_business"]},
+{id:"n0_ownership", r:0, l:"numbers", t:"What owning equity gets you",
+ q:"What does a share actually entitle you to, in good times and bad, compared with someone who lent the company money?",
+ why:"Owners and lenders have opposite payoffs. That conflict drives every negotiation in distress.",
+ test:"Explain it to someone who has never invested, with one numerical case where the company does well and one where it doesn't.",
+ src:"Berk, DeMarzo & Harford, Fundamentals of Corporate Finance (opening chapter on the corporation)", req:["n0_equation"]},
+{id:"n0_statements", r:0, l:"numbers", t:"The three statements",
+ q:"What does each statement tell you that the other two can't, and how is each one tied to the others?",
+ why:"Every analysis you build sits on these three. Interviews start here and never stop testing it.",
+ test:"Name all three, say what each answers, and trace one transaction through all of them in words before numbers.",
+ src:"Piper, Accounting Made Simple (balance sheet through cash flow chapters)", req:["n0_equation","n0_rpc"]},
+{id:"n0_claims", r:0, l:"numbers", t:"Who gets paid, in what order",
+ q:"When a company has lenders and owners and can't pay everyone, who gets what, and why that order?",
+ why:"The order of claims is the whole game in a bankruptcy. Every fight you will sit in is over where the money runs out in this line.",
+ test:"Given a company worth less than it owes, allocate the value and justify each step out loud.",
+ src:"Berk, DeMarzo & Harford (capital structure chapter); a first look at Moyer, Distressed Debt Analysis", req:["n0_ownership","n0_contract"]},
+
+{id:"n0_interest", r:0, l:"markets", t:"Debt and interest",
+ q:"What is a loan, really, and why does a lender charge for it at all?",
+ why:"Every credit you will analyze is a promise to pay interest and principal. Restructuring is what happens when that promise breaks.",
+ test:"Compute what is owed on three loans by hand, and explain in your own words what the lender is being paid for.",
+ src:"Berk, DeMarzo & Harford (interest rates chapter)", req:[]},
+{id:"n0_tvm", r:0, l:"markets", t:"Time value of money",
+ q:"Why is a dollar today worth more than a dollar later, for at least two different reasons, and how do you put a number on the gap?",
+ why:"Every valuation, bond price and recovery estimate in a bankruptcy is a time-value calculation underneath.",
+ test:"Compute present and future values by hand for three cases, and give both reasons in your own words.",
+ src:"Berk, DeMarzo & Harford (time value of money chapter)", req:["n0_interest"]},
+{id:"n0_bonds", r:0, l:"markets", t:"Bonds and why prices move",
+ q:"When market rates change, what happens to the price of a bond you already hold, and why?",
+ why:"Distressed investing means buying debt at a price far from its face value. Reading that price is step one.",
+ test:"Predict the direction of a bond's price for three rate changes, then confirm each one with the math.",
+ src:"Berk, DeMarzo & Harford (bond valuation chapter)", req:["n0_tvm"]},
+{id:"n0_risk", r:0, l:"markets", t:"How markets price risk",
+ q:"Why do two borrowers pay different rates on the same loan, and what is the extra rate paying for?",
+ why:"That gap is one of the numbers credit people watch every day. You will learn to read it before it shows up in the news.",
+ test:"Rank five real borrowers by the rate you would expect them to pay, then defend the order.",
+ src:"Berk, DeMarzo & Harford (cost of debt and bond ratings)", req:["n0_bonds"]},
+
+{id:"n0_contract", r:0, l:"paper", t:"Debt is a contract",
+ q:"What exactly does a borrower promise in writing, and what can a lender do when a promise breaks?",
+ why:"Outcomes in restructuring turn on exact words in documents. Your relationship with legal paper starts here.",
+ test:"Read a real consumer loan or lease agreement line by line and list every promise and every consequence.",
+ src:"Your own lease, car loan or student loan paperwork", req:["n0_interest"]},
+
+{id:"n0_physical", r:0, l:"pocket", t:"Physical layer I: inside a data center",
+ q:"What is inside a hyperscale data center, how is its size measured, and why does an AI campus need far more power and cooling than an older one?",
+ why:"Most credit analysts covering this sector have never been inside one, and it shows in their assumptions. You can close that gap early.",
+ test:"Explain MW, critical IT load, rack density and cooling to a non-finance friend. Then visit the Chesterfield or Henrico campuses and describe what you are looking at.",
+ src:"Data Center Frontier and Datacenter Dynamics (free); Uptime Institute's tier classification", req:[]},
+{id:"n0_power", r:0, l:"pocket", t:"Power I: the bottleneck",
+ q:"Where does a data center's electricity come from, and why can it take years to connect a new site to the grid?",
+ why:"Power is the binding constraint on the buildout, which turns power access into a credit risk on every deal.",
+ test:"Explain an interconnection queue and quote two numbers from LBNL's Queued Up from memory.",
+ src:"LBNL, Queued Up (2026 edition), emp.lbl.gov/queues", req:[]},
+{id:"n0_players", r:0, l:"pocket", t:"Who's who in the buildout",
+ q:"Who builds, who rents, who lends and who owns in AI infrastructure, and which of them can least afford a bad year?",
+ why:"Every deal you will study has the same handful of player types. Know them and you can read any headline in one pass.",
+ test:"Sort twelve real names (Meta, Microsoft, CoreWeave, Blue Owl, QTS, Equinix, Digital Realty, Nvidia, Morgan Stanley, Apollo, a utility, a rating agency) into roles and explain each one's incentive.",
+ src:"Item 1 of the Equinix, Digital Realty and CoreWeave 10-Ks (EDGAR)", req:["n0_business"]},
+
+{id:"n0_game", r:0, l:"game", t:"Players, payoffs, strategies",
+ q:"In a game where each side's best move hurts both of them, what happens, and what would have to change for a better outcome?",
+ why:"Holdouts, creditor groups and liability management fights are all strategic games. You will map every case this way.",
+ test:"Solve three 2×2 games cold: each player's best response, the outcome, and one way to change the game.",
+ src:"Dixit & Nalebuff, The Art of Strategy, Part I", req:[]},
+{id:"n0_nego", r:0, l:"game", t:"Leverage and alternatives",
+ q:"Before a negotiation starts, what do you need to know about your own options and the other side's, and how does that set how hard you can push?",
+ why:"Every restructuring negotiation is shaped before anyone sits down. You will learn to see that shape first.",
+ test:"For three real negotiations (a car, a job offer, a lease), write each side's walk-away point and fallback before talking numbers.",
+ src:"Fisher & Ury, Getting to Yes; Malhotra & Bazerman, Negotiation Genius, ch. 1", req:["n0_game"]},
+
+{id:"n0_explain", r:0, l:"voice", t:"Explain it back",
+ q:"Can you explain each new concept to someone who has never heard of it, in your own words, with no notes?",
+ why:"If you can't explain it plainly, you don't own it. The same habit becomes the memos and teardowns people remember you for.",
+ test:"A 150-word explain-back for every Rung 0 skill, graded. Anything vague, borrowed or memorized gets redone.",
+ src:"Your own notebook", req:[]},
+{id:"n0_commit", r:0, l:"voice", t:"Commit to an answer",
+ q:"Can you state your conclusion first, with a confidence score, and keep the hedging out of the answer?",
+ why:"Hedging is your known pattern. In credit work, the person who commits and turns out right gets credit for the call.",
+ test:"Every answer in the lab ends with a committed position and a 1–5 confidence score.",
+ src:"Practice, every session", req:[]},
+
+{id:"n0_ledger", r:0, l:"room", t:"Start the Ledger",
+ q:"Who did you have a real conversation with this week about this field, and what did you learn that you couldn't have read?",
+ why:"The Canvas rule: never a zero-contact week. Knowledge that never reaches a room is worth nothing.",
+ test:"At least one real contact every week, logged with what you learned.",
+ src:"The Canvas §11 and §15.1", req:[]},
+{id:"n0_court", r:0, l:"room", t:"Sit in a bankruptcy courtroom",
+ q:"What actually happens at a Chapter 11 hearing, who speaks, and who holds power in the room?",
+ why:"Free, local, and almost nobody your age does it. You will hear the vocabulary in its natural setting long before you can use it.",
+ test:"Attend one public hearing. Write one page on who was there, what was argued, and what you didn't understand.",
+ src:"U.S. Bankruptcy Court, Eastern District of Virginia, Richmond division (hearing calendars on the court's site)", req:[]},
+{id:"n0_apply", r:0, l:"room", t:"Apply to what's open now",
+ q:"Which summer 2027 and off-cycle seats are still taking applications, and which of them hire candidates from non-target schools?",
+ why:"Recruiting won't wait until you are ready. Your research doc names the realistic doors: Big 4 restructuring, RX consulting, middle-market banks and bank special-assets programs.",
+ test:"A tracked list of applications sent, by firm, each with a referral attempt.",
+ src:"Research doc, §3 and Recommendation 1", req:[]},
+{id:"fork_grad", r:0, l:"room", fork:true, t:"Graduate Dec 2027 or May 2028?",
+ q:"Is one more semester worth it to reach the summer 2028 recruiting cycle, given what it costs?",
+ why:"Summer internships generally require you to still be a student, so a December graduate can't use the 2028 cycle (judgment). Per your research doc, those applications run September 2026 to February 2027, with the main wave in December and January. Decide before that wave.",
+ test:"A one-page written decision with the costs on both sides priced (The Canvas, Part VII).",
+ src:"The Canvas §8; research doc §3", req:[]},
+
+/* ---------- RUNG 1 · Table stakes ---------- */
+{id:"n1_link", r:1, l:"numbers", t:"Three statements, linked cold",
+ q:"Someone names a transaction. What happens on all three statements, including the cash flow line, in under ten seconds?",
+ why:"The most-tested skill in every finance interview, and The Stack's binding constraint for your first seat.",
+ test:"Twenty named transactions in random order, ten seconds each, closed book. Then build a linked three-statement model from a blank sheet until it is motor memory.",
+ src:"Any intermediate accounting text. Build, don't read (The Stack §3).", req:["n0_statements"]},
+{id:"n1_hard", r:1, l:"numbers", t:"The hard transactions",
+ q:"What happens on all three statements when debt is issued at a discount, interest is paid in kind, a lease is capitalized, or a subsidiary is deconsolidated?",
+ why:"Distressed companies are full of these. Your research doc puts PIK, OID and lease accounting on the line between hireable and strong.",
+ test:"Walk each one through all three statements unprompted, including the non-cash add-backs.",
+ src:"Fridson & Alvarez, Financial Statement Analysis; free Big 4 guides to lease accounting (ASC 842)", req:["n1_link"]},
+{id:"n1_credit", r:1, l:"numbers", t:"Credit fundamentals",
+ q:"How do you judge whether a company can carry its debt: leverage, coverage, liquidity, and how the debt is stacked?",
+ why:"Credit is the lens for everything after your first seat, whichever vehicle you end up building.",
+ test:"From a real 10-K, compute leverage, interest coverage and liquidity, and lay out the debt stack top to bottom.",
+ src:"Fridson & Alvarez; S&P corporate ratings methodology (free)", req:["n1_link","n0_claims","n0_risk"]},
+{id:"n1_valuation", r:1, l:"numbers", t:"DCF and comps",
+ q:"What is a company worth based on the cash it will produce, and what are similar companies trading or selling for?",
+ why:"Restructuring is a fight over value. Whichever valuation the court believes decides who owns the company afterward.",
+ test:"Build a DCF and trading comps for a real public company from a blank sheet in 60–90 minutes.",
+ src:"Rosenbaum & Pearl, Investment Banking (valuation chapters)", req:["n1_link","n0_tvm"]},
+{id:"n1_13w", r:1, l:"numbers", t:"13-week cash flow",
+ q:"Week by week, where does cash come from, where does it go, and in which week does it run out?",
+ why:"The restructuring workhorse. It is central in RX consulting, your most likely first seat, and few people outside RX build one well.",
+ test:"Build one from receivables and payables agings and a payroll schedule, then write a weekly variance report.",
+ src:"DIP budgets in first-day filings on Kroll, Stretto and Epiq case sites", req:["n1_link","n0_rpc"]},
+{id:"n1_lbo", r:1, l:"numbers", t:"LBO",
+ q:"How much can a buyer borrow against a business, and what return does the equity earn if the plan works?",
+ why:"Many companies in restructuring got there through a leveraged buyout. Knowing how the debt went on tells you how it comes off.",
+ test:"A paper LBO in 10 minutes; a full LBO from a blank sheet in 60–90 minutes.",
+ src:"Rosenbaum & Pearl (LBO chapters)", req:["n1_valuation","n1_credit"]},
+{id:"n1_waterfall", r:1, l:"numbers", t:"Recovery waterfall",
+ q:"Given what a company is worth and everything it owes, how much does each creditor class get back, and who gets nothing?",
+ why:"A staple of every RX interview and the base of every distressed trade.",
+ test:"Allocate value through a six-tranche capital structure at three different valuations, cold.",
+ src:"Moyer, Distressed Debt Analysis (recovery analysis)", req:["n1_credit","n1_valuation","n1_security"]},
+
+{id:"n1_security", r:1, l:"paper", t:"Collateral, liens and priority",
+ q:"What makes debt secured, how does it differ from unsecured debt, a revolver or a bond, and what does that change when things go wrong?",
+ why:"Secured versus unsecured is the first split in every waterfall you will build.",
+ test:"Lay out a real company's debt stack from its 10-K, label each piece's security, and rank them.",
+ src:"Moyer; The Stack §5", req:["n0_contract","n0_claims"]},
+{id:"n1_covenants", r:1, l:"paper", t:"Covenants",
+ q:"What does a borrower promise beyond paying interest, and what happens the day one of those promises breaks?",
+ why:"A broken covenant is often the first moment lenders get leverage over a company. The restructuring clock starts there.",
+ test:"Find and explain every financial covenant in a real 10-K debt footnote.",
+ src:"Moyer; 10-K debt footnotes on EDGAR", req:["n0_contract","n1_credit"]},
+{id:"n1_ch11", r:1, l:"paper", t:"Chapter 11 in one page",
+ q:"What happens the day a company files: the automatic stay, who runs the business, DIP financing, 363 sales, and what a plan needs to pass?",
+ why:"The one-page version every RX interview expects. The deep version comes on the job.",
+ test:"Explain Chapter 11 versus Chapter 7, the stay, DIP financing and a 363 sale in two minutes each.",
+ src:"Moyer (bankruptcy chapters); American Bankruptcy Institute resources", req:["n1_security","n0_court"]},
+
+{id:"n1_leases", r:1, l:"pocket", t:"Leases and tenant credit",
+ q:"What is a data center worth when the tenant is a AA-rated hyperscaler on a 20-year lease, versus a venture-funded neocloud on five years?",
+ why:"From The Stack: two assets that look identical in a spreadsheet can be radically different credits. This is why.",
+ test:"Compare two real tenants' credit and lease terms on one page.",
+ src:"Morningstar DBRS and KBRA data center methodologies; hyperscaler 10-K lease footnotes", req:["n1_credit","n0_players"]},
+{id:"n1_depr", r:1, l:"pocket", t:"GPU useful life",
+ q:"Over how many years should a GPU be depreciated, who argues 2–3 years versus 4–6, and what changes if the short side is right?",
+ why:"Your research doc calls GPU residual value the most contested number in the AI stack. Load-bearing assumptions are where distress starts.",
+ test:"Restate one neocloud's earnings and collateral value on a 3-year life instead of 6, and say who loses.",
+ src:"CoreWeave 10-K depreciation note; the Burry vs. Nvidia useful-life debate (Nov 2025)", req:["n1_link","n0_physical"]},
+{id:"n1_neocloud", r:1, l:"pocket", t:"Neocloud economics I",
+ q:"How does a neocloud make money, what does it owe, and what happens when its customer contracts are shorter than its loans?",
+ why:"Your research doc's judgment: neocloud and GPU-backed debt is the most likely first place the buildout breaks.",
+ test:"One page on CoreWeave from its 10-Q: revenue sources, customer concentration, and debt maturities against contract terms.",
+ src:"CoreWeave Q2 2026 10-Q. Use the filing, not the press.", req:["n1_depr","n1_leases"]},
+
+{id:"n1_rates", r:1, l:"markets", t:"Rates and the Fed",
+ q:"What sets short and long rates, what is the yield curve saying today, and how does that reach a company's cost of borrowing?",
+ why:"Refinancing walls, default waves and distressed supply all start with rates. This is also the layer you would share with the macro path.",
+ test:"Explain today's curve and the last Fed decision in two minutes, using numbers you looked up that morning.",
+ src:"Fabozzi, Bond Markets, Analysis, and Strategies; FOMC statements (federalreserve.gov)", req:["n0_bonds"]},
+{id:"n1_spreads", r:1, l:"markets", t:"Spreads, ratings, prices",
+ q:"What does a spread over Treasuries say about a borrower, how do ratings map to spreads, and what does a loan quoted at 60 mean?",
+ why:"The language of trade talk. If you can't quote spreads and prices, you can't hold a conversation on a credit desk.",
+ test:"Take a real loan or bond price, convert it to a yield and a spread, and say what the market expects.",
+ src:"Fabozzi; free LCD/PitchBook commentary", req:["n1_rates","n0_risk"]},
+{id:"n1_defaults", r:1, l:"markets", t:"Defaults and recoveries",
+ q:"How often do leveraged companies default, how much do lenders get back, and how often does an out-of-court fix fail later?",
+ why:"Base rates keep your judgment honest. Per your research doc, 37% of companies in S&P's LME sample later filed for bankruptcy.",
+ test:"Quote current default rates and recovery ranges from memory, with sources.",
+ src:"LCD/PitchBook default reports; S&P Global default studies", req:["n1_spreads"]},
+
+{id:"n1_seq", r:1, l:"game", t:"Backward induction",
+ q:"When players move in turns, how do you solve the game from the end, and which threats are actually credible?",
+ why:"Your claimed strength, now tested. Restructuring talks run in rounds, and whoever solves them backward stops wasting moves on empty threats.",
+ test:"Solve three game trees cold and say which threats are credible and why.",
+ src:"Dixit & Nalebuff, The Art of Strategy, Part II", req:["n0_game"]},
+{id:"n1_repeated", r:1, l:"game", t:"Repeated games and reputation",
+ q:"Why does keeping your word pay when you will face the same people again, and what makes cooperation collapse?",
+ why:"Restructuring is a small world where the same advisors and funds meet deal after deal. Your research doc names trust in that repeated game as the currency of creditor groups.",
+ test:"Explain the logic using a real broken coalition, and predict when the next one breaks.",
+ src:"The Art of Strategy (cooperation and coordination)", req:["n0_game"]},
+{id:"n1_reps", r:1, l:"game", t:"Negotiation reps I",
+ q:"Can you hold a position under pressure, against a counterparty who owes you nothing, without giving away your fallback?",
+ why:"Negotiation is learned through reps, not books. The Stack says it only becomes a strength through live practice.",
+ test:"Six graded roleplays (car, salary, lease, vendor, creditor call, interview), each with a debrief on what you gave away.",
+ src:"Shell, Bargaining for Advantage", req:["n0_nego"]},
+
+{id:"n1_memo", r:1, l:"voice", t:"The one-page memo",
+ q:"Can you write a one-page recommendation with the conclusion first, no hedging, and every claim backed?",
+ why:"The person who writes the clearest memo in the room gets credit for the thinking in it (The Stack §16).",
+ test:"Every case you study, written up as a graded one-page memo.",
+ src:"Minto, The Pyramid Principle", req:["n0_explain","n0_commit"]},
+{id:"n1_proof", r:1, l:"voice", t:"Proof #1: one presale, read plainly",
+ q:"Can you read a real data center ABS presale and explain the collateral, the tenants, the cash waterfall and the stress cases on one page?",
+ why:"Small, real and yours. Your research doc wanted two proofs by spring 2027. Starting from zero, one plain read is the honest target.",
+ test:"One page, written with no AI, that you can defend line by line.",
+ src:"S&P presale page (public); Morningstar DBRS presales (free account)", req:["n1_memo","n1_leases"]},
+
+{id:"n1_alumni", r:1, l:"room", t:"Alumni and TMA",
+ q:"Which VCU alumni and Richmond–D.C. professionals work in restructuring, and which have you actually spoken with?",
+ why:"Your research doc's route for non-targets: targeted alumni outreach and TMA events. Relationships get you past the screen your GPA trips.",
+ test:"Ten real conversations logged by June 2027.",
+ src:"TMA (turnaround.org) student chapters and events; LinkedIn alumni search", req:["n0_ledger"]},
+{id:"n1_sie", r:1, l:"room", opt:true, t:"SIE exam",
+ q:"Is a weekend of study worth a weak signal on your résumé right now?",
+ why:"Cheap, and no sponsor needed. Per your research doc, it won't get you an interview.",
+ test:"Pass it, if you choose to take it.",
+ src:"FINRA's SIE content outline", req:[]},
+{id:"n1_interview", r:1, l:"room", t:"Interview-ready",
+ q:"Can you pass a restructuring technical interview: statements, waterfall, Chapter 11 basics, and one live situation explained in two minutes?",
+ why:"Per your research doc, these are the topics RX interviews test. What separates top candidates is fluency in a live situation, with the documents actually read.",
+ test:"A graded mock technical interview, plus a recorded first-round practice.",
+ src:"Research doc §2, “What RX interviews test today”", req:["n1_waterfall","n1_ch11","n1_hard","n1_lbo","n1_reps","n0_apply"]},
+
+/* ---------- RUNG 2 · The door ---------- */
+{id:"n2_fulcrum", r:2, l:"numbers", t:"The fulcrum",
+ q:"In a given capital structure and valuation, whose claim converts into ownership, and how does that change when the valuation moves?",
+ why:"Finding the fulcrum is how distressed investors decide what to buy. It is also a standard RX interview question.",
+ test:"Identify the fulcrum in three real capital structures under low, base and high valuations.",
+ src:"Moyer, Distressed Debt Analysis", req:["n1_waterfall"]},
+{id:"n2_rebuild", r:2, l:"numbers", t:"Rebuild the DCF and BBBY",
+ q:"Can you rebuild the DCF and the BBBY analysis that AI built for you, from a blank sheet, and defend every line?",
+ why:"The ownership test. Anything with your name on it has to survive questioning with no AI in the room.",
+ test:"Both rebuilt solo, then defended in a hostile roleplay.",
+ src:"Your earlier files, kept closed until the rebuild is done", req:["n1_valuation","n1_waterfall","n1_ch11"]},
+
+{id:"n2_ca", r:2, l:"paper", t:"Read a credit agreement",
+ q:"Where in a credit agreement are the things that decide outcomes, and what do the definitions, negative covenants and baskets actually permit?",
+ why:"Most analysts read summaries. Per your research doc, Serta, Mitel and Incora were decided on specific words in the documents.",
+ test:"Pull one credit agreement from EDGAR (an 8-K exhibit), read all of it, and write two pages on what it permits.",
+ src:"SEC EDGAR full-text search; The Stack §8", req:["n1_covenants","n1_security"]},
+{id:"n2_lme", r:2, l:"paper", t:"LMEs: uptier, drop-down, double-dip",
+ q:"How did some lenders get ahead of others out of court in J.Crew, Serta and Mitel, and why did similar deals win in one court and lose in another?",
+ why:"Per your research doc, LMEs now make up the majority of defaults. Explaining one in two minutes is an interview staple.",
+ test:"Explain an uptier and a drop-down in two minutes each, then Serta versus Mitel on the exact contract language.",
+ src:"Law-firm client memos (Jones Day, Mayer Brown, Paul Weiss); free Octus articles", req:["n2_ca","n1_ch11"]},
+
+{id:"n2_pf", r:2, l:"pocket", t:"Project finance I",
+ q:"How does a new hyperscale campus get funded, from the SPV and construction loan to the long-term takeout, and where does each lender sit?",
+ why:"The Stack's first Tier 3 piece. The structure decides who gets hurt if the build runs late or the tenant walks.",
+ test:"Draw the sources and uses and the debt stack of one real campus financing from public filings.",
+ src:"Yescombe, Principles of Project Finance", req:["n1_credit","n1_leases","n0_power"]},
+{id:"n2_abs", r:2, l:"pocket", t:"Data center ABS and CMBS",
+ q:"How does data center rent become rated bonds, what protects the bondholders, and what do the rating agencies stress?",
+ why:"Per your research doc, data center securitization runs to tens of billions of dollars a year and the deal documents are public. Few students ever read them.",
+ test:"Map the full waterfall of one real deal, including coverage tests, cash traps and amortization triggers, and run one stress case of your own.",
+ src:"KBRA Data Center ABS methodology (Jan 2026); S&P presales; CRE Finance Council data center primer", req:["n1_proof","n1_waterfall"]},
+
+{id:"n2_cycle", r:2, l:"markets", t:"The credit cycle",
+ q:"Where is the credit cycle right now, what would tell you it is turning, and what does that mean for distressed supply?",
+ why:"The great distressed investors built their records by deploying when others couldn't. You have to recognize the moment before you can use it.",
+ test:"A one-page monthly cycle read built on three indicators you track yourself.",
+ src:"Marks, Mastering the Market Cycle; Oaktree memos (free)", req:["n1_defaults"]},
+{id:"n2_pc", r:2, l:"markets", t:"Private credit basics",
+ q:"What is a unitranche loan, why do borrowers switch to paying interest in kind, and what happens when a direct lender forecloses?",
+ why:"Your research doc rates private credit's first full default cycle as a high-confidence growth area: “bad PIK” at 6.2% of loans in Q2 2026 and $22.3B of foreclosures in H1 2026.",
+ test:"Explain the “shadow default rate” argument and one foreclosure or credit bid, two minutes each.",
+ src:"Lincoln International Private Market Index releases", req:["n1_hard","n1_credit"]},
+
+{id:"n2_holdout", r:2, l:"game", t:"Holdouts and coalitions",
+ q:"In a creditor group, who gains by holding out, what keeps a majority together, and what do the documents let the majority do to the minority?",
+ why:"Per your research doc, cooperation agreements are now an arms race: 13 attempts in 2025 to block them in documents, and 3 that succeeded.",
+ test:"Build the full game map for one real LME: players, payoffs, leverage, what the documents permit, coalition dynamics, where value breaks.",
+ src:"Octus coverage of cooperation agreements; law-firm memos on Serta and Mitel", req:["n1_seq","n1_repeated","n2_lme"]},
+
+{id:"n2_teardown", r:2, l:"voice", t:"Teardown #1, published",
+ q:"Can you publish a real credit analysis of a data center or neocloud capital structure: the structure, tenant credit, depreciation assumptions, where it breaks, and what would make you comfortable?",
+ why:"The Stack: worth more than your GPA and résumé combined. The Canvas: it is your networking strategy.",
+ test:"Published under your name before graduation, and defended line by line with no AI.",
+ src:"The Stack §14; The Canvas §15.1", req:["n1_neocloud","n2_abs","n2_pf","n1_memo"]},
+
+{id:"n2_inbound", r:2, l:"room", t:"Contact through the work",
+ q:"Who replied to your published work, and did you answer every one of them?",
+ why:"The Canvas inversion: the artifact does the approaching. A stranger who read your teardown and replied is worth ten cold messages.",
+ test:"Ledger at 25 or more (The Canvas, Gate 0), with every engagement answered within a week.",
+ src:"The Canvas §15.1", req:["n2_teardown","n1_alumni"]},
+{id:"n2_seat", r:2, l:"room", t:"Sign the first seat",
+ q:"Which offer gives you the most reps, a senior sponsor, and a record you can attribute to yourself, rather than just the highest pay?",
+ why:"Your research doc's route: RX consulting or Big 4 for one to three years, then a lateral. The Canvas adds the attributable-record test.",
+ test:"A signed offer at an RX consulting firm, a Big 4 restructuring team, a middle-market bank, or a bank special-assets group.",
+ src:"Research doc §1 and §3; The Canvas §9", req:["n1_interview","n1_alumni","n2_teardown","n2_rebuild"]},
+
+/* ---------- RUNG 3 · The craft ---------- */
+{id:"n3_liquidity", r:3, l:"numbers", t:"Liquidity under fire",
+ q:"Can you build a company's cash runway under several scenarios in under a day and defend it to its lenders?",
+ why:"Your research doc's top-tier analyst standard for the 13-week. Lenders make decisions on this number.",
+ test:"Live case work, signed off by a director.",
+ src:"On the job; DIP budgets and variance reports on public dockets", req:["n1_13w"]},
+{id:"n3_leverage", r:3, l:"numbers", t:"True leverage",
+ q:"Can you read a 10-K's footnotes and rebuild what a company really owes, including leases, guarantees, residual value guarantees and off-balance-sheet JVs?",
+ why:"A top-tier analyst skill in your research doc. Meta's Hyperion guarantee sits in the footnotes, not on the balance sheet.",
+ test:"Rebuild one hyperscaler's true leverage from its filings.",
+ src:"Meta Q3 2025 10-Q; lease accounting guides (ASC 842)", req:["n1_hard","n1_leases"]},
+{id:"n3_distressed_val", r:3, l:"numbers", t:"Distressed valuation",
+ q:"How do you value a company in Chapter 11 (normalized earnings, tax assets, cost of capital under distress) so it holds up at a confirmation hearing?",
+ why:"Valuation decides who owns the company after the case. It is where the fight is.",
+ test:"A valuation section that survives a mock cross-examination.",
+ src:"Altman, Hotchkiss & Wang, Corporate Financial Distress, Restructuring, and Bankruptcy; Moyer", req:["n2_fulcrum","n1_valuation"]},
+
+{id:"n3_baskets", r:3, l:"paper", t:"Baskets and sacred rights",
+ q:"Can you map every basket, unrestricted-subsidiary capacity, the pro rata sharing exceptions and the sacred rights in a live credit agreement?",
+ why:"The “strong” analyst standard in your research doc. This is where the next LME is hiding.",
+ test:"One fully annotated credit agreement a month, from EDGAR.",
+ src:"EDGAR; law-firm memos", req:["n2_ca"]},
+{id:"n3_ch11", r:3, l:"paper", t:"Chapter 11 in depth",
+ q:"What does §1129 require to confirm a plan, how does cramdown work, and how do DIP terms, 363 sales and releases after Purdue decide who wins?",
+ why:"The deep version you learn on live cases. Your research doc flags release strategy and cross-border tools as newly important after Purdue.",
+ test:"Predict the outcome of a live confirmation fight in writing, then check it against the ruling.",
+ src:"First-day declarations on Kroll, Stretto, Epiq and Omni case sites; Moyer; ABI", req:["n1_ch11"]},
+{id:"n3_blocker", r:3, l:"paper", t:"Blocker map, published",
+ q:"For a live credit agreement, which LMEs does it allow, which is it protected against, and how would you attack or defend it?",
+ why:"A top-tier analyst skill and the second proof of work your research doc recommends.",
+ test:"A published, annotated blocker map of a real agreement.",
+ src:"EDGAR; J.Crew and Serta blocker language explained in law-firm memos", req:["n3_baskets","n2_lme"]},
+
+{id:"n3_power", r:3, l:"pocket", t:"Power II: PPAs and IPPs",
+ q:"How is a power plant financed, what separates contracted from merchant power risk, and how does a PPA change a data center's credit?",
+ why:"The Stack: power is the real constraint on the buildout, which makes it the real asset.",
+ test:"Lay out one IPP's capital structure and one data center PPA's key terms from filings.",
+ src:"FERC filings; IPP 10-Ks; LBNL queue data", req:["n2_pf"]},
+{id:"n3_abs", r:3, l:"pocket", t:"ABS waterfalls, advanced",
+ q:"Can you model anticipated repayment dates, cash traps, rapid amortization triggers and the agencies' cash flow haircuts?",
+ why:"Item two on your research doc's mastery checklist for this specialization.",
+ test:"Rebuild a rating agency's stress case for a real deal and compare your result with theirs.",
+ src:"KBRA and Morningstar DBRS methodologies; S&P presales; Fabozzi & Kothari, Introduction to Securitization", req:["n2_abs"]},
+{id:"n3_gpu", r:3, l:"pocket", t:"GPU-backed lending",
+ q:"How is a loan secured by GPUs and customer contracts structured, and what happens to the collateral if the contracts aren't renewed?",
+ why:"Per your research doc, CoreWeave's DDTL 5.5 runs about five years against contracts averaging about three. Lenders are underwriting re-leasing risk.",
+ test:"Your research doc's third proof: a CoreWeave DDTL 4.0 versus 5.5 comparison from SEC exhibits.",
+ src:"CoreWeave 8-K exhibits on EDGAR; Moody's rating action on DDTL 4.0", req:["n1_neocloud","n2_ca"]},
+{id:"n3_rvg", r:3, l:"pocket", t:"Off-balance-sheet structures",
+ q:"How did Meta and Blue Owl fund Hyperion without it landing on Meta's balance sheet, and what does Meta still owe if things go wrong?",
+ why:"Per your research doc, this is the off-balance-sheet template for the buildout, and pricing it takes lease, guarantee and accounting analysis.",
+ test:"A two-page teardown: the JV split, the notes, the residual value guarantee, and who bears the residual risk.",
+ src:"Meta Q3 2025 10-Q; coverage of the Beignet Investor LLC notes", req:["n2_pf","n3_leverage"]},
+
+{id:"n3_trading", r:3, l:"markets", t:"How distressed debt trades",
+ q:"How do loans and claims trade, what moves a distressed price day to day, and how do you size a position to legal and valuation uncertainty?",
+ why:"The bridge from advising to investing, and the ground the distressed and macro paths share most.",
+ test:"A paper portfolio of three distressed names, marked monthly, each with a written thesis.",
+ src:"Moyer; free Octus and Debtwire coverage", req:["n2_cycle","n2_fulcrum"]},
+{id:"fork_macro", r:3, l:"markets", fork:true, t:"Distressed principal or macro?",
+ q:"Is the destination the restructuring-to-principal route, or a rates and FX trading seat?",
+ why:"Per your research doc, keeping both open is cheap through about 2029 because the rates and credit layer is shared, and expensive after that because neither track record transfers. Decide by 2030.",
+ test:"A deliberate written decision before 2030.",
+ src:"Research doc §9", req:["n1_rates"]},
+
+{id:"n3_reps", r:3, l:"game", t:"Negotiation reps II: live",
+ q:"In real advisor calls and creditor meetings, can you read who holds leverage and hold your position without leaking it?",
+ why:"The Canvas: negotiation becomes a real strength only through live reps against people who owe you nothing.",
+ test:"A debrief log of live negotiations you sat in on or ran, with what was given away.",
+ src:"Shell; Diamond, Getting More", req:["n1_reps"]},
+{id:"n3_maps", r:3, l:"game", t:"Case maps, written in advance",
+ q:"For every live case you touch, can you map the players, payoffs, leverage, document permissions, holdouts and where value breaks before the outcome is known?",
+ why:"Writing the map before the outcome is how judgment gets calibrated instead of rationalized.",
+ test:"Ten case predictions written in advance and scored afterward.",
+ src:"Your own prediction log", req:["n2_holdout","n3_ch11"]},
+
+{id:"n3_cadence", r:3, l:"voice", t:"Publish on a schedule",
+ q:"Are you publishing a teardown every quarter, and is anyone reading it?",
+ why:"The Canvas: publish on a schedule, reply to everyone who engages, and the Ledger builds itself. Check your employer's policy on outside publishing first.",
+ test:"Four published pieces a year, each defended with no AI.",
+ src:"The Canvas §15.1; The Stack, Part IX", req:["n2_teardown"]},
+
+{id:"n3_sponsor", r:3, l:"room", t:"A senior sponsor",
+ q:"Who senior at your firm would ask for you by name, and why?",
+ why:"The Canvas, Phase 1: deal reps, one director-level sponsor, a zero-defect reputation.",
+ test:"You go from being staffed to being requested.",
+ src:"The Canvas §9", req:["n2_seat"]},
+{id:"n3_record", r:3, l:"room", t:"Which seats build a record?",
+ q:"Which seats produce a track record you can attribute to yourself, and which don't?",
+ why:"The Canvas: you need this answer eight years before you need the record. Ask it in every practitioner conversation.",
+ test:"Twenty practitioner answers logged, and a written conclusion.",
+ src:"The Canvas §9", req:["n1_alumni","n2_inbound"]},
+{id:"n3_cira", r:3, l:"room", opt:true, t:"CIRA",
+ q:"Does the restructuring-specific credential make sense in your seat?",
+ why:"Per your research doc, it pays off around years 2 to 5 in consulting.",
+ test:"Pass it, if your seat values it.",
+ src:"AIRA (aira.org)", req:["n2_seat"]},
+
+/* ---------- RUNG 4 · Specialize ---------- */
+{id:"n4_workout", r:4, l:"numbers", t:"Private credit workouts",
+ q:"Can you structure a forbearance, a PIK conversion, an equity cure or a lender takeover?",
+ why:"A high-confidence growth skill per your research doc. The 13-week and lender-reporting skills from consulting are exactly what workout teams lack.",
+ test:"Lead a workstream on a live workout.",
+ src:"On the job; Lincoln International data", req:["n2_pc","n3_liquidity"]},
+{id:"n4_judgment", r:4, l:"numbers", t:"Size to uncertainty",
+ q:"Can you size a position to a range of legal and valuation outcomes instead of a single point estimate?",
+ why:"Per your research doc, judgment at the top means sizing to litigation and valuation ranges, and being right when the consensus is wrong.",
+ test:"A record of calls, sized and documented before the outcome.",
+ src:"Marks memos; your own prediction log", req:["n3_trading","n3_distressed_val","n3_maps"]},
+
+{id:"n4_lme_struct", r:4, l:"paper", t:"LMEs: offense and defense",
+ q:"Can you design a transaction that survives a Serta-type challenge, or block one, and model what participating and non-participating lenders recover?",
+ why:"Your research doc's associate and VP standard for liability management.",
+ test:"Mandate work on a live LME.",
+ src:"Octus “Year in LMEs”; law-firm memos; live mandates", req:["n3_blocker","n3_maps"]},
+
+{id:"n4_stress", r:4, l:"pocket", t:"Where AI infrastructure breaks",
+ q:"Can you run a full stress framework on any AI-infrastructure credit: tenant defaults, re-leasing lags, GPU residual haircuts, power delays, stressed exit values?",
+ why:"KBRA's methodology stresses rounds of tenant defaults, re-leasing lags, revenue haircuts and stressed terminal cap rates. You will build and publish your own version.",
+ test:"Your framework applied to three real structures, with predictions logged.",
+ src:"KBRA Data Center ABS methodology; your own published work", req:["n3_gpu","n3_abs","n3_rvg","n3_power"]},
+{id:"n4_specialist", r:4, l:"pocket", t:"Creditor-side mandates",
+ q:"Are you the person in the room who reads AI-infrastructure structures for creditors?",
+ why:"The Canvas, Phase 2: credit over generalist M&A, with creditor-side mandates in infrastructure, power or technology credit.",
+ test:"Specialist standing in one niche: mandates, citations, inbound calls.",
+ src:"The Canvas §10", req:["n4_stress","n4_lateral"]},
+
+{id:"n4_turn", r:4, l:"markets", t:"Call the turn",
+ q:"Can you tell when the AI-infrastructure credit cycle is turning, and when not to act on it?",
+ why:"Per your research doc, nobody can date the first wave of failures, and distress expertise is worth most when it comes. Your edge is being ready when it does.",
+ test:"A dated, written record of your cycle calls, right and wrong.",
+ src:"Your own memos", req:["n2_cycle","n4_stress"]},
+
+{id:"n4_lead", r:4, l:"game", t:"Lead the economics",
+ q:"Can you lead advisor-to-advisor calls on DIP fees, roll-ups and exit equity splits?",
+ why:"Your research doc's associate and VP negotiation standard.",
+ test:"Run the economics calls on a live case.",
+ src:"On the job", req:["n3_reps"]},
+{id:"n4_coalitions", r:4, l:"game", t:"Coalition design",
+ q:"Can you build, hold and defend a creditor co-op, including tiered treatment, against anti-co-op tactics and antitrust risk?",
+ why:"Per your research doc, co-ops moved from defense to offense, and the Selecta and Optimum suits raised antitrust questions.",
+ test:"Lead coalition work on a live mandate.",
+ src:"Octus; live mandates", req:["n3_maps","n3_reps"]},
+
+{id:"n4_authority", r:4, l:"voice", t:"Known for one thing",
+ q:"When someone needs to understand AI-infrastructure credit, is yours the name they hear?",
+ why:"The Canvas, Phase 2: become known for one thing. Inbound scales without proportional discomfort.",
+ test:"Inbound requests, citations, invitations to speak.",
+ src:"The Canvas §10 and §15.1", req:["n3_cadence","n4_stress"]},
+
+{id:"n4_lateral", r:4, l:"room", t:"Lateral to the creditor side",
+ q:"Which move gets you closest to principal capital: RX banking, a private credit workout team, or a special-situations fund?",
+ why:"Your research doc's well-trodden lateral paths start from exactly the seats you are likely to hold.",
+ test:"The lateral, made with a written reason.",
+ src:"Research doc §3", req:["n3_sponsor","n3_record","n3_liquidity"]},
+{id:"n4_anchor", r:4, l:"room", t:"Anchor relationships",
+ q:"Who would put money behind you, and what would they need to see first?",
+ why:"Per your research doc, successful fund launches have an anchor and a team spun out of a known platform.",
+ test:"At least one committed anchor relationship (The Canvas, Gate 2).",
+ src:"Research doc §7; The Canvas §7", req:["n4_lateral","n4_authority"]},
+{id:"n4_cfa", r:4, l:"room", opt:true, t:"CFA: decide in 2030",
+ q:"Does the buy-side credit seat you are aiming for value the CFA enough to justify the hours?",
+ why:"Your research doc: low return before 2031, worth reconsidering for the buy-side credit phase. The Stack says skip it.",
+ test:"A decision, made on purpose.",
+ src:"Research doc credentials table; The Stack, Part VII", req:[]},
+
+/* ---------- RUNG 5 · Principal ---------- */
+{id:"n5_record", r:5, l:"numbers", t:"An attributable record",
+ q:"Can you show five or more years of P&L or deal ownership that is clearly yours, at a recognized platform?",
+ why:"Your research doc's bar for a credible Fund I, around 2038 to 2042.",
+ test:"The record itself.",
+ src:"Research doc §7", req:["n4_judgment","n4_lateral","n4_workout"]},
+{id:"n5_norms", r:5, l:"paper", t:"Set the documentation norms",
+ q:"Do lenders and their lawyers draft around the protections and attacks you designed?",
+ why:"Your research doc's apex standard for coalition and document work.",
+ test:"Your structures show up in other people's documents.",
+ src:"Live mandates", req:["n4_lme_struct","n4_coalitions"]},
+{id:"n5_buyer", r:5, l:"pocket", t:"Buy what impairs",
+ q:"When AI-infrastructure assets and credits impair, can you price them better than anyone and buy them?",
+ why:"The Canvas thesis, held as principal instead of advised on.",
+ test:"Capital deployed in a distressed AI-infrastructure situation on a thesis written in advance.",
+ src:"The Canvas §3 and §12", req:["n4_specialist","n4_turn","n5_record"]},
+{id:"n5_panic", r:5, l:"markets", t:"Deploy in panics",
+ q:"When others are forced to sell, do you have capital, conviction and a process ready to act?",
+ why:"Your research doc's common trait of the apex investors: deploying capital in panics.",
+ test:"Capital deployed during a dislocation, with the thesis written before the bottom.",
+ src:"Marks memos; Oaktree's 2008 distressed fund as the reference case", req:["n4_turn","n5_record"]},
+{id:"n5_trust", r:5, l:"game", t:"Trusted to lead",
+ q:"When you give your word in a creditor group, does everyone at the table believe it?",
+ why:"Per your research doc, a reputation for keeping your word is the currency in co-ops and ad hoc groups.",
+ test:"Groups ask you to lead them.",
+ src:"Live mandates", req:["n4_coalitions","n4_lead"]},
+{id:"n5_memos", r:5, l:"voice", t:"Memos people quote",
+ q:"Are your memos read, quoted and passed around by people who don't work with you?",
+ why:"Your research doc: Marks's memos are a franchise asset in their own right.",
+ test:"Others cite your writing.",
+ src:"Oaktree memos as the model", req:["n4_authority"]},
+{id:"fork_vehicle", r:5, l:"room", fork:true, t:"Fund, holdco, or both?",
+ q:"Which vehicle fits you: a distressed credit fund, a holdco of acquired businesses, or both in sequence?",
+ why:"The Canvas proposes both in sequence and leans toward the fund if they are close. Your research doc adds that a holdco needs operating skill credit work doesn't supply, and that managers founded in the last five years raised under 1% of private credit capital in 2025.",
+ test:"A deliberate choice at The Canvas's Gate 3, made against the evidence of the day.",
+ src:"The Canvas §6–7 and §11–12; research doc §7", req:["n4_anchor","n5_record"]}
+];
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var LV = ["unseen","exposed","explains","applies","teaches"];
+  var LV_LABEL = {unseen:"Unseen", exposed:"Exposed", explains:"Explains", applies:"Applies cold", teaches:"Teaches"};
+  var LV_DESC = {
+    unseen:"Not met yet.",
+    exposed:"You recognize it.",
+    explains:"You explain it unprompted, in your own words.",
+    applies:"You use it on a new problem with no help.",
+    teaches:"You teach it and handle the follow-up questions."
+  };
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  var byId = new Map(NODES.map(function(n){ return [n.id, n]; }));
+  var laneById = new Map(LANES.map(function(l){ return [l.id, l]; }));
+  var traitById = new Map(APEX.map(function(a){ return [a.id, a]; }));
+  var deps = new Map(NODES.map(function(n){ return [n.id, []]; }));
+  NODES.forEach(function(n){ n.req.forEach(function(r){ deps.get(r).push(n.id); }); });
+  var order = new Map(NODES.map(function(n, i){ return [n.id, i]; }));
+
+  var depthMemo = new Map();
+  function depth(id){
+    if (depthMemo.has(id)) return depthMemo.get(id);
+    var n = byId.get(id), d = 0;
+    n.req.forEach(function(r){ d = Math.max(d, depth(r) + 1); });
+    depthMemo.set(id, d); return d;
+  }
+  var ancMemo = new Map(), descMemo = new Map();
+  function ancestors(id){
+    if (ancMemo.has(id)) return ancMemo.get(id);
+    var s = new Set();
+    byId.get(id).req.forEach(function(r){ s.add(r); ancestors(r).forEach(function(x){ s.add(x); }); });
+    ancMemo.set(id, s); return s;
+  }
+  function descendants(id){
+    if (descMemo.has(id)) return descMemo.get(id);
+    var s = new Set();
+    deps.get(id).forEach(function(d){ s.add(d); descendants(d).forEach(function(x){ s.add(x); }); });
+    descMemo.set(id, s); return s;
+  }
+  var traitSet = new Map(APEX.map(function(a){
+    var s = new Set();
+    a.feeds.forEach(function(f){ s.add(f); ancestors(f).forEach(function(x){ s.add(x); }); });
+    return [a.id, s];
+  }));
+  function traitsFedBy(id){ return APEX.filter(function(a){ return traitSet.get(a.id).has(id); }).map(function(a){ return a.id; }); }
+
+  function h(tag, cls, text){
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  /* ---------- Build the ladder ---------- */
+  var ladder = document.getElementById("ladder");
+  var svg = document.getElementById("edges");
+  var cardEls = new Map(), traitEls = new Map(), bandEls = new Map();
+
+  LANES.forEach(function(l){
+    var d = h("div", "lane-h");
+    d.append(h("div", "lane-n", l.name), h("div", "lane-s", l.sub));
+    ladder.append(d);
+  });
+
+  var apex = h("section", "apex");
+  apex.setAttribute("aria-labelledby", "apexTitle");
+  var apexHead = h("div", "apex-head");
+  var apexK = h("div", "k", "The apex");
+  var apexT = h("h2", null, "What the ladder builds"); apexT.id = "apexTitle";
+  var apexP = h("p", null, "One of the few people who can read an AI-infrastructure capital structure cold, call where it breaks, and own the capital when it does. Open a trait to trace it down to today.");
+  apexHead.append(apexK, apexT, apexP);
+  var traitsWrap = h("div", "apex-traits");
+  APEX.forEach(function(a){
+    var b = h("button", "trait"); b.type = "button"; b.dataset.trait = a.id;
+    var nonFork = Array.from(traitSet.get(a.id)).filter(function(id){ return !byId.get(id).fork; }).length;
+    b.append(h("span", "trait-n", a.name), h("span", "trait-l", a.line), h("span", "trait-c", nonFork + " skills feed this"));
+    traitEls.set(a.id, b); traitsWrap.append(b);
+  });
+  apex.append(apexHead, traitsWrap);
+  ladder.append(apex);
+
+  function makeCard(n){
+    var b = h("button", "card"); b.type = "button"; b.dataset.id = n.id; b.dataset.lv = "pending";
+    if (n.fork) b.classList.add("fork");
+    var t = h("span", "t");
+    if (n.fork) t.append(h("span", "tag", "Decision"));
+    else if (n.opt) t.append(h("span", "tag", "Optional"));
+    t.append(document.createTextNode(n.t));
+    var sr = h("span", "sr", ""); sr.dataset.role = "lv"; t.append(sr);
+    b.append(t);
+    if (n.fork) { var dia = h("span", "dia"); dia.setAttribute("aria-hidden", "true"); b.append(dia); }
+    else {
+      var m = h("span", "meter"); m.setAttribute("aria-hidden", "true");
+      for (var i = 0; i < 4; i++) m.append(h("i"));
+      b.append(m);
+    }
+    cardEls.set(n.id, b);
+    return b;
+  }
+
+  for (var r = RUNGS.length - 1; r >= 0; r--){
+    var R = RUNGS[r];
+    var band = h("div", "band"); band.id = "rung-" + r;
+    var bid = h("div", "band-id");
+    var num = h("span", "band-num", "Rung " + r);
+    var nm = h("div");
+    nm.append(h("div", "band-name", R.name), h("div", "band-meta", R.tier + " · " + R.when + " · " + R.basis));
+    bid.append(num, nm);
+    var gate = h("div", "band-gate");
+    gate.append(h("span", "k", "Gate up"), document.createTextNode(R.gate));
+    var prog = h("div", "band-prog", "");
+    band.append(bid, gate, prog);
+    bandEls.set(r, {band: band, prog: prog});
+    ladder.append(band);
+    LANES.forEach(function(l){
+      var cell = h("div", "cell"); cell.dataset.lane = l.id;
+      var list = NODES.filter(function(n){ return n.r === r && n.l === l.id; })
+        .sort(function(a, b){ return (depth(b.id) - depth(a.id)) || (order.get(b.id) - order.get(a.id)); });
+      if (!list.length) cell.classList.add("is-empty");
+      cell.append(h("div", "cell-lane", l.name));
+      var stack = h("div", "stack");
+      list.forEach(function(n){ stack.append(makeCard(n)); });
+      cell.append(stack);
+      ladder.append(cell);
+    });
+  }
+  var start = h("div", "start");
+  start.append(h("span", "start-n", "Start"), h("p", null, "October 7, 2026. Baseline diagnostic: 0 of 12 answers fully correct. Everything above is built from here."));
+  ladder.append(start);
+
+  /* ---------- Ratings state (from the artifact database) ---------- */
+  var S = { status: "loading", ratings: {}, decisions: {}, active: [], activeNote: "", rung: 0, asOf: "", log: [] };
+  function lvOf(id){
+    if (S.status !== "ready") return null;
+    var v = S.ratings[id];
+    return LV.indexOf(v) >= 0 ? v : "unseen";
+  }
+  function fmtDate(s){
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || "");
+    if (!m) return s || "";
+    return MONTHS[+m[2] - 1] + " " + (+m[3]) + ", " + m[1];
+  }
+
+  function paintCards(){
+    NODES.forEach(function(n){
+      var el = cardEls.get(n.id);
+      var sr = el.querySelector('[data-role="lv"]');
+      el.classList.toggle("is-now", S.status === "ready" && S.active.indexOf(n.id) >= 0);
+      if (n.fork){
+        var decided = S.status === "ready" && S.decisions[n.id];
+        el.classList.toggle("is-decided", !!decided);
+        sr.textContent = decided ? " (decided)" : " (open decision)";
+        return;
+      }
+      var lv = lvOf(n.id);
+      el.dataset.lv = lv == null ? "pending" : String(LV.indexOf(lv));
+      sr.textContent = lv == null ? "" : " (rating: " + LV_LABEL[lv] + ")";
+    });
+  }
+
+  function paintHeader(){
+    var here = document.getElementById("herePos");
+    var act = document.getElementById("hereActive");
+    var meta = document.getElementById("hereMeta");
+    var bar = document.getElementById("bar");
+    var legend = document.getElementById("legend");
+    var rated = NODES.filter(function(n){ return !n.fork; });
+    var counts = [0,0,0,0,0];
+    if (S.status === "ready") rated.forEach(function(n){ counts[LV.indexOf(lvOf(n.id))]++; });
+    var rung = RUNGS[S.rung] ? S.rung : 0;
+    here.textContent = "Rung " + rung + " · " + RUNGS[rung].name;
+    bar.replaceChildren(); legend.replaceChildren();
+    for (var bi = LV.length - 1; bi >= 0; bi--){
+      if (S.status === "ready" && counts[bi] > 0){
+        var seg = h("span", "lv-" + bi); seg.style.width = (counts[bi] / rated.length * 100) + "%"; bar.append(seg);
+      }
+    }
+    LV.forEach(function(k, i){
+      var li = h("li");
+      var m = h("span", "meter"); m.setAttribute("aria-hidden", "true");
+      for (var j = 0; j < 4; j++) m.append(h("i"));
+      li.dataset.lv = String(i);
+      li.append(m, document.createTextNode(LV_LABEL[k] + " "), h("b", null, S.status === "ready" ? String(counts[i]) : "–"));
+      legend.append(li);
+    });
+    act.replaceChildren();
+    if (S.status === "ready"){
+      var started = rated.length - counts[0];
+      if (S.active.length){
+        var a = byId.get(S.active[0]);
+        act.append(h("b", null, "Working on: "));
+        var link = h("button", "linkish", a ? a.t : S.active[0]); link.type = "button"; link.dataset.goto = S.active[0];
+        act.append(link, document.createTextNode(". " + (S.activeNote || "")));
+      } else {
+        act.textContent = "No active skill set.";
+      }
+      meta.textContent = started + " of " + rated.length + " skills started. Ratings as of " + fmtDate(S.asOf) + ". They rise only on graded, cold performance.";
+    } else if (S.status === "empty"){
+      act.textContent = "Nothing rated yet. Ratings appear here after your first graded session.";
+      meta.textContent = rated.length + " skills on the ladder.";
+    } else if (S.status === "unavailable"){
+      act.textContent = "Ratings live in this page's database and load inside the claude.ai viewer.";
+      meta.textContent = rated.length + " skills on the ladder.";
+    } else {
+      act.textContent = "Loading your current work.";
+      meta.textContent = "Loading ratings.";
+    }
+    for (var r2 = 0; r2 < RUNGS.length; r2++){
+      var be = bandEls.get(r2);
+      be.band.classList.toggle("is-here", S.status === "ready" && r2 === rung);
+      var inR = NODES.filter(function(n){ return n.r === r2 && !n.fork; });
+      if (S.status === "ready"){
+        var st = inR.filter(function(n){ return lvOf(n.id) !== "unseen"; }).length;
+        var ex = inR.filter(function(n){ return LV.indexOf(lvOf(n.id)) >= 2; }).length;
+        be.prog.textContent = st + "/" + inR.length + " started · " + ex + "/" + inR.length + " at Explains+";
+      } else {
+        be.prog.textContent = inR.length + " skills";
+      }
+    }
+  }
+
+  function paintLog(){
+    var wrap = document.getElementById("logwrap");
+    wrap.replaceChildren();
+    if (S.status !== "ready" || !S.log.length){
+      wrap.append(h("p", "empty", S.status === "unavailable" ? "The log loads inside the claude.ai viewer." : (S.status === "loading" ? "Loading the log." : "No changes recorded yet.")));
+      return;
+    }
+    var t = h("table", "log");
+    var thead = h("thead"); var tr = h("tr");
+    ["Date","Skill","Change","Evidence"].forEach(function(x){ tr.append(h("th", null, x)); });
+    thead.append(tr); t.append(thead);
+    var tb = h("tbody");
+    S.log.slice().reverse().forEach(function(e){
+      var row = h("tr");
+      row.append(h("td", "d", fmtDate(e.date)));
+      var td = h("td");
+      var n = byId.get(e.node);
+      if (n){ var b = h("button", "linkish", n.t); b.type = "button"; b.dataset.goto = n.id; td.append(b); }
+      else td.textContent = e.node || "";
+      row.append(td);
+      row.append(h("td", "c", (LV_LABEL[e.from] || e.from || "") + " → " + (LV_LABEL[e.to] || e.to || "")));
+      row.append(h("td", null, e.evidence || ""));
+      tb.append(row);
+    });
+    t.append(tb); wrap.append(t);
+  }
+
+  function applyDoc(data){
+    S.status = "ready";
+    S.ratings = (data && typeof data.ratings === "object" && data.ratings) || {};
+    S.decisions = (data && typeof data.decisions === "object" && data.decisions) || {};
+    S.active = (data && Array.isArray(data.active)) ? data.active.filter(function(id){ return byId.has(id); }) : [];
+    S.activeNote = (data && data.activeNote) || "";
+    S.rung = (data && typeof data.rung === "number") ? data.rung : 0;
+    S.asOf = (data && data.asOf) || "";
+    S.log = (data && Array.isArray(data.log)) ? data.log : [];
+    repaint();
+  }
+  function repaint(){
+    paintCards(); paintHeader(); paintLog();
+    if (pinned) renderDrawer(pinned);
+  }
+
+  /* ---------- Edges ---------- */
+  var wide = window.matchMedia("(min-width: 1024px)");
+  var edgeEls = [];
+  var NS = "http://www.w3.org/2000/svg";
+  function layout(){
+    edgeEls = [];
+    svg.replaceChildren();
+    if (!wide.matches) return;
+    var base = ladder.getBoundingClientRect();
+    var W = ladder.offsetWidth, H = ladder.offsetHeight;
+    svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    var box = new Map();
+    function rect(el){
+      var q = el.getBoundingClientRect();
+      return {x: q.left - base.left, y: q.top - base.top, w: q.width, h: q.height, cx: q.left - base.left + q.width / 2};
+    }
+    cardEls.forEach(function(el, id){ box.set(id, rect(el)); });
+    traitEls.forEach(function(el, id){ box.set(id, rect(el)); });
+
+    var list = [];
+    NODES.forEach(function(n){ n.req.forEach(function(rq){ list.push({from: rq, to: n.id, trait: false}); }); });
+    APEX.forEach(function(a){ a.feeds.forEach(function(f){ list.push({from: f, to: a.id, trait: true}); }); });
+    var outs = new Map(), ins = new Map();
+    list.forEach(function(e){
+      var s = byId.get(e.from), t = e.trait ? null : byId.get(e.to);
+      e.v = e.trait || t.r > s.r || (t.r === s.r && t.l === s.l);
+      if (e.v){
+        if (!outs.has(e.from)) outs.set(e.from, []); outs.get(e.from).push(e);
+        if (!ins.has(e.to)) ins.set(e.to, []); ins.get(e.to).push(e);
+      }
+    });
+    function spread(arr, key, other, edgeY){
+      arr.sort(function(a, b){ return box.get(a[other]).cx - box.get(b[other]).cx; });
+      arr.forEach(function(e, i){
+        var B = box.get(e[key]);
+        var f = arr.length === 1 ? 0.5 : 0.22 + 0.56 * i / (arr.length - 1);
+        if (key === "from"){ e.sx = B.x + B.w * f; e.sy = B.y; }
+        else { e.tx = B.x + B.w * f; e.ty = B.y + B.h; }
+      });
+    }
+    outs.forEach(function(arr){ spread(arr, "from", "to"); });
+    ins.forEach(function(arr){ spread(arr, "to", "from"); });
+
+    var defs = document.createElementNS(NS, "defs");
+    [["mA","mk-a"],["mD","mk-d"]].forEach(function(p){
+      var mk = document.createElementNS(NS, "marker");
+      mk.setAttribute("id", p[0]); mk.setAttribute("viewBox", "0 0 8 8"); mk.setAttribute("refX", "7"); mk.setAttribute("refY", "4");
+      mk.setAttribute("markerWidth", "7"); mk.setAttribute("markerHeight", "7"); mk.setAttribute("orient", "auto-start-reverse");
+      var path = document.createElementNS(NS, "path"); path.setAttribute("d", "M0,0 L8,4 L0,8 z"); path.setAttribute("class", p[1]);
+      mk.append(path); defs.append(mk);
+    });
+    svg.append(defs);
+
+    var f = function(x){ return x.toFixed(1); };
+    list.forEach(function(e){
+      var d;
+      if (e.v){
+        var gap = Math.max(0, e.sy - e.ty);
+        var dy = gap * 0.45;
+        var ty = e.ty + 1;
+        d = "M" + f(e.sx) + "," + f(e.sy) + " C" + f(e.sx) + "," + f(e.sy - dy) + " " + f(e.tx) + "," + f(ty + dy) + " " + f(e.tx) + "," + f(ty);
+      } else {
+        var S2 = box.get(e.from), T = box.get(e.to);
+        var right = T.cx > S2.cx;
+        var sx = right ? S2.x + S2.w : S2.x, tx = right ? T.x - 1 : T.x + T.w + 1;
+        var sy = S2.y + S2.h / 2, tyy = T.y + T.h / 2;
+        var k = Math.max(24, Math.abs(tx - sx) * 0.38) * (right ? 1 : -1);
+        d = "M" + f(sx) + "," + f(sy) + " C" + f(sx + k) + "," + f(sy) + " " + f(tx - k) + "," + f(tyy) + " " + f(tx) + "," + f(tyy);
+      }
+      var p = document.createElementNS(NS, "path"); p.setAttribute("d", d);
+      svg.append(p);
+      edgeEls.push({from: e.from, to: e.to, trait: e.trait, el: p});
+    });
+    highlight(pinned || hovered);
+  }
+  var raf = 0;
+  function scheduleLayout(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(layout); }
+
+  /* ---------- Highlight ---------- */
+  var pinned = null, hovered = null;
+  function sameKey(a, b){ return a && b && a.type === b.type && a.id === b.id; }
+  function highlight(key){
+    cardEls.forEach(function(el){ el.classList.remove("is-anc", "is-desc", "is-focus"); });
+    traitEls.forEach(function(el){ el.classList.remove("is-on", "is-fed"); });
+    edgeEls.forEach(function(e){ e.el.removeAttribute("class"); });
+    if (!key){ ladder.classList.remove("has-focus"); return; }
+    ladder.classList.add("has-focus");
+    var anc, desc = new Set(), fed = [];
+    if (key.type === "node"){
+      anc = ancestors(key.id); desc = descendants(key.id); fed = traitsFedBy(key.id);
+      cardEls.get(key.id).classList.add("is-focus");
+      fed.forEach(function(t){ traitEls.get(t).classList.add("is-fed"); });
+    } else {
+      anc = traitSet.get(key.id);
+      traitEls.get(key.id).classList.add("is-on");
+    }
+    anc.forEach(function(id){ cardEls.get(id).classList.add("is-anc"); });
+    desc.forEach(function(id){ cardEls.get(id).classList.add("is-desc"); });
+    var up = new Set(anc), down = new Set(desc);
+    if (key.type === "node"){ up.add(key.id); down.add(key.id); }
+    edgeEls.forEach(function(e){
+      var cls = "";
+      if (e.trait){
+        if (key.type === "trait" && e.to === key.id) cls = "e-anc";
+        else if (key.type === "node" && down.has(e.from) && fed.indexOf(e.to) >= 0) cls = "e-desc";
+      } else if (up.has(e.from) && up.has(e.to)) cls = "e-anc";
+      else if (down.has(e.from) && down.has(e.to)) cls = "e-desc";
+      if (cls) e.el.setAttribute("class", cls);
+    });
+  }
+  function keyOf(el){
+    if (!el) return null;
+    if (el.dataset.id) return {type: "node", id: el.dataset.id};
+    if (el.dataset.trait) return {type: "trait", id: el.dataset.trait};
+    return null;
+  }
+  ladder.addEventListener("pointerover", function(e){
+    if (pinned || e.pointerType === "touch") return;
+    var k = keyOf(e.target.closest(".card,.trait"));
+    if (k && !sameKey(k, hovered)){ hovered = k; highlight(k); }
+  });
+  ladder.addEventListener("pointerout", function(e){
+    if (pinned) return;
+    var from = e.target.closest(".card,.trait");
+    if (!from) return;
+    if (e.relatedTarget && from.contains(e.relatedTarget)) return;
+    hovered = null; highlight(null);
+  });
+  ladder.addEventListener("click", function(e){
+    var k = keyOf(e.target.closest(".card,.trait"));
+    if (!k) return;
+    if (sameKey(k, pinned)) unpin(); else pin(k, false);
+  });
+
+  /* ---------- Drawer ---------- */
+  var drawer = document.getElementById("drawer");
+  var dEyebrow = document.getElementById("dEyebrow");
+  var dTitle = document.getElementById("dTitle");
+  var dBody = document.getElementById("dBody");
+  var returnFocus = null;
+
+  function chip(id, cls){
+    var n = byId.get(id), t = traitById.get(id);
+    var b = h("button", "chip" + (cls ? " " + cls : ""), n ? n.t : (t ? t.name : id));
+    b.type = "button";
+    if (n) b.dataset.goto = id; else b.dataset.gotrait = id;
+    return b;
+  }
+  function sec(title, content, extra){
+    var s = h("div", "dsec" + (extra ? " " + extra : ""));
+    s.append(h("h3", null, title));
+    if (typeof content === "string") s.append(h("p", null, content)); else s.append(content);
+    return s;
+  }
+  function renderDrawer(key){
+    dBody.replaceChildren();
+    if (key.type === "node"){
+      var n = byId.get(key.id), R = RUNGS[n.r], L = laneById.get(n.l);
+      dEyebrow.textContent = "Rung " + n.r + " · " + R.name + " · " + L.name;
+      dTitle.textContent = n.t;
+      if (n.fork){
+        var dec = S.status === "ready" && S.decisions[n.id];
+        var c = h("div", "callout fork");
+        c.append(h("b", null, dec ? "Decided. " : "Open decision. "), document.createTextNode(dec ? String(dec) : "This is yours to make, in writing, on the evidence."));
+        dBody.append(c);
+      } else {
+        var lv = lvOf(n.id);
+        var sc = h("div", "scale");
+        LV.forEach(function(k){ var sp = h("span", lv === k ? "on" : "", LV_LABEL[k]); sc.append(sp); });
+        dBody.append(sc);
+        dBody.append(h("p", "scale-note", lv ? (LV_LABEL[lv] + ": " + LV_DESC[lv] + " Rises only on graded, cold performance.") : "Rating loads inside the claude.ai viewer."));
+      }
+      if (n.opt) dBody.append(h("p", "statline", "Optional."));
+      if (S.status === "ready" && S.active.indexOf(n.id) >= 0){
+        var cn = h("div", "callout");
+        cn.append(h("b", null, "You are working on this now. "), document.createTextNode(S.activeNote || ""));
+        dBody.append(cn);
+      }
+      dBody.append(sec("Answer this cold", n.q, "q"));
+      dBody.append(sec("Why it matters on the path", n.why));
+      dBody.append(sec("How you prove it", n.test));
+      dBody.append(sec("Study with", n.src));
+      if (n.req.length){ var c1 = h("div", "chips"); n.req.forEach(function(id){ c1.append(chip(id, "anc")); }); dBody.append(sec("Builds on", c1)); }
+      else dBody.append(sec("Builds on", "Nothing. You can start this today."));
+      var dn = deps.get(n.id);
+      if (dn.length){ var c2 = h("div", "chips"); dn.forEach(function(id){ c2.append(chip(id, "desc")); }); dBody.append(sec("Unlocks", c2)); }
+      var fed = traitsFedBy(n.id);
+      if (fed.length){ var c3 = h("div", "chips"); fed.forEach(function(id){ c3.append(chip(id)); }); dBody.append(sec("Feeds these apex traits", c3)); }
+      else if (!n.fork) dBody.append(sec("Feeds these apex traits", "None directly. It still sits on the path."));
+    } else {
+      var a = traitById.get(key.id);
+      var all = Array.from(traitSet.get(a.id)).filter(function(id){ return !byId.get(id).fork; });
+      dEyebrow.textContent = "The apex";
+      dTitle.textContent = a.name;
+      dBody.append(sec("What it means", a.line, "q"));
+      var rungsTouched = new Set(all.map(function(id){ return byId.get(id).r; }));
+      var startedN = S.status === "ready" ? all.filter(function(id){ return lvOf(id) !== "unseen"; }).length : null;
+      dBody.append(h("p", "statline", all.length + " skills across " + rungsTouched.size + " rungs feed this trait" + (startedN != null ? ". " + startedN + " started so far." : ".")));
+      var roots = all.filter(function(id){ return byId.get(id).r === 0; }).sort(function(x, y){ return order.get(x) - order.get(y); });
+      if (roots.length){ var c4 = h("div", "chips"); roots.forEach(function(id){ c4.append(chip(id, "anc")); }); dBody.append(sec("Where it starts, on Rung 0", c4)); }
+      var c5 = h("div", "chips"); a.feeds.forEach(function(id){ c5.append(chip(id, "anc")); });
+      dBody.append(sec("Last steps before the apex", c5));
+      dBody.append(sec("On the map", "Every skill that feeds this trait is outlined in amber, with its connections drawn."));
+    }
+  }
+  function pin(key, scroll){
+    pinned = key; hovered = null;
+    highlight(key);
+    renderDrawer(key);
+    if (!drawer.classList.contains("open")) returnFocus = document.activeElement;
+    drawer.classList.add("open"); drawer.removeAttribute("inert"); drawer.setAttribute("aria-hidden", "false");
+    if (scroll){
+      var el = key.type === "node" ? cardEls.get(key.id) : traitEls.get(key.id);
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      el.scrollIntoView({block: "center", behavior: reduce ? "auto" : "smooth"});
+    }
+    dTitle.focus({preventScroll: true});
+  }
+  function unpin(){
+    pinned = null;
+    highlight(null);
+    drawer.classList.remove("open"); drawer.setAttribute("inert", ""); drawer.setAttribute("aria-hidden", "true");
+    if (returnFocus && document.contains(returnFocus)) returnFocus.focus({preventScroll: true});
+    returnFocus = null;
+  }
+  document.getElementById("dClose").addEventListener("click", unpin);
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && pinned) unpin(); });
+  document.addEventListener("click", function(e){
+    var g = e.target.closest("[data-goto],[data-gotrait]");
+    if (!g || !g.dataset) return;
+    if (g.dataset.goto) pin({type: "node", id: g.dataset.goto}, true);
+    else if (g.dataset.gotrait) pin({type: "trait", id: g.dataset.gotrait}, true);
+  });
+
+  /* ---------- Controls ---------- */
+  var web = document.getElementById("webToggle");
+  try { if (localStorage.getItem("ladder.web") === "off") web.checked = false; } catch (err) {}
+  function applyWeb(){ ladder.classList.toggle("web-off", !web.checked); }
+  web.addEventListener("change", function(){
+    applyWeb();
+    try { localStorage.setItem("ladder.web", web.checked ? "on" : "off"); } catch (err) {}
+  });
+  applyWeb();
+  document.getElementById("jumpBtn").addEventListener("click", function(){
+    if (S.status === "ready" && S.active.length) pin({type: "node", id: S.active[0]}, true);
+    else {
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document.getElementById("rung-" + (S.rung || 0)).scrollIntoView({block: "start", behavior: reduce ? "auto" : "smooth"});
+    }
+  });
+
+  /* ---------- Boot ---------- */
+  repaint();
+  layout();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleLayout);
+  if (window.ResizeObserver) new ResizeObserver(scheduleLayout).observe(ladder);
+  else window.addEventListener("resize", scheduleLayout);
+  if (wide.addEventListener) wide.addEventListener("change", scheduleLayout);
+
+  (function connect(){
+    var use = window.claude && typeof window.claude.use === "function" ? window.claude.use("db") : Promise.resolve(null);
+    Promise.resolve(use).then(function(db){
+      if (!db){ S.status = "unavailable"; repaint(); return; }
+      db.doc("km/current").onSnapshot(function(snap){
+        if (!snap.exists){ S.status = "empty"; S.log = []; repaint(); return; }
+        applyDoc(snap.data());
+      }, function(){ S.status = "unavailable"; repaint(); });
+    }).catch(function(){ S.status = "unavailable"; repaint(); });
+  })();
+})();
+</script>
+
+</body></html>
