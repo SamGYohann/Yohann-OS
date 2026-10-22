@@ -1,0 +1,564 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The Tally</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: the day's blocks as a working column on the left, the record on the right (the week's tally, misses, what's coming).
+   Stacks to one column under 900px. Same type and palette family as The Ladder, so the two read as one system. */
+:root{
+  --bg:#EDF0EF;
+  --surface:#FAFBFA;
+  --sunk:#E2E8E6;
+  --ink:#121A1C;
+  --muted:#55646A;
+  --rule:#C8D1D2;
+  --accent:#1D6A58;
+  --accent-ink:#165445;
+  --on-accent:#FAFBFA;
+  --miss:#B23A2E;
+  --miss-ink:#8E2A20;
+  --miss-soft:#F4E1DD;
+  --off:#8C9A9E;
+  --amber:#9A6A00;
+  --focus:#121A1C;
+  --font-display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",sans-serif;
+  --font-body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1214; --surface:#151D20; --sunk:#10181A; --ink:#E3EAEA; --muted:#93A3A7; --rule:#29363A;
+    --accent:#55BD9D; --accent-ink:#7FD3B8; --on-accent:#0D1214;
+    --miss:#E5776A; --miss-ink:#F2A196; --miss-soft:#3A201C; --off:#62757B; --amber:#E0A93A; --focus:#E3EAEA;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1214; --surface:#151D20; --sunk:#10181A; --ink:#E3EAEA; --muted:#93A3A7; --rule:#29363A;
+  --accent:#55BD9D; --accent-ink:#7FD3B8; --on-accent:#0D1214;
+  --miss:#E5776A; --miss-ink:#F2A196; --miss-soft:#3A201C; --off:#62757B; --amber:#E0A93A; --focus:#E3EAEA;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;
+  padding-block:24px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-font-smoothing:antialiased}
+.page{max-width:1180px;margin-inline:auto}
+button,input{font:inherit;color:inherit}
+.k{font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* Header */
+.top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:20px 40px;align-items:end;padding-bottom:20px;border-bottom:1px solid var(--rule)}
+@media (max-width:900px){.top{grid-template-columns:1fr}}
+h1{font-family:var(--font-display);font-weight:800;font-size:clamp(54px,8vw,96px);line-height:.84;text-transform:uppercase;margin:8px 0 12px;letter-spacing:.005em}
+.dek{margin:0;max-width:48ch;font-size:15.5px;text-wrap:pretty}
+.dek b{font-weight:600}
+.streaks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px 14px 12px;display:grid;gap:2px;min-width:0}
+.tile .n{font-family:var(--font-display);font-weight:800;font-size:clamp(40px,6vw,58px);line-height:.9;font-variant-numeric:tabular-nums}
+.tile .l{font-weight:600;font-size:13.5px}
+.tile .b{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.tile.hot .n{color:var(--accent)}
+.tally{display:flex;gap:3px;height:14px;margin:4px 0 2px;align-items:flex-end;overflow:hidden}
+.tally i{display:block;width:2px;height:14px;background:var(--accent);border-radius:1px;flex:none}
+.tally i:nth-child(5n){transform:rotate(-58deg) translateX(-7px);width:2px;margin-right:5px;height:22px;transform-origin:bottom center}
+.tally .more{font-family:var(--font-mono);font-size:10px;color:var(--muted);align-self:center;margin-left:4px}
+
+/* Day bar */
+.daybar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:16px 0 14px}
+.nav{display:flex;align-items:center;gap:8px}
+.icon-btn{width:36px;height:36px;border-radius:6px;border:1px solid var(--rule);background:var(--surface);cursor:pointer;font-size:18px;line-height:1}
+.icon-btn:disabled{opacity:.35;cursor:default}
+.ghost{height:36px;padding:0 12px;border-radius:6px;border:1px solid var(--rule);background:transparent;cursor:pointer;font-size:13px;font-weight:600}
+.dayname{font-family:var(--font-display);font-weight:800;font-size:30px;line-height:1;text-transform:uppercase;min-width:7ch}
+.daydate{margin-top:3px}
+.dayprog{font-family:var(--font-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.sync{margin-left:auto;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--off)}
+.sync[data-s="ok"]::before{background:var(--accent)}
+.sync[data-s="busy"]::before{background:var(--amber)}
+.sync[data-s="bad"]{color:var(--miss-ink)}
+.sync[data-s="bad"]::before{background:var(--miss)}
+
+/* Main */
+.main{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:28px 36px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:1fr}}
+
+.daynote{margin:0 0 12px;font-size:13.5px;color:var(--muted)}
+.daynote.warn{color:var(--miss-ink);font-weight:600}
+.blocks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.blk{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:4px 14px;align-items:start;background:var(--surface);
+  border:1px solid var(--rule);border-radius:8px;padding:12px 12px 12px 14px;position:relative}
+.blk::before{content:"";position:absolute;left:-1px;top:-1px;bottom:-1px;width:4px;border-radius:8px 0 0 8px;background:transparent}
+.blk[data-state="done"]::before{background:var(--accent)}
+.blk[data-state="missed"]::before{background:var(--miss)}
+.blk[data-state="off"]::before{background:var(--off)}
+.blk[data-state="missed"]{background:color-mix(in srgb,var(--miss-soft) 55%,var(--surface))}
+.time{font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums;padding-top:2px;color:var(--muted);white-space:nowrap}
+.time.due{color:var(--amber);font-weight:500}
+.title{font-weight:600;font-size:15px;line-height:1.3}
+.sub{font-size:13px;color:var(--muted);margin-top:2px;text-wrap:pretty}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--rule);border-radius:3px;padding:0 5px;margin-right:6px;vertical-align:2px}
+.why{margin-top:8px}
+.why input{width:100%;height:34px;border:1px solid var(--rule);border-radius:6px;background:var(--bg);padding:0 10px;font-size:13.5px}
+.why input.needs{border-color:var(--miss)}
+.why input::placeholder{color:var(--muted)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden;align-self:start}
+.seg button{border:0;background:transparent;padding:7px 11px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--muted);min-width:60px}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button:hover:not(:disabled){color:var(--ink);background:var(--sunk)}
+.seg button[aria-pressed="true"][data-s="done"]{background:var(--accent);color:var(--on-accent)}
+.seg button[aria-pressed="true"][data-s="missed"]{background:var(--miss);color:var(--on-accent)}
+.seg button[aria-pressed="true"][data-s="off"]{background:var(--off);color:var(--on-accent)}
+.seg button:disabled{cursor:default;opacity:.45}
+.ctx{display:grid;grid-template-columns:76px minmax(0,1fr);gap:4px 14px;padding:8px 12px 8px 14px;border:1px dashed var(--rule);border-radius:8px}
+.ctx .title{font-weight:500;font-size:14px;color:var(--muted)}
+@media (max-width:560px){
+  .blk{grid-template-columns:62px minmax(0,1fr)}
+  .seg{grid-column:1/-1;width:100%}
+  .seg button{flex:1}
+  .ctx{grid-template-columns:62px minmax(0,1fr)}
+}
+.empty{padding:24px;border:1px dashed var(--rule);border-radius:8px;color:var(--muted);font-size:14px}
+
+/* Side */
+.side{display:grid;gap:26px}
+.side h2{font-family:var(--font-display);font-weight:800;font-size:24px;line-height:1;text-transform:uppercase;margin:0 0 10px}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wd{border:1px solid var(--rule);border-radius:7px;background:var(--surface);padding:8px 6px 8px;cursor:pointer;display:grid;gap:6px;justify-items:center;text-align:center;min-width:0}
+.wd:hover{border-color:var(--off)}
+.wd.sel{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.wd .dn{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.wd .dd{font-family:var(--font-display);font-weight:800;font-size:20px;line-height:1}
+.wd.today .dd{color:var(--accent)}
+.dots{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;min-height:9px}
+.dot{width:8px;height:8px;border-radius:2px;border:1.5px solid var(--rule);display:block}
+.dot.done{background:var(--accent);border-color:var(--accent)}
+.dot.missed{background:var(--miss);border-color:var(--miss)}
+.dot.off{background:var(--rule);border-color:var(--rule)}
+.dot.late{border-color:var(--miss)}
+.wd .sc{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.counts{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:12px 0 0}
+.counts div{background:var(--surface);border:1px solid var(--rule);border-radius:7px;padding:8px 10px}
+.counts dt{font-size:12px;color:var(--muted)}
+.counts dd{margin:0;font-family:var(--font-mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
+.counts dd small{font-size:11px;color:var(--muted);font-weight:400}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.list li{display:grid;grid-template-columns:88px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:13.5px}
+.list .when{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);padding-top:1px;font-variant-numeric:tabular-nums}
+.list .when b{display:block;font-weight:500;color:var(--ink)}
+.list .what b{font-weight:600}
+.list .what span{display:block;color:var(--muted);font-size:12.5px}
+.list .miss-n{color:var(--miss-ink)}
+.list .none{display:block;color:var(--muted);padding:9px 0;border-bottom:1px solid var(--rule)}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--muted);max-width:80ch}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="page">
+  <header class="top">
+    <div>
+      <div class="k">Dream Work · Accountability</div>
+      <h1>The Tally</h1>
+      <p class="dek">Every block on your calendar, marked <b>done</b> or <b>missed</b> the same night, with one honest line for each miss. A block you never mark counts as missed.</p>
+    </div>
+    <div class="streaks" id="streaks" aria-live="polite"></div>
+  </header>
+
+  <div class="daybar">
+    <div class="nav">
+      <button class="icon-btn" id="prev" type="button" aria-label="Previous day">&#8249;</button>
+      <div>
+        <div class="dayname" id="dayName">Today</div>
+        <div class="k daydate" id="dayDate"></div>
+      </div>
+      <button class="icon-btn" id="next" type="button" aria-label="Next day">&#8250;</button>
+    </div>
+    <button class="ghost" id="todayBtn" type="button">Today</button>
+    <span class="dayprog" id="dayProg"></span>
+    <span class="sync" id="sync" data-s="idle">Connecting</span>
+  </div>
+
+  <div class="main">
+    <section aria-label="Blocks for this day">
+      <p class="daynote" id="dayNote"></p>
+      <ol class="blocks" id="blocks"></ol>
+    </section>
+    <aside class="side">
+      <section>
+        <h2>This week</h2>
+        <div class="week" id="week"></div>
+        <dl class="counts" id="counts"></dl>
+      </section>
+      <section>
+        <h2>Misses this week</h2>
+        <ul class="list" id="misses"></ul>
+      </section>
+      <section>
+        <h2>Coming up</h2>
+        <ul class="list" id="upcoming"></ul>
+      </section>
+    </aside>
+  </div>
+
+  <p class="foot">These blocks mirror your VCU Google Calendar as of October 22, 2026. When the calendar changes, the tally gets updated at your Sunday review. Use Off only when a block truly didn't exist that day, like a valet day off or a cancelled class, and say why.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var START = "2026-10-22";
+  function pad(n){ return String(n).padStart(2,"0"); }
+  function keyOf(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+  function parse(k){ var p=k.split("-").map(Number); return new Date(p[0],p[1]-1,p[2]); }
+  function addD(k,n){ var d=parse(k); d.setDate(d.getDate()+n); return keyOf(d); }
+  function dow(k){ return parse(k).getDay(); }
+  function todayKey(){ return keyOf(new Date()); }
+  function between(k,a,b){ return k>=a && k<=b; }
+  function M(h,m){ return h*60+(m||0); }
+  function fmt(min){ if(min<0) return "Due"; var h=Math.floor(min/60), m=min%60, ap=h>=12?"PM":"AM"; h=h%12||12; return h+":"+pad(m)+" "+ap; }
+  function shortDate(k){ return parse(k).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}); }
+
+  /* ---------- The schedule (mirrors the calendar) ---------- */
+  var BREAK_A="2026-11-23", BREAK_B="2026-11-29";
+  var CHECKPOINTS={"2026-10-31":1,"2026-11-14":2,"2026-12-05":3};
+  var LAB_SUB="60 minutes of work, 5 off, 25 minutes of explain-back with no notes. End with something you produced.";
+  var COURSE_SUB={1:"FIRE 311 video quiz (due today), then MGMT 310 reading for tonight.",2:"MGMT 303 work, the BUSN 301 assignment, BUSN 323 reading.",3:"FIRE 311 MyLab homework (due Thursday).",4:"BUSN 323 prep before class, then Monday's MGMT 310 reading."};
+
+  // [date, minutes (-1 = all day), title, detail, tracked]
+  var DATED=[
+    ["2026-10-23",-1,"Submitted: STAC survey draft","Team draft of the needs-assessment survey.",true],
+    ["2026-10-23",M(13),"RamQ: SAP and spring aid","What is still open for spring, what to submit and by when, any registration hold, and how a W would affect SAP.",true],
+    ["2026-10-26",M(15,30),"Registration check","Time ticket and holds in eServices, credits left in DegreeWorks. Book an advisor if you need a sign-off.",true],
+    ["2026-10-27",-1,"Spring registration opens","Register the moment your time ticket opens.",false],
+    ["2026-10-27",-1,"Submitted: BUSN 301 Career Coaching Reflection","",true],
+    ["2026-10-27",M(19,30),"Sent 3 career-conversation requests","Restructuring people. Needed for BUSN 301, and it feeds the Ledger.",true],
+    ["2026-10-30",-1,"Last day to withdraw (W) or choose pass/fail","Get RamQ's answer first. A W can count against SAP.",false],
+    ["2026-10-31",-1,"Checkpoint #1","Today's lab block. Closed book, on paper.",false],
+    ["2026-11-02",-1,"Submitted: FIRE 311 Discussion 2 post","MGMT 310 Quiz 5 is at 7:00 tonight.",true],
+    ["2026-11-03",M(9,30),"Bankruptcy court: sit in on a hearing","701 E Broad St. Write one page afterward.",true],
+    ["2026-11-04",-1,"Submitted: BUSN 301 Quinncia AI interview","",true],
+    ["2026-11-05",-1,"Submitted: FIRE 311 Discussion 2 replies","",true],
+    ["2026-11-06",-1,"Submitted: STAC executive summary","Feedback and engagement approach.",true],
+    ["2026-11-09",-1,"MGMT 310 Quiz 6 at 7:00","Respondus, no make-ups.",false],
+    ["2026-11-10",-1,"Submitted: BUSN 301 Upskill with LinkedIn","",true],
+    ["2026-11-13",-1,"Career conversation held","Needed for the Nov 17 reflection.",true],
+    ["2026-11-14",-1,"Checkpoint #2","Today's lab block. Closed book, on paper.",false],
+    ["2026-11-15",-1,"Final exam dates confirmed and added","INFO 360, MGMT 303, BUSN 323.",true],
+    ["2026-11-16",-1,"Submitted: MGMT 310 Article 4","Due at 7:00 PM.",true],
+    ["2026-11-17",-1,"Submitted: BUSN 301 Career Conversation Reflection","",true],
+    ["2026-11-19",-1,"Submitted: FIRE 311 Discussion 3 post + HW Ch. 11–12","",true],
+    ["2026-11-20",-1,"STAC final presentation","In person. Last day of the fall program.",true],
+    ["2026-11-28",-1,"Graduation decision written","December 2027 or May 2028, one page, both sides priced. Due Nov 30.",true],
+    ["2026-11-30",-1,"Submitted: MGMT 310 Case 2","At least 3 pages, due 7:00 PM.",true],
+    ["2026-12-01",-1,"Submitted: BUSN 301 Career Action Plan","",true],
+    ["2026-12-03",-1,"Submitted: FIRE 311 Discussion 3 replies + HW Ch. 13","",true],
+    ["2026-12-05",-1,"Checkpoint #3 (Rung 0 gate)","Today's lab block. Closed book, on paper.",false],
+    ["2026-12-07",-1,"Submitted: BUSN 301 Resume #2","Last day of classes.",true],
+    ["2026-12-08",M(16),"FINAL: FIRE 311","One sheet of notes and your calculator.",true],
+    ["2026-12-10",M(19),"FINAL: BUSN 323","Date assumed. Confirm it in class.",true],
+    ["2026-12-13",-1,"Rebuild the schedule for break and spring","In tonight's weekly review.",false],
+    ["2026-12-14",M(19),"FINAL: MGMT 310","Respondus, 7:00 sharp.",true]
+  ];
+
+  var memo={};
+  function blocksFor(k){
+    if(memo[k]) return memo[k];
+    var L=[];
+    function T(id,min,title,sub,kind,tag){ L.push({id:id,min:min,title:title,sub:sub||"",kind:kind,track:true,tag:tag||""}); }
+    function C(id,min,title,sub){ L.push({id:id,min:min,title:title,sub:sub||"",kind:"ctx",track:false}); }
+    if(k<START){ memo[k]=L; return L; }
+    var w=dow(k), brk=between(k,BREAK_A,BREAK_B), sem=!brk;
+    if(k==="2026-11-26"){ C("thx",-1,"Thanksgiving","Day off. Nothing to mark."); memo[k]=L; return L; }
+    var nov3 = k==="2026-11-03";
+    var stacOn = sem && k<="2026-11-20" && !nov3;
+    var finals = between(k,"2026-12-08","2026-12-15");
+    function cls(id,min,name,last,where){ if(sem && k<=last && !nov3) T(id,min,name,where,"class","Class"); }
+    function cw(min){ if(sem && k<="2026-12-15") T("cw",min,finals?"Exam prep":"Coursework",finals?"Finals week: study for the next exam on the calendar.":COURSE_SUB[w],"cw"); }
+    function lab(min){ var n=CHECKPOINTS[k]; T("lab",min,n?"Checkpoint #"+n+", closed book on paper":"Lab: The Ladder",n?"No AI, notes or search. Paste your answers into Dream Work for grading.":LAB_SUB,"lab"); }
+    function gym(min,sub){ T("gym",min,"Gym",sub||(brk?"Any Planet Fitness near home.":"Planet Fitness, Willow Lawn. Includes the drive."),"gym"); }
+    function stac(min,sub){ if(stacOn) T("stac",min,"STAC work",sub||"Remote hours. Log them.","stac"); }
+    function valet(){ if(!between(k,"2026-11-27","2026-11-29")) C("valet",M(15),"Valet, if you're on the schedule","3:00 to 11:00 PM. Leave by 2:40."); }
+    if(w!==0) T("wake",w===4?M(8,45):M(9),w===4?"Up at 8:45":"Up at 9:00 and out the door","Laptop closed and phone down until you're moving. This is where your last schedules died.","wake");
+    switch(w){
+      case 1:
+        gym(M(9,20),brk?null:"Short session. Home by 10:55 for the STAC call.");
+        if(stacOn) T("stacm",M(11),"STAC check-in (Zoom)","Weekly form submitted beforehand.","stac");
+        lab(M(12,15));
+        cls("info",M(14),"INFO 360","2026-12-07","Snead B1127. Time assumed; fix it on the calendar if wrong.");
+        cw(M(15,30));
+        cls("m303",M(17,30),"MGMT 303","2026-12-07","Zoom, camera on. Take it from Snead.");
+        cls("m310",M(19),"MGMT 310","2026-12-07","Snead B1115. Quizzes start at 7:00 sharp.");
+        break;
+      case 2:
+        gym(nov3?M(15):M(9,20),nov3?"Afternoon today, after court.":null);
+        lab(nov3?M(13):M(11,15));
+        stac(M(13));
+        cls("fire",M(15,30),"FIRE 311","2026-12-01","MPC Learning Commons 2100. Bring the calculator.");
+        cw(M(17,15));
+        T("rec",M(19,30),"Recruiting + contact","One application sent and two outreach messages. Log every contact.","rec");
+        break;
+      case 3:
+        gym(M(9,20)); lab(M(11,15));
+        cls("info",M(14),"INFO 360","2026-12-07","Snead B1127. Time assumed; fix it on the calendar if wrong.");
+        cw(M(15,30));
+        cls("m303",M(17,30),"MGMT 303","2026-12-07","Zoom, camera on.");
+        stac(M(19));
+        break;
+      case 4:
+        cls("b301",M(9,30),"BUSN 301","2026-12-03","Snead B2166.");
+        gym(M(10,30),brk?null:"Straight from Snead. Includes the drive.");
+        lab(M(12,30));
+        stac(M(14,15),"Remote hours. Eat lunch at the start.");
+        cw(M(16,45));
+        cls("b323",M(19),"BUSN 323","2026-12-03","Snead B2166.");
+        break;
+      case 5:
+        gym(M(9,20)); lab(M(11,15)); stac(M(13),"Remote hours. Submit the weekly check-in form before Monday."); valet();
+        break;
+      case 6:
+        gym(M(9,20)); lab(M(11,15));
+        T("rec",M(13),"Recruiting + contact","Applications and follow-ups. Answer anyone who replied this week.","rec");
+        valet();
+        break;
+      case 0:
+        T("meal",M(12),"Meal prep","Three or four days of food.","sun");
+        T("family",M(13),"Family calls","Dad, Mom, Grandpa.","sun");
+        if(k<="2026-12-06" && k!=="2026-11-29") T("journal",M(14),"MGMT 303 journal","Top Hat, due tonight.","cw");
+        valet();
+        T("review",M(23,15),"Weekly review","Mark today here, then type \"Weekly review\" in Dream Work.","review");
+        break;
+    }
+    if(w!==0) C("checkin",M(23,45),"Mark this page, then close the laptop","Lights out by 1:00.");
+    DATED.forEach(function(d,i){ if(d[0]===k && d[4]) T("d"+i,d[1],d[2],d[3],"due",d[1]<0?"Due":""); });
+    L.sort(function(a,b){ return a.min-b.min; });
+    memo[k]=L; return L;
+  }
+
+  /* ---------- State ---------- */
+  var data={};          // dateKey -> {b:{blockId:{s,n}}}
+  var db=null, live=false;
+  var sel=todayKey(); if(sel<START) sel=START;
+  var sync=document.getElementById("sync");
+  function setSync(s,t){ sync.dataset.s=s; sync.textContent=t; }
+
+  function statusOf(k,id){ var d=data[k]; return d && d.b && d.b[id] ? d.b[id] : null; }
+  function evalDay(k){
+    var bl=blocksFor(k).filter(function(b){return b.track;});
+    var r={total:bl.length,done:0,missed:0,off:0,un:0,blocks:bl};
+    bl.forEach(function(b){ var s=statusOf(k,b.id); s=s&&s.s; if(s==="done")r.done++; else if(s==="missed")r.missed++; else if(s==="off")r.off++; else r.un++; });
+    return r;
+  }
+  function testClean(k){ var e=evalDay(k); if(!e.total) return "skip"; if(e.missed) return "miss"; if(e.un) return "pending"; return "hit"; }
+  function testBlock(id){ return function(k){ var b=blocksFor(k).some(function(x){return x.id===id&&x.track;}); if(!b) return "skip"; var s=statusOf(k,id); s=s&&s.s; if(s==="done") return "hit"; if(s==="off") return "skip"; if(s==="missed") return "miss"; return "pending"; }; }
+  function runBack(test){
+    var t=todayKey(), k=t, n=0;
+    while(k>=START){ var r=test(k); if(r==="hit") n++; else if(r==="skip"){} else if(r==="pending" && k===t){} else break; k=addD(k,-1); }
+    return n;
+  }
+  function bestRun(test){
+    var t=todayKey(), k=START, cur=0, best=0;
+    while(k<=t){ var r=test(k); if(r==="hit"){cur++; if(cur>best)best=cur;} else if(r==="skip"){} else if(r==="pending" && k===t){} else cur=0; k=addD(k,1); }
+    return best;
+  }
+
+  /* ---------- Rendering ---------- */
+  function h(tag,cls,text){ var e=document.createElement(tag); if(cls)e.className=cls; if(text!=null)e.textContent=text; return e; }
+
+  function renderStreaks(){
+    var el=document.getElementById("streaks"); el.replaceChildren();
+    [["Clean days","Every block done or off",testClean],["Lab streak","Lab sessions in a row",testBlock("lab")],["Mornings","Up on time in a row",testBlock("wake")]].forEach(function(s){
+      var n=runBack(s[2]), best=bestRun(s[2]);
+      var t=h("div","tile"+(n>0?" hot":""));
+      t.append(h("div","n",String(n)));
+      var ta=h("div","tally"); ta.setAttribute("aria-hidden","true");
+      for(var i=0;i<Math.min(n,15);i++) ta.append(h("i"));
+      if(n>15) ta.append(h("span","more","+"+(n-15)));
+      t.append(ta, h("div","l",s[0]), h("div","b","best "+best+" · "+s[1].toLowerCase()));
+      el.append(t);
+    });
+  }
+
+  function renderBar(){
+    var d=parse(sel), t=todayKey();
+    document.getElementById("dayName").textContent = sel===t?"Today":d.toLocaleDateString("en-US",{weekday:"long"});
+    document.getElementById("dayDate").textContent = d.toLocaleDateString("en-US",{weekday:sel===t?"long":undefined,month:"long",day:"numeric",year:"numeric"});
+    document.getElementById("prev").disabled = sel<=START;
+    var e=evalDay(sel);
+    var marked=e.total-e.un;
+    document.getElementById("dayProg").textContent = e.total ? (marked+" of "+e.total+" marked"+(e.missed?" · "+e.missed+" missed":"")) : "";
+    var note=document.getElementById("dayNote"); note.className="daynote";
+    if(sel>t) note.textContent="A future day. You can mark these blocks once the day arrives.";
+    else if(sel<t && e.un){ note.textContent=e.un+(e.un===1?" block was":" blocks were")+" never marked. Unmarked counts as missed. Mark it honestly now."; note.className="daynote warn"; }
+    else if(sel===t) note.textContent="Mark each block when it ends, or all of them at 11:45 PM. Every miss gets one honest line.";
+    else note.textContent="";
+  }
+
+  function rowState(li,k,b){
+    var s=statusOf(k,b.id), st=s?s.s:"";
+    li.dataset.state=st||"";
+    li.querySelectorAll(".seg button").forEach(function(btn){ btn.setAttribute("aria-pressed", btn.dataset.s===st?"true":"false"); });
+    var why=li.querySelector(".why"), inp=why.querySelector("input");
+    why.hidden = !(st==="missed"||st==="off");
+    if(document.activeElement!==inp) inp.value = s&&s.n ? s.n : "";
+    inp.classList.toggle("needs", !why.hidden && !inp.value.trim());
+    inp.placeholder = st==="off" ? "Why was this off? One line." : "Why did you miss it? One honest line.";
+  }
+
+  function renderDay(){
+    var ol=document.getElementById("blocks"); ol.replaceChildren();
+    var list=blocksFor(sel), t=todayKey(), future=sel>t;
+    if(sel<START || !list.length){ var e=h("li","empty", sel<START?"The tally starts on October 22, 2026.":"Nothing scheduled."); ol.append(e); return; }
+    list.forEach(function(b){
+      if(!b.track){
+        var c=h("li","ctx"); c.append(h("div","time",b.min<0?"":fmt(b.min)));
+        var bd=h("div"); bd.append(h("div","title",b.title)); if(b.sub) bd.append(h("div","sub",b.sub)); c.append(bd); ol.append(c); return;
+      }
+      var li=h("li","blk"); li.dataset.id=b.id;
+      li.append(h("div","time"+(b.min<0?" due":""), fmt(b.min)));
+      var body=h("div"); var ti=h("div","title");
+      if(b.tag && b.min>=0) ti.append(h("span","tag",b.tag));
+      ti.append(document.createTextNode(b.title)); body.append(ti);
+      if(b.sub) body.append(h("div","sub",b.sub));
+      var why=h("div","why"); why.hidden=true;
+      var inp=document.createElement("input"); inp.type="text"; inp.id="why-"+sel+"-"+b.id; inp.maxLength=200; inp.setAttribute("aria-label","Reason for "+b.title);
+      why.append(inp); body.append(why); li.append(body);
+      var seg=h("div","seg"); seg.setAttribute("role","group"); seg.setAttribute("aria-label","Mark "+b.title);
+      [["done","Done"],["missed","Missed"],["off","Off"]].forEach(function(o){ var bt=h("button",null,o[1]); bt.type="button"; bt.dataset.s=o[0]; bt.disabled=future; seg.append(bt); });
+      li.append(seg); ol.append(li);
+      rowState(li,sel,b);
+    });
+  }
+
+  function weekStart(k){ return addD(k, -((dow(k)+6)%7)); }
+  function renderWeek(){
+    var wk=document.getElementById("week"); wk.replaceChildren();
+    var mon=weekStart(sel), t=todayKey();
+    var counts={lab:[0,0],gym:[0,0],wake:[0,0],rec:[0,0],class:[0,0],all:[0,0]};
+    var missRows=[];
+    for(var i=0;i<7;i++){
+      var k=addD(mon,i), e=evalDay(k);
+      var cell=h("button","wd"+(k===sel?" sel":"")+(k===t?" today":"")); cell.type="button"; cell.dataset.goto=k;
+      cell.setAttribute("aria-label",shortDate(k)+": "+e.done+" done, "+e.missed+" missed, "+e.un+" unmarked");
+      cell.append(h("span","dn",parse(k).toLocaleDateString("en-US",{weekday:"short"})), h("span","dd",String(parse(k).getDate())));
+      var dots=h("span","dots");
+      e.blocks.forEach(function(b){
+        var s=statusOf(k,b.id); s=s&&s.s;
+        var cls="dot"+(s?" "+s:"")+(!s && k<t?" late":"");
+        dots.append(h("i",cls));
+        var kind=b.kind==="stac"||b.kind==="cw"||b.kind==="sun"||b.kind==="review"||b.kind==="due"?null:b.kind;
+        if(s!=="off"){ counts.all[1]++; if(s==="done") counts.all[0]++; if(kind&&counts[kind]){ counts[kind][1]++; if(s==="done") counts[kind][0]++; } }
+        if(k<=t && (s==="missed" || (!s && k<t))) missRows.push([k,b,s?statusOf(k,b.id).n:null]);
+      });
+      cell.append(dots, h("span","sc", e.total? (e.done+"/"+(e.total-e.off)) : "–"));
+      wk.append(cell);
+    }
+    var dl=document.getElementById("counts"); dl.replaceChildren();
+    [["Lab sessions","lab"],["Gym","gym"],["On-time mornings","wake"],["Recruiting blocks","rec"],["Classes attended","class"],["All blocks","all"]].forEach(function(r){
+      var c=counts[r[1]]; var d=h("div"); d.append(h("dt",null,r[0]));
+      var dd=h("dd"); dd.append(document.createTextNode(c[0]+" "), h("small",null,"of "+c[1])); d.append(dd); dl.append(d);
+    });
+    var ul=document.getElementById("misses"); ul.replaceChildren();
+    if(!missRows.length){ ul.append(h("li","none","No misses so far this week.")); }
+    missRows.forEach(function(m){
+      var li=h("li"); var w=h("div","when"); w.append(h("b",null,shortDate(m[0]).split(",")[0]), document.createTextNode(fmt(m[1].min)));
+      var wh=h("div","what"); wh.append(h("b",null,m[1].title));
+      wh.append(h("span", m[2]?"":"miss-n", m[2] ? m[2] : (statusOf(m[0],m[1].id)?"Missed, no reason given.":"Never marked.")));
+      li.append(w,wh); ul.append(li);
+    });
+  }
+
+  function renderUpcoming(){
+    var ul=document.getElementById("upcoming"); ul.replaceChildren(); var t=todayKey();
+    var items=DATED.filter(function(d){return d[0]>=t;}).slice(0,7);
+    if(!items.length){ ul.append(h("li","none","Nothing dated left. Rebuild the schedule at your next review.")); return; }
+    items.forEach(function(d){
+      var days=Math.round((parse(d[0])-parse(t))/86400000);
+      var li=h("li"); var w=h("div","when"); w.append(h("b",null,days===0?"Today":days===1?"Tomorrow":"In "+days+" days"), document.createTextNode(shortDate(d[0])));
+      var wh=h("div","what"); wh.append(h("b",null,d[2])); if(d[3]) wh.append(h("span",null,d[3]));
+      li.append(w,wh); ul.append(li);
+    });
+  }
+
+  function renderSide(){ renderStreaks(); renderBar(); renderWeek(); renderUpcoming(); }
+  function renderAll(){ renderDay(); renderSide(); }
+
+  /* ---------- Writes ---------- */
+  var queue={}, timers={};
+  function save(k){
+    if(!db){ return; }
+    setSync("busy","Saving");
+    queue[k]=(queue[k]||Promise.resolve()).then(function(){
+      var b=(data[k]&&data[k].b)||{};
+      return db.doc("days/"+k).set({date:k,b:JSON.parse(JSON.stringify(b)),at:new Date().toISOString()});
+    }).then(function(){ setSync("ok","Saved"); }, function(e){
+      setSync("bad", e && e.code==="quota_exceeded" ? "Storage is full" : "Couldn't save. Mark it again");
+    });
+  }
+  function ensure(k){ if(!data[k]) data[k]={b:{}}; else data[k]={b:Object.assign({},data[k].b)}; return data[k]; }
+
+  document.getElementById("blocks").addEventListener("click",function(ev){
+    var btn=ev.target.closest(".seg button"); if(!btn||btn.disabled) return;
+    var li=btn.closest(".blk"), id=li.dataset.id, k=sel;
+    var b=blocksFor(k).filter(function(x){return x.id===id;})[0]; if(!b) return;
+    var d=ensure(k), cur=d.b[id]||{};
+    var next = cur.s===btn.dataset.s ? null : btn.dataset.s;
+    if(next){ d.b[id]={s:next,n:(next==="done"?"":(cur.n||""))}; } else { delete d.b[id]; }
+    rowState(li,k,b); renderSide(); save(k);
+    if(next==="missed"||next==="off"){ var inp=li.querySelector(".why input"); if(inp && !inp.value) inp.focus(); }
+  });
+  document.getElementById("blocks").addEventListener("input",function(ev){
+    var inp=ev.target; if(!inp.matches(".why input")) return;
+    var li=inp.closest(".blk"), id=li.dataset.id, k=sel;
+    var d=ensure(k); if(!d.b[id]) return;
+    d.b[id]=Object.assign({},d.b[id],{n:inp.value.slice(0,200)});
+    inp.classList.toggle("needs",!inp.value.trim());
+    clearTimeout(timers[k]); timers[k]=setTimeout(function(){ renderWeek(); save(k); },700);
+  });
+  document.getElementById("blocks").addEventListener("focusout",function(ev){
+    if(!ev.target.matches(".why input")) return;
+    var k=sel; if(timers[k]){ clearTimeout(timers[k]); timers[k]=null; renderWeek(); save(k); }
+  });
+
+  function go(k){ if(k<START) k=START; sel=k; renderAll(); }
+  document.getElementById("prev").addEventListener("click",function(){ go(addD(sel,-1)); });
+  document.getElementById("next").addEventListener("click",function(){ go(addD(sel,1)); });
+  document.getElementById("todayBtn").addEventListener("click",function(){ go(todayKey()); });
+  document.getElementById("week").addEventListener("click",function(ev){ var c=ev.target.closest("[data-goto]"); if(c) go(c.dataset.goto); });
+  document.addEventListener("keydown",function(ev){
+    if(ev.target.matches("input")) return;
+    if(ev.key==="ArrowLeft" && sel>START) go(addD(sel,-1));
+    if(ev.key==="ArrowRight") go(addD(sel,1));
+  });
+
+  // Roll over to the new day if the page stays open past midnight.
+  var lastToday=todayKey();
+  setInterval(function(){ var t=todayKey(); if(t!==lastToday){ if(sel===lastToday) sel=t; lastToday=t; renderAll(); } },60000);
+
+  renderAll();
+
+  /* ---------- Connect the store ---------- */
+  var use = window.claude && typeof window.claude.use==="function" ? window.claude.use("db") : Promise.resolve(null);
+  Promise.resolve(use).then(function(store){
+    if(!store){ setSync("bad","Not saving. Open this page in claude.ai"); return; }
+    db=store;
+    db.collection("days").onSnapshot(function(snap){
+      var next={};
+      snap.docs.forEach(function(doc){ var v=doc.data(); if(v && v.b) next[doc.id]={b:v.b}; });
+      // Keep any local edit that is still waiting on its debounce timer.
+      Object.keys(timers).forEach(function(k){ if(timers[k] && data[k]) next[k]=data[k]; });
+      data=next;
+      if(!live){ live=true; setSync("ok","Saved"); }
+      var typing=document.activeElement && document.activeElement.matches && document.activeElement.matches(".why input");
+      if(typing) renderSide(); else renderAll();
+    }, function(){ setSync("bad","Lost the connection. Reload the page"); });
+  }).catch(function(){ setSync("bad","Not saving. Open this page in claude.ai"); });
+})();
+</script>
+
+</body></html>
