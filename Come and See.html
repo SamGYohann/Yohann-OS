@@ -1,0 +1,658 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Come and See</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap">
+<style>
+/* Layout: a reading plan laid out like the lectionary pages at the back of a Bible.
+   Wide screens: a sticky left rail holds today's reading and the 90-day map; the nine parts run down the right.
+   Phones: one column, today's reading first. Rubric red marks references and today, as in printed Bibles. */
+:root{
+  --paper:#ECEFEC;
+  --leaf:#F8F9F7;
+  --ink:#17202A;
+  --muted:#56606A;
+  --rule:#CBD2D1;
+  --rubric:#9E2A2F;
+  --rubric-wash:#F4E4E3;
+  --display:"IM Fell English","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --caps:"IM Fell English SC","IM Fell English","Iowan Old Style",Georgia,serif;
+  --body:"Literata",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#11161B; --leaf:#182027; --ink:#E3E6E1; --muted:#9AA4AD; --rule:#2B353E;
+    --rubric:#E58387; --rubric-wash:#2C1F23; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11161B; --leaf:#182027; --ink:#E3E6E1; --muted:#9AA4AD; --rule:#2B353E;
+  --rubric:#E58387; --rubric-wash:#2C1F23; color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:32px 88px;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.sc{font-variant-caps:small-caps;letter-spacing:.03em}
+.label{font-family:var(--caps);font-size:15px;letter-spacing:.06em;color:var(--rubric);line-height:1.2}
+.wrap{max-width:1140px;margin-inline:auto}
+
+/* Header */
+.head{max-width:760px;margin-bottom:36px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(56px, 12vw, 112px);line-height:.88;letter-spacing:-.01em;margin:10px 0 18px;text-wrap:balance}
+h1 em{font-style:italic;color:var(--rubric)}
+.dek{font-size:18px;line-height:1.55;margin:0 0 20px;max-width:58ch;text-wrap:pretty}
+.name{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline;max-width:58ch;
+  padding-top:14px;border-top:1px solid var(--rule);font-size:15px;color:var(--muted)}
+.name p{margin:0}
+.name .label{white-space:nowrap}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:1fr;gap:40px}
+@media (min-width:980px){
+  .grid{grid-template-columns:340px minmax(0,1fr);gap:56px;align-items:start}
+  .rail{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 20px)}
+}
+.rail{display:grid;gap:22px;min-width:0}
+.main{min-width:0;display:grid;gap:48px}
+
+/* Today */
+.today{background:var(--leaf);border:1px solid var(--rule);border-radius:6px;padding:20px 20px 18px;display:grid;gap:10px}
+.t-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.t-count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.t-ref{font-family:var(--display);font-size:40px;line-height:1;margin:2px 0 0}
+.t-part{font-size:13.5px;color:var(--muted);margin:0}
+.t-note{margin:4px 0 6px;font-size:15.5px;line-height:1.55;text-wrap:pretty}
+.btn{justify-self:start;background:var(--ink);color:var(--paper);border:0;border-radius:4px;padding:10px 16px;
+  font-weight:600;font-size:15px;cursor:pointer}
+.btn:hover{opacity:.9}
+.undo{font-size:13.5px;color:var(--muted);margin:0;min-height:1.4em}
+.linkbtn{background:none;border:0;padding:0;cursor:pointer;color:var(--rubric);text-decoration:underline;text-underline-offset:3px;font-size:inherit}
+
+/* Map */
+.map{display:grid;gap:10px}
+.map-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.map-count{font-size:14px;font-variant-numeric:tabular-nums}
+.map-count b{font-weight:600}
+.groups{display:grid;gap:7px}
+.group{display:grid;grid-template-columns:30px 1fr;align-items:center;gap:8px}
+.group .rn{font-family:var(--display);font-size:15px;color:var(--muted);text-align:right}
+.cells{display:flex;flex-wrap:wrap;gap:3px}
+.cell{width:13px;height:13px;border-radius:2px;border:1px solid var(--rule);background:transparent}
+.cell.is-done{background:var(--ink);border-color:var(--ink)}
+.cell.is-today{border:2px solid var(--rubric)}
+.sync{font-size:12.5px;color:var(--muted);margin:0}
+
+/* Sections */
+h2{font-family:var(--display);font-weight:400;font-size:34px;line-height:1.05;margin:4px 0 14px;text-wrap:balance}
+.lede{margin:0 0 18px;max-width:62ch;color:var(--muted)}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:14px;max-width:64ch}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:4px 10px}
+.steps .num{font-family:var(--display);font-size:28px;line-height:1;color:var(--rubric);font-variant-numeric:oldstyle-nums}
+.steps b{display:block;font-weight:600}
+.steps p{margin:0}
+.fine{margin:16px 0 0;font-size:14.5px;color:var(--muted);max-width:64ch}
+.order{border-top:1px solid var(--rule);padding-top:16px;margin-top:22px;max-width:64ch}
+.order p{margin:6px 0 0}
+
+.rules{margin:0;display:grid;gap:14px;max-width:64ch}
+.rules div{display:grid;gap:2px}
+.rules dt{font-weight:600}
+.rules dd{margin:0;color:var(--ink)}
+
+/* Parts */
+.parts{display:grid;gap:14px}
+.part{background:var(--leaf);border:1px solid var(--rule);border-radius:6px}
+.part > summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:4px 12px;
+  align-items:center;padding:16px 18px}
+.part > summary::-webkit-details-marker{display:none}
+.part > summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:6px}
+.p-num{font-family:var(--display);font-size:30px;line-height:1;color:var(--rubric);text-align:center}
+.p-title{font-family:var(--display);font-size:25px;line-height:1.1;display:block}
+.p-meta{font-size:13.5px;color:var(--muted);display:block;margin-top:2px}
+.p-prog{font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.chev{width:9px;height:9px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
+.part[open] .chev{transform:rotate(-135deg) translateY(-1px)}
+.p-body{padding:0 18px 18px;display:grid;gap:16px;border-top:1px solid var(--rule);padding-top:16px;margin-inline:0}
+.p-intro{margin:0;max-width:64ch}
+.memory{margin:0;font-size:14.5px;color:var(--muted)}
+.memory .label{margin-right:8px;font-size:14px}
+.memory .ref{color:var(--ink);font-weight:600}
+
+.days{list-style:none;margin:0 -8px;padding:0;display:grid;gap:2px}
+.day{display:grid;grid-template-columns:24px minmax(0,1fr);gap:4px 12px;width:100%;text-align:left;background:transparent;
+  border:0;border-radius:5px;padding:10px 8px;cursor:pointer}
+.day:hover{background:color-mix(in srgb, var(--rule) 32%, transparent)}
+.day:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.box{width:20px;height:20px;border:1.5px solid var(--muted);border-radius:3px;margin-top:4px;display:grid;place-items:center}
+.box svg{width:13px;height:13px;opacity:0}
+.box path{fill:none;stroke:var(--paper);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.day[aria-pressed="true"] .box{background:var(--ink);border-color:var(--ink)}
+.day[aria-pressed="true"] .box svg{opacity:1}
+.d-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+.d-num{font-family:var(--caps);font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:4.2em}
+.d-ref{font-family:var(--display);font-size:21px;line-height:1.2;color:var(--ink)}
+.d-tag{font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--rubric)}
+.d-date{font-size:12.5px;color:var(--muted);margin-left:auto}
+.day > span:last-child{min-width:0}
+.d-note{font-size:15px;line-height:1.55;color:var(--muted);text-wrap:pretty}
+.day.is-today{background:var(--rubric-wash)}
+.day.is-today .d-note{color:var(--ink)}
+.day[aria-pressed="true"] .d-ref{color:var(--muted)}
+
+.reflect{border-top:1px solid var(--rule);padding-top:14px;max-width:64ch}
+.reflect p{margin:4px 0 0}
+
+.after ul{margin:0;padding-left:20px;display:grid;gap:8px;max-width:64ch}
+.after li::marker{color:var(--rubric)}
+
+@media (max-width:520px){
+  .t-ref{font-size:34px}
+  h2{font-size:29px}
+  .part > summary{grid-template-columns:34px minmax(0,1fr);padding:14px 14px}
+  .p-prog{grid-column:2}
+  .p-num{font-size:26px}
+  .p-title{font-size:22px}
+  .p-body{padding:14px 14px 16px}
+  .d-date{margin-left:0;flex-basis:100%}
+}
+@media (prefers-reduced-motion: reduce){ .chev{transition:none} }
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div class="label">Ninety mornings in Scripture</div>
+    <h1>Come <em>and</em> See</h1>
+    <p class="dek">When two men started following Jesus and asked where he was staying, he didn't give them an argument. He said, “Come and see” (John 1:39). This is ninety mornings of taking him up on it, one chapter at a time, starting with the Gospel that carries your name.</p>
+    <div class="name">
+      <span class="label">Yohann</span>
+      <p>Your name comes from Yohannes, the name John, from the Hebrew Yochanan: <i>the <span class="sc">Lord</span> has been gracious.</i> On Day 40 you'll read God using that same word to describe himself.</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside class="rail" aria-label="Your place">
+      <section class="today" aria-live="polite">
+        <div class="t-top">
+          <span class="label" id="tLabel">Today's reading</span>
+          <span class="t-count" id="tCount">Day 1 of 90</span>
+        </div>
+        <div class="t-ref" id="tRef">John 1</div>
+        <p class="t-part" id="tPart">Part I · Meet Him</p>
+        <p class="t-note" id="tNote"></p>
+        <button class="btn" id="tBtn" type="button">Mark Day 1 read</button>
+        <p class="undo" id="tUndo"></p>
+      </section>
+
+      <section class="map" aria-label="Progress">
+        <div class="map-top">
+          <span class="label">The ninety</span>
+          <span class="map-count" id="mapCount"><b>0</b> of 90 read</span>
+        </div>
+        <div class="groups" id="groups"></div>
+        <p class="sync" id="sync">Finding your place.</p>
+      </section>
+    </aside>
+
+    <main class="main">
+      <section aria-labelledby="hMorning">
+        <div class="label">About fifteen minutes</div>
+        <h2 id="hMorning">The morning</h2>
+        <p class="lede">Same time every day, before the phone. Four steps, in this order.</p>
+        <ol class="steps">
+          <li><span class="num">1</span><p><b>Ask</b>Before you open it, pray one line: “Speak, <span class="sc">Lord</span>, your servant is listening” (1 Samuel 3:10).</p></li>
+          <li><span class="num">2</span><p><b>Read</b>One chapter, once, slowly. A paper Bible if you have one. The phone will try to pull you somewhere else.</p></li>
+          <li><span class="num">3</span><p><b>Write</b>Two lines in a paper notebook: what this shows me about God, and one thing I'll do today because of it.</p></li>
+          <li><span class="num">4</span><p><b>Pray it back</b>Talk to God about what you read, in your own words. Then go do the one thing.</p></li>
+        </ol>
+        <div class="order">
+          <span class="label">Why this order</span>
+          <p>Parts I to IV are mostly about who God is. The chapters aimed straight at work, confidence and money start in Part V. That's on purpose. In Scripture, people change after they meet God, not before. You don't have to fix yourself to start.</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="hRules">
+        <div class="label">Before Day 1</div>
+        <h2 id="hRules">Five rules for the road</h2>
+        <dl class="rules">
+          <div><dt>Day numbers, not dates.</dt><dd>Miss a morning and you pick up at the next unread day. Never double up to catch up. Cramming works for exams. It doesn't work for knowing someone.</dd></div>
+          <div><dt>Read it before you ask about it.</dt><dd>Don't have AI summarize a chapter you haven't read. Questions afterward are good. Take them to a pastor, a study Bible, or someone reading with you.</dd></div>
+          <div><dt>The checkmarks are a bookmark.</dt><dd>They show where you are. They aren't a score, and there's no streak to protect.</dd></div>
+          <div><dt>Don't read alone.</dt><dd>Find a church this month, and one person who'll read along or check in once a week (Hebrews 10:24–25).</dd></div>
+          <div><dt>Do one thing.</dt><dd>Every morning ends with one concrete action. Reading without doing is exactly what James warns about (James 1:22).</dd></div>
+        </dl>
+        <p class="fine">Use a readable translation: NIV, ESV or CSB. If those feel heavy, try the NLT.</p>
+      </section>
+
+      <section aria-labelledby="hParts">
+        <div class="label">The journey</div>
+        <h2 id="hParts">Nine parts, ninety days</h2>
+        <p class="lede">Tap a day to mark it read; tap again to undo. Each part has one verse to learn by heart and one thing to write when you finish it.</p>
+        <div class="parts" id="parts"></div>
+      </section>
+
+      <section class="after" aria-labelledby="hAfter">
+        <div class="label">Then</div>
+        <h2 id="hAfter">After Day 90</h2>
+        <ul>
+          <li>Read Luke, then Acts. Luke tells the story of Jesus in order; Acts tells what his followers did next.</li>
+          <li>Then read the whole Bible in a year, about three or four chapters a day. Pick a plan with your church so someone is reading alongside you.</li>
+          <li>Keep the morning, the notebook and the person you read with. Those three matter more than any plan, this one included.</li>
+          <li>Read your Day 1 notebook entry next to your Day 90 entry.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PARTS = [
+    {num:"I", title:"Meet Him", span:"John 1–21",
+     intro:"Christians know God most clearly in Jesus. In John 14:9 he tells Philip that whoever has seen him has seen the Father, so the journey starts here. John tells you why he wrote the book in 20:31: so that you would believe and have life in his name.",
+     memory:"John 15:5",
+     reflect:"Close the Bible and write one paragraph: who is Jesus, according to John? Then read 20:30–31 and check yourself against it.",
+     days:[
+      ["John 1","Jesus is called the Word: with God, and God, and then made flesh. Notice how the first disciples meet him. Nobody argues them in. They're told to come and see (1:39, 1:46)."],
+      ["John 2","His first sign is turning water into wine at a wedding. Then he drives the traders out of the temple. Notice both: his generosity, and his anger at turning worship into a market (2:16)."],
+      ["John 3","Nicodemus, a respected teacher, comes to Jesus at night. Jesus tells him he must be born again, and 3:16 follows. Notice that the most educated man in the scene is the most confused."],
+      ["John 4","A woman with a complicated past meets Jesus at a well. He knows everything about her and offers her living water anyway. Notice how many social lines he crosses to reach her."],
+      ["John 5","A man has been paralyzed for 38 years. Jesus asks him, “Do you want to be healed?” (5:6). Notice that he answers with a reason why he can't. Answer the question yourself before you move on."],
+      ["John 6","Jesus feeds five thousand, walks on water, and calls himself the bread of life. Many followers leave at the end. Notice Peter's answer when Jesus asks if the twelve will leave too (6:68)."],
+      ["John 7","The crowds argue about who he is, and even his brothers don't believe him yet. Notice his invitation in 7:37: anyone who is thirsty, come to me and drink."],
+      ["John 8","A woman caught in adultery, “the truth will set you free,” and “before Abraham was, I am.” Notice how he treats the woman, and how he treats the men holding the stones."],
+      ["John 9","Jesus heals a man born blind, and the religious leaders interrogate him. Notice that the man doesn't have every answer. He holds to what he knows: I was blind, now I see (9:25)."],
+      ["John 10","The good shepherd knows his sheep by name and lays down his life for them. Notice the difference between the shepherd and the hired hand when the wolf comes (10:11–13)."],
+      ["John 11","Lazarus dies. Jesus knows he's about to raise him and still weeps at the tomb (11:35). Notice what that says about how God feels about grief."],
+      ["John 12","Mary pours perfume worth a year's wages on Jesus' feet. Judas objects about the money, and John tells you why (12:6). Notice who calculates and who gives."],
+      ["John 13","Jesus washes his disciples' feet, Judas's included. Notice 13:3: he does it knowing the Father had given all things into his hands. Full authority, used to serve."],
+      ["John 14","“I am the way, and the truth, and the life” (14:6). Notice what he tells Philip in 14:9. That verse is why this journey starts in John."],
+      ["John 15","The vine and the branches. Notice 15:5: apart from me you can do nothing. This is the center of your question about becoming fully yourself. A branch is most itself when it's attached."],
+      ["John 16","Jesus promises the Holy Spirit and warns them about what's coming. Notice 16:33: in this world you will have trouble, but take heart, I have overcome the world."],
+      ["John 17","Jesus prays for his disciples and for everyone who would believe through them (17:20). That includes you. Notice how he defines eternal life in 17:3: knowing God."],
+      ["John 18","The arrest and trial. Peter swings a sword at armed soldiers, then folds when a servant girl asks him a question. Notice where his courage held and where it broke."],
+      ["John 19","The crucifixion. Read it slowly. Notice his last word in 19:30: “It is finished.”"],
+      ["John 20","The empty tomb. Mary recognizes him the moment he says her name (20:16). Notice how Jesus handles Thomas's doubt, then read 20:31 again."],
+      ["John 21","By a charcoal fire, the same kind Peter stood beside when he denied him (18:18), Jesus asks three times, “Do you love me?” Notice that he doesn't lecture Peter. He gives him work: feed my sheep."]
+     ]},
+    {num:"II", title:"In the Beginning", span:"Genesis",
+     intro:"The story behind John 1. Who God is as Creator, what went wrong, and the promise he made to fix it through one family. It ends with Joseph: a young man with big dreams who rose to run Egypt's economy and stayed faithful the whole way up.",
+     memory:"Genesis 50:20",
+     reflect:"Joseph landed in a pit, a master's house, a prison and a palace. Write what stayed the same in him in all four. Then write which of those you'd have lost first.",
+     days:[
+      ["Genesis 1","Creation. Notice the rhythm: God speaks, it happens, he calls it good. Notice that people are made in his image (1:27) and handed responsibility the same day (1:28)."],
+      ["Genesis 2","Notice that work comes before anything goes wrong. God puts the man in the garden to work it and keep it (2:15). Work isn't the curse."],
+      ["Genesis 3","The fall. Notice the serpent's opening move is to make Eve doubt what God said (3:1). Then notice God's first words to the hiding man: “Where are you?” (3:9)."],
+      ["Genesis 12","God calls Abram to leave everything on the strength of a promise. Notice the purpose of the blessing in 12:2: he is blessed so that he will be a blessing."],
+      ["Genesis 15","Abram is childless and starting to doubt. God shows him the stars. Notice 15:6: Abram believed, and God counted it as righteousness. Paul builds a whole argument on that verse in Romans 4."],
+      ["Genesis 22","A hard chapter. God tests Abraham with Isaac. Notice “God will provide” (22:8, 22:14), and that a ram dies in Isaac's place. Christians read this as a picture of Jesus."],
+      ["Genesis 37","Joseph is 17, his father's favorite, and dreaming. His brothers sell him into slavery. Notice that the dreams were true, and the road to them ran through a pit first."],
+      ["Genesis 39","Joseph rises in Potiphar's house because the LORD was with him (39:2), then goes to prison for refusing Potiphar's wife. Notice why he refuses in 39:9: it would be a sin against God."],
+      ["Genesis 41","Joseph reads Pharaoh's dreams and is put in charge of Egypt. Notice his plan: store grain in the seven good years to carry the country through the seven bad ones. Notice who he credits in 41:16."],
+      ["Genesis 45 and 50","Joseph reveals himself and forgives the brothers who sold him. Notice 50:20: you meant evil against me, but God meant it for good."]
+     ]},
+    {num:"III", title:"The God Who Rescues", span:"Exodus",
+     intro:"God hears his people crying out in slavery, calls a reluctant man, rescues them, gives them his law, and tells them his name. Part II showed you God's promises. Part III shows you his character.",
+     memory:"Exodus 34:6",
+     reflect:"Write God's description of himself from Exodus 34:6–7 from memory. Then write which part you most need to be true for you right now, and why.",
+     days:[
+      ["Exodus 3","The burning bush. God tells Moses his name: I AM WHO I AM (3:14). Notice what God says first, in 3:7: I have seen, I have heard, I know."],
+      ["Exodus 4","Moses has excuses: they won't believe me, I'm not a good speaker, send someone else. Notice God's answer in 4:11–12. If you hold back from speaking up, read this one twice."],
+      ["Exodus 12","The Passover: a lamb, blood on the doorframe, and death passing over. Notice why John the Baptist calls Jesus “the Lamb of God” in John 1:29. This is the background."],
+      ["Exodus 14","Trapped between an army and the sea. Notice 14:14: the LORD will fight for you; you need only to be still. Stillness that comes from trust is different from stillness used as a tactic."],
+      ["Exodus 16","Manna in the desert. Notice the rule: gather enough for today, and anything hoarded rots overnight (16:19–20). Then think back to John 6, where Jesus calls himself the bread from heaven."],
+      ["Exodus 20","The Ten Commandments. Notice what comes before the first rule (20:2): who God is and what he already did for them. Rescue first, then the law."],
+      ["Exodus 32","The golden calf. Moses is gone for forty days, and the people build a god they can see and control. Notice how fast it happens when the real God feels slow."],
+      ["Exodus 33","Moses asks to see God's glory. Notice what he refuses in 33:15: he won't go on, even to the promised land, if God's presence isn't going with him."],
+      ["Exodus 34","God passes by and describes himself (34:6–7): merciful and gracious, slow to anger, abounding in steadfast love and faithfulness. The Hebrew word for “gracious” here comes from the same root as your name."]
+     ]},
+    {num:"IV", title:"Learn to Pray", span:"Psalms",
+     intro:"The Psalms are prayers real people prayed: scared, guilty, angry, grateful. They teach you that you can bring God everything, including what you'd rather hide. After each one, pray it back in your own words before you close the book.",
+     memory:"Psalm 139:23–24",
+     reflect:"Write your own psalm, eight to twelve lines, about where you actually are right now. Be as honest as David was.",
+     days:[
+      ["Psalm 1","Two ways to live: a tree and chaff. Notice where the tree's strength comes from in 1:3. It's planted by water. The fruit comes from the roots, not from straining."],
+      ["Psalm 23","The LORD is my shepherd. Read it one line at a time. Notice the valley is still in the psalm (23:4). God walks you through it, not around it."],
+      ["Psalm 27","David has enemies on every side. Notice what he asks for in 27:4. It's one thing, and it isn't safety."],
+      ["Psalm 32","What hiding sin does to a person, and what confessing it does. Notice David's body in 32:3–4, then the relief in 32:5."],
+      ["Psalm 51","David's prayer after his worst failure: adultery with Bathsheba and the killing of her husband. Notice he asks for a clean heart (51:10), not a cleaned-up reputation."],
+      ["Psalm 63","Thirst for God in a dry land. The King James puts verse 1 as “early will I seek thee.” Notice that it's a morning prayer, and you're reading it in the morning."],
+      ["Psalm 73","The writer envies arrogant rich people who seem to have everything, and nearly slips. Notice what changes his mind in 73:17: going into God's presence and seeing where they end."],
+      ["Psalm 90","A prayer of Moses about how short life is. Notice 90:12, teach us to number our days, and 90:17, establish the work of our hands."],
+      ["Psalm 103","Bless the LORD, and forget none of his benefits. Notice how far he removes our sins (103:12) and what he remembers about us (103:14)."],
+      ["Psalm 139","Known completely: before you speak, while you were being formed, wherever you go. Notice how it ends (139:23–24). He asks God to search him."]
+     ]},
+    {num:"V", title:"Called Young", span:"Samuel, Jeremiah, Daniel, Nehemiah",
+     intro:"God keeps choosing young, unlikely people and growing them inside systems that didn't honor him, without letting the system own them. Read these as a young man who wants to rise in finance and stay himself.",
+     memory:"1 Samuel 16:7",
+     reflect:"Daniel served in Babylon for decades and never became Babylonian. List what he refused and what he went along with. Then write where your own lines will be in finance, before anyone asks you to cross them.",
+     days:[
+      ["1 Samuel 3","The boy Samuel hears his name called in the night and runs to Eli three times before anyone realizes it's God. Notice the answer Eli teaches him (3:9). It's the prayer at the top of every morning, and Samuel is your first name."],
+      ["1 Samuel 16","God sends Samuel to anoint a king, and it's the youngest son, the one nobody bothered to bring in. Notice 16:7: people look at the outside; the LORD looks at the heart."],
+      ["1 Samuel 17","David and Goliath. Notice where David's confidence comes from (17:34–37): what God did with him in private, against a lion and a bear, when nobody was watching."],
+      ["Jeremiah 1","God calls Jeremiah, who answers, “I am only a youth.” Notice God's reply in 1:7–8: don't say that. Go, speak, and don't be afraid of them."],
+      ["Daniel 1","Daniel is taken to Babylon and trained for the king's service. Notice the line he draws (1:8) and how he holds it: a respectful, specific proposal with a ten-day test (1:12)."],
+      ["Daniel 2","Every wise man in Babylon is sentenced to death, Daniel included. Notice what he does: asks for time, gets his friends praying, then gives God the credit in front of the king (2:27–28)."],
+      ["Daniel 3","The fiery furnace. Notice 3:17–18: our God is able to save us, but even if he doesn't, we won't bow."],
+      ["Daniel 6","Daniel's rivals search his work for something to accuse him of and come up empty (6:4). Notice the only charge they can build is his prayer, and he keeps praying exactly as before (6:10)."],
+      ["Nehemiah 1","Nehemiah, cupbearer to the Persian king, hears that Jerusalem's walls are in ruins. Notice that he weeps, fasts and prays for months before he does anything."],
+      ["Nehemiah 2","Nehemiah asks the king for leave and supplies to rebuild. Notice 2:4–5: a silent prayer, then a specific ask. That's what speaking up looks like with God in it."]
+     ]},
+    {num:"VI", title:"The Work", span:"Proverbs",
+     intro:"Proverbs is wisdom for ordinary life, and it's blunt about laziness. The chapters are collections of short sayings, so read slowly, mark the two or three that hit you, and copy them into your notebook.",
+     memory:"Proverbs 3:5–6",
+     reflect:"Name one field in your life that's going to weeds right now, and the smallest daily action that would start clearing it. Then do it this week.",
+     days:[
+      ["Proverbs 3","Trust in the LORD with all your heart, and don't lean on your own understanding (3:5–6). Notice 3:9: honor the LORD with your wealth, from the first of it, not what's left over."],
+      ["Proverbs 6","“Go to the ant, O sluggard” (6:6–11). Notice the ant has no boss and still works. Notice how poverty arrives in 6:11: like a robber, a little sleep at a time."],
+      ["Proverbs 10","The diligent and the lazy, side by side. Notice 10:4 and 10:22 together: the diligent hand makes rich, and the LORD's blessing makes rich and adds no sorrow to it."],
+      ["Proverbs 22","Notice 22:1: a good name is worth more than great riches. Notice 22:29: someone skilled in their work will stand before kings."],
+      ["Proverbs 24","Notice 24:10: if you faint in the day of trouble, your strength is small. Then the sluggard's field (24:30–34). Nothing dramatic happened there. It just went to weeds."]
+     ]},
+    {num:"VII", title:"Wealth and the Heart", span:"The law, the wisdom books, Jesus, Paul",
+     intro:"The Bible doesn't call wealth evil. Abraham, Joseph and Job were rich. But Jesus warns about money more directly than almost anything else. Some of these chapters will push back on your plans, and they're here on purpose. If the dream survives them, it's a dream God can use.",
+     memory:"Matthew 6:33",
+     reflect:"Your Canvas asks whether you'd still take the path if it topped out far below the number. Ask it again in front of God: if he led you to a smaller number, would you still follow? Write the honest answer, not the right-sounding one.",
+     days:[
+      ["Deuteronomy 8","Before Israel ever gets rich, God warns them what riches will do. Notice 8:17–18: don't say my own power got me this. Remember it's God who gives the power to get wealth."],
+      ["Ecclesiastes 2","Solomon builds everything, owns everything, and denies himself nothing. Notice his verdict when he looks back at all of it in 2:11."],
+      ["Ecclesiastes 5","Notice 5:10: whoever loves money never has enough. Then notice 5:18–19: work and its rewards, enjoyed as a gift from God. Same book, both truths."],
+      ["Matthew 5","The Sermon on the Mount begins. Notice who Jesus calls blessed in 5:3–12. By the world's scoreboard, almost none of them are winning."],
+      ["Matthew 6","Giving and praying in secret, treasure in heaven, and two masters. Notice 6:24, then 6:33. The order in 6:33 is the whole point, and it's the order you named yourself: God first."],
+      ["Matthew 25","The parable of the talents: money entrusted to three servants. Notice why the master calls the third one wicked and slothful (25:25–26). He buried what he was given because he was afraid."],
+      ["Mark 10","A rich young man asks how to inherit eternal life and walks away sad. Notice 10:21: Jesus looked at him and loved him before telling him the hard thing. Notice 10:43–45 too."],
+      ["Luke 12","The rich fool plans bigger barns and dies that night (12:16–21). Notice who he talks to the whole time he's planning: only himself."],
+      ["1 Timothy 6","Notice 6:6–10: contentment, and the love of money as a root of all kinds of evil. Then notice what Paul tells the rich to do in 6:17–19: be rich in good works, generous, ready to share."],
+      ["Ecclesiastes 12","Remember your Creator in the days of your youth (12:1). Notice how the book that called everything vanity ends (12:13)."]
+     ]},
+    {num:"VIII", title:"Made New", span:"Romans, Ephesians, Philippians, Colossians",
+     intro:"You said you have a lot of work to do on yourself. Paul's letters explain how that change actually happens: grace comes first, and a new life works itself out from there. Romans is the most tightly argued book in the Bible, so give it your full attention.",
+     memory:"Ephesians 2:10",
+     reflect:"Romans 7 describes the gap between what you want to do and what you actually do. Romans 8 describes how it closes. Explain how it closes in one paragraph, in your own words, without looking.",
+     days:[
+      ["Romans 3","Everyone has sinned and falls short (3:23), and the way back is the same for everyone: made right freely, by grace, through faith in Jesus (3:22–24). Notice that nobody gets a better deal for a better résumé."],
+      ["Romans 5","Peace with God, and suffering that builds endurance, character and hope (5:3–5). Notice 5:8: God showed his love while we were still sinners, not after we cleaned up."],
+      ["Romans 6","Paul asks: if grace covers everything, why not keep sinning (6:1)? Notice his answer. Grace isn't permission. It's a new life under a new master."],
+      ["Romans 7","“I do not do what I want, but I do the very thing I hate” (7:15). If you've fought your own laziness and lost, Paul knows the feeling. Notice where the chapter turns (7:24–25)."],
+      ["Romans 8","No condemnation (8:1), life by the Spirit, and nothing that can separate you from God's love (8:38–39). Notice that 8:28 comes right after the Spirit praying for us when we don't know how (8:26–27)."],
+      ["Romans 12","Offer your whole life to God, and be transformed by the renewing of your mind (12:1–2). Notice that “be transformed” is something done to you that you cooperate with. It isn't a self-improvement plan."],
+      ["Ephesians 2","Saved by grace, not by works, so nobody can boast (2:8–9). Notice 2:10: you are his workmanship, created for good works he prepared in advance. Grace first, then the work."],
+      ["Philippians 3","Paul lists his credentials and calls them loss compared with knowing Christ (3:7–8). Notice he still says “I press on” (3:12–14). He didn't stop striving. He changed what he was striving for."],
+      ["Philippians 4","Don't be anxious; pray about everything (4:6–7). Notice the context of “I can do all things through him” (4:11–13). Paul is talking about being content with little or with plenty."],
+      ["Colossians 3","Set your mind on things above. Notice 3:23: whatever you do, work at it with your whole heart, as for the Lord and not for people. That's the verse for an ordinary Tuesday at work."]
+     ]},
+    {num:"IX", title:"Doers of the Word", span:"James",
+     intro:"James wrote to people who believed the right things and weren't living them. It's the shortest bridge from reading to doing. Your own rule is that knowledge which never reaches a room is worth nothing. James says the same about faith.",
+     memory:"James 1:22",
+     reflect:"Go back through your notebook and count the mornings you actually did your “one thing.” Pick the one that mattered most and make it permanent.",
+     days:[
+      ["James 1","Trials, wisdom, and the mirror. Notice 1:5: ask God for wisdom and he gives it generously. Notice 1:22–25: hearing without doing is like looking in a mirror and forgetting your own face."],
+      ["James 2","Favoritism toward the rich, and faith without works. Notice how the rich man and the poor man are treated at the door in 2:2–4, and the hard line in 2:17."],
+      ["James 3","The tongue: small, and it steers the whole ship (3:4–5). Notice 3:17, what wisdom from above looks like. Compare it with how you talk under pressure."],
+      ["James 4","Notice 4:13–15. It's written to people making business plans: next year we'll go to this city and make a profit. James doesn't say don't plan. He says plan with “if the Lord wills.”"],
+      ["James 5","A warning to the rich, then patience like a farmer waiting for rain, then prayer. Notice 5:16: confess to one another and pray for one another. You were never meant to do this alone."]
+     ]}
+  ];
+
+  /* ---------- Data ---------- */
+  var DAYS = [];
+  PARTS.forEach(function(p, pi){
+    p.start = DAYS.length + 1;
+    p.days = p.days.map(function(d){
+      var day = {n: DAYS.length + 1, ref: d[0], note: d[1], part: pi};
+      DAYS.push(day);
+      return day;
+    });
+    p.end = DAYS.length;
+  });
+  var TOTAL = DAYS.length;
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var LS_KEY = "comeandsee.done.v1";
+
+  function el(tag, cls, text){
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  /* "LORD" in the notes renders in small caps, as in English Bibles. */
+  function rich(target, text){
+    target.replaceChildren();
+    text.split(/(LORD)/).forEach(function(part){
+      if (part === "LORD"){ var s = el("span", "sc", "Lord"); target.append(s); }
+      else if (part) target.append(document.createTextNode(part));
+    });
+    return target;
+  }
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function isoToday(){ var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function fmt(iso){
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+    return m ? MONTHS[+m[2] - 1] + " " + (+m[3]) : "";
+  }
+  function sanitize(obj){
+    var out = {};
+    if (!obj || typeof obj !== "object") return out;
+    Object.keys(obj).forEach(function(k){
+      var n = +k;
+      if (n >= 1 && n <= TOTAL && Math.floor(n) === n && typeof obj[k] === "string") out[String(n)] = obj[k];
+    });
+    return out;
+  }
+
+  var done = (function(){
+    try { var s = localStorage.getItem(LS_KEY); if (s) return sanitize(JSON.parse(s)); } catch (e) {}
+    return {};
+  })();
+  function saveLocal(){ try { localStorage.setItem(LS_KEY, JSON.stringify(done)); } catch (e) {} }
+
+  /* ---------- Build ---------- */
+  var partsWrap = document.getElementById("parts");
+  var groupsWrap = document.getElementById("groups");
+  var dayEls = new Map(), cellEls = new Map(), partEls = [];
+
+  PARTS.forEach(function(p, pi){
+    var det = el("details", "part"); det.id = "part-" + p.num;
+    var sum = el("summary");
+    var num = el("span", "p-num", p.num); num.setAttribute("aria-hidden", "true");
+    var mid = el("span");
+    var title = el("span", "p-title", p.title);
+    var sr = el("span", null, ""); sr.className = "p-meta";
+    sr.textContent = "Part " + p.num + " · " + p.span + " · Days " + p.start + "–" + p.end;
+    mid.append(title, sr);
+    var prog = el("span", "p-prog");
+    var progT = el("span", null, "");
+    var chev = el("span", "chev"); chev.setAttribute("aria-hidden", "true");
+    prog.append(progT, chev);
+    sum.append(num, mid, prog);
+    det.append(sum);
+
+    var body = el("div", "p-body");
+    body.append(el("p", "p-intro", p.intro));
+    var mem = el("p", "memory");
+    mem.append(el("span", "label", "Learn by heart"), el("span", "ref", p.memory));
+    body.append(mem);
+
+    var list = el("ol", "days");
+    p.days.forEach(function(d){
+      var li = el("li");
+      var b = el("button", "day"); b.type = "button"; b.dataset.n = d.n; b.id = "day-" + d.n;
+      b.setAttribute("aria-pressed", "false");
+      var box = el("span", "box"); box.setAttribute("aria-hidden", "true");
+      box.innerHTML = '<svg viewBox="0 0 14 14"><path d="M3 7.4l2.6 2.6L11 4.4"/></svg>';
+      var content = el("span");
+      var line = el("span", "d-line");
+      var dn = el("span", "d-num", "Day " + d.n);
+      var ref = el("span", "d-ref", d.ref);
+      var tag = el("span", "d-tag", "Today"); tag.hidden = true;
+      var date = el("span", "d-date", "");
+      line.append(dn, ref, tag, date);
+      var note = el("span", "d-note"); rich(note, d.note); note.style.display = "block";
+      content.append(line, note);
+      b.append(box, content);
+      li.append(b); list.append(li);
+      dayEls.set(d.n, {btn: b, tag: tag, date: date});
+    });
+    body.append(list);
+
+    var ref2 = el("div", "reflect");
+    ref2.append(el("span", "label", "When you finish this part, write"), el("p", null, p.reflect));
+    body.append(ref2);
+    det.append(body);
+    partsWrap.append(det);
+    partEls.push({det: det, prog: progT});
+
+    var g = el("div", "group");
+    var rn = el("span", "rn", p.num); rn.setAttribute("aria-hidden", "true");
+    var cells = el("div", "cells"); cells.setAttribute("aria-hidden", "true");
+    p.days.forEach(function(d){ var c = el("span", "cell"); cells.append(c); cellEls.set(d.n, c); });
+    g.append(rn, cells);
+    groupsWrap.append(g);
+  });
+
+  /* ---------- Render ---------- */
+  var tLabel = document.getElementById("tLabel"), tCount = document.getElementById("tCount"),
+      tRef = document.getElementById("tRef"), tPart = document.getElementById("tPart"),
+      tNote = document.getElementById("tNote"), tBtn = document.getElementById("tBtn"),
+      tUndo = document.getElementById("tUndo"), mapCount = document.getElementById("mapCount");
+  var lastMarked = null;
+
+  function current(){
+    for (var i = 0; i < DAYS.length; i++) if (!done[DAYS[i].n]) return DAYS[i];
+    return null;
+  }
+
+  function render(){
+    var cur = current();
+    var count = Object.keys(done).length;
+    DAYS.forEach(function(d){
+      var e = dayEls.get(d.n), isDone = !!done[d.n], isToday = cur && cur.n === d.n;
+      e.btn.setAttribute("aria-pressed", isDone ? "true" : "false");
+      e.btn.classList.toggle("is-today", !!isToday);
+      e.tag.hidden = !isToday;
+      e.date.textContent = isDone ? "Read " + fmt(done[d.n]) : "";
+      var c = cellEls.get(d.n);
+      c.classList.toggle("is-done", isDone);
+      c.classList.toggle("is-today", !!isToday);
+    });
+    PARTS.forEach(function(p, pi){
+      var n = p.days.filter(function(d){ return done[d.n]; }).length;
+      partEls[pi].prog.textContent = n === p.days.length ? "Finished" : n + " of " + p.days.length;
+    });
+    mapCount.replaceChildren(el("b", null, String(count)), document.createTextNode(" of " + TOTAL + " read"));
+
+    if (cur){
+      var p = PARTS[cur.part];
+      tLabel.textContent = count === 0 ? "Start here" : "Today's reading";
+      tCount.textContent = "Day " + cur.n + " of " + TOTAL;
+      tRef.textContent = cur.ref;
+      tPart.textContent = "Part " + p.num + " · " + p.title;
+      rich(tNote, cur.note);
+      tBtn.hidden = false;
+      tBtn.textContent = "Mark Day " + cur.n + " read";
+    } else {
+      tLabel.textContent = "All ninety read";
+      tCount.textContent = TOTAL + " of " + TOTAL;
+      tRef.textContent = "Well done.";
+      tPart.textContent = "Part IX · Doers of the Word, finished";
+      tNote.textContent = "Read your Day 1 notebook entry next to your Day 90 entry. Then start Luke.";
+      tBtn.hidden = true;
+    }
+    tUndo.replaceChildren();
+    if (lastMarked && done[lastMarked]){
+      var u = el("button", "linkbtn", "Undo"); u.type = "button";
+      u.addEventListener("click", function(){ var n = lastMarked; lastMarked = null; setDone(n, false); });
+      tUndo.append(document.createTextNode("Marked Day " + lastMarked + " read. "), u);
+    }
+  }
+
+  function openPartFor(n){
+    var d = DAYS[n - 1];
+    if (d) partEls[d.part].det.open = true;
+  }
+
+  function setDone(n, val){
+    if (val) done[n] = isoToday(); else delete done[n];
+    saveLocal(); render(); persist();
+  }
+
+  tBtn.addEventListener("click", function(){
+    var cur = current(); if (!cur) return;
+    lastMarked = cur.n;
+    setDone(cur.n, true);
+    var next = current(); if (next) openPartFor(next.n);
+  });
+  partsWrap.addEventListener("click", function(e){
+    var b = e.target.closest(".day"); if (!b) return;
+    var n = +b.dataset.n;
+    lastMarked = null;
+    setDone(n, !done[n]);
+  });
+
+  /* ---------- Sync (artifact database, with this-browser fallback) ---------- */
+  var sync = document.getElementById("sync");
+  var ref = null, writing = false, dirty = false, readOnly = false;
+  function setMode(m){
+    sync.textContent = {
+      sync: "Your place is saved to your account and follows you across devices.",
+      local: "Your place is saved in this browser.",
+      readonly: "This copy is read-only, so checkmarks stay in this browser."
+    }[m] || "";
+  }
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function persist(){
+    if (!ref || readOnly) return;
+    if (writing){ dirty = true; return; }
+    writing = true;
+    (async function(){
+      do {
+        dirty = false;
+        var body = {done: Object.assign({}, done), updated: new Date().toISOString()};
+        try { await ref.set(body); }
+        catch (e){
+          var c = e && e.code;
+          if (c === "unavailable"){
+            await sleep(600 + Math.random() * 900);
+            try { await ref.set(body); } catch (e2){ setMode("local"); }
+          } else if (c === "invalid_argument"){ readOnly = true; setMode("readonly"); }
+          else { setMode("local"); }
+        }
+      } while (dirty && !readOnly);
+      writing = false;
+    })();
+  }
+
+  render();
+  var start = current(); openPartFor(start ? start.n : TOTAL);
+
+  (function connect(){
+    var hasUse = window.claude && typeof window.claude.use === "function";
+    if (!hasUse){ setMode("local"); return; }
+    Promise.resolve(window.claude.use("db")).then(function(db){
+      if (!db){ setMode("local"); return; }
+      ref = db.doc("journey/progress");
+      var first = true;
+      ref.onSnapshot(function(snap){
+        if (first){
+          first = false;
+          setMode("sync");
+          if (!snap.exists){ if (Object.keys(done).length) persist(); return; }
+        }
+        if (writing || dirty) return;
+        var data = snap.exists ? (snap.data() || {}) : {};
+        var hadNone = Object.keys(done).length === 0;
+        done = sanitize(data.done);
+        saveLocal(); render();
+        if (hadNone){ var c = current(); openPartFor(c ? c.n : TOTAL); }
+      }, function(){ ref = null; setMode("local"); });
+    }).catch(function(){ setMode("local"); });
+  })();
+})();
+</script>
+
+</body></html>
